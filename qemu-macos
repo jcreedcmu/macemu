@@ -1,0 +1,17 @@
+#!/bin/bash
+cd "$(dirname "$0")"
+
+# -nic user,hostfwd=tcp::2121-:21,hostfwd=tcp::8080-:80 \
+
+qemu-system-m68k \
+ -M q800 \
+ -m 128 \
+ -bios "Quadra800.rom" \
+ -display gtk \
+ -full-screen -g 1152x870x8 \
+ -drive file=pram-macos.img,format=raw,if=mtd \
+ -device scsi-hd,scsi-id=0,drive=hd0 \
+ -drive file=MacOS7.5.3.img,format=raw,media=disk,if=none,id=hd0 \
+ -device scsi-hd,scsi-id=1,drive=hd1 \
+ -drive file=Saved.hda,format=raw,media=disk,if=none,id=hd1 \
+ -monitor stdio
