@@ -39,8 +39,6 @@ resource 'MENU' (129) {
     {
         "New Document Window", noIcon, "N", noMark, plain;
         "New Rounded Window", noIcon, "M", noMark, plain;
-        "New Custom Window (10-byte stub)", noIcon, "1", noMark, plain;
-        "New Custom Window (code resource)", noIcon, "2", noMark, plain;
         "Close", noIcon, "W", noMark, plain;
         "-", noIcon, noKey, noMark, plain;
         "Quit", noIcon, "Q", noMark, plain;
@@ -69,8 +67,6 @@ resource 'STR#' (128) {
     {
         "Standard Document Window",
         "Rounded Document Window",
-        "Custom Window (10-byte stub)",
-        "Custom Window (code resource)";
     }
 };
 

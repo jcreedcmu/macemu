@@ -45,10 +45,8 @@ enum
 
     kItemNewDoc = 1,
     kItemNewRounded = 2,
-    kItemNewCustomFromStub = 3,
-    kItemNewCustomFromRes = 4,
-    kItemClose = 5,
-    kItemQuit = 7
+    kItemClose = 3,
+    kItemQuit = 5
   };
 
 void MakeNewWindow(ConstStr255Param title, short procID)
