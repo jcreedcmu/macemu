@@ -81,7 +81,7 @@ add_custom_command(
     DEPENDS ${WDEF_RESOURCE} ${WDEF_R})
 
 # Now build the application
-add_application(WDEFShell
+add_application(Logic
     wdefshell.c
     wdefshell.r
 
@@ -92,5 +92,5 @@ add_application(WDEFShell
     )
 
 # Again, add some options to make things smaller.
-set_target_properties(WDEFShell PROPERTIES COMPILE_OPTIONS -ffunction-sections)
-set_target_properties(WDEFShell PROPERTIES LINK_FLAGS "-Wl,-gc-sections")
+set_target_properties(Logic PROPERTIES COMPILE_OPTIONS -ffunction-sections)
+set_target_properties(Logic PROPERTIES LINK_FLAGS "-Wl,-gc-sections")
