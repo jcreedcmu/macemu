@@ -64,32 +64,6 @@ void MakeNewWindow(ConstStr255Param title, short procID)
     OffsetRect(&nextWindowRect, 15, 15);
 }
 
-void InitCustomWDEF(void)
-{
-/* The 10-byte code resource stub trick.
- *
- * The bytes in this resource are 68K machine code for
- *     move.l L1(pc), -(sp)    | 2F3A 0004
- *     rts                     | 4E75
- * L1: dc.l 0x00000000         | 0000 0000
- *
- * The application loads this resource and replaces the final four bytes
- * with the address of MyWindowDefProc.
- */
-
-    Handle h = GetResource('WDEF', 128);
-    HLock(h);
-    *(WindowDefUPP*)(*h + 6) = NewWindowDefUPP(&MyWindowDefProc);
-    // note: for 68K, the above is equivalent to:
-    //    *(WindowDefProcPtr*)(*h + 6) = &MyWindowDefProc;
-    // for PPC, it creates a routine descriptor data structure to get out of the emulator again.
-
-    // On PPC only, we could also bypass the emulator by putting the routine descriptor into the resource,
-    // and putting the pointer to the code into it here. This wouldn't work for the 68K version of this code, though.
-    
-    // By the way, this was the only part of this file relevant for dealing
-    // with custom WDEFs.
-}
 
 void ShowAboutBox(void)
 {
@@ -127,7 +101,7 @@ void UpdateMenus(void)
 
     m = GetMenu(kMenuEdit);
     if(w && GetWindowKind(w) < 0)
-    {  
+    {
         // Desk accessory in front: Enable edit menu items
         EnableItem(m,1);
         EnableItem(m,3);
@@ -136,7 +110,7 @@ void UpdateMenus(void)
         EnableItem(m,6);
     }
     else
-    {   
+    {
         // Application window or nothing in front, disable edit menu
         DisableItem(m,1);
         DisableItem(m,3);
@@ -247,8 +221,6 @@ int main(void)
     AppendResMenu(GetMenu(128), 'DRVR');
     DrawMenuBar();
 
-    InitCustomWDEF();
-
     InitCursor();
 
     Rect r;
@@ -259,7 +231,7 @@ int main(void)
     {
         EventRecord e;
         WindowRef win;
-        
+
         SystemTask();
         if(GetNextEvent(everyEvent, &e))
         {

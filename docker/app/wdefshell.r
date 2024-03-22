@@ -90,21 +90,6 @@ resource 'WIND' (128) {
     noAutoCenter;
 };
 
-/* The 10-byte code resource stub trick.
- *
- * The bytes in this resource are 68K machine code for
- *     move.l L1(pc), -(sp)    | 2F3A 0004
- *     rts                     | 4E75
- * L1: dc.l 0x00000000         | 0000 0000
- *
- * The application loads this resource and replaces the final four bytes
- * with the address of the WDEF function in wdef.c, which is compiled as part
- * of the application.
- */
-data 'WDEF' (128) {
-    $"2F3A 0004 4E75 0000 0000"
-};
-
 resource 'SIZE' (-1) {
 	reserved,
 	acceptSuspendResumeEvents,
