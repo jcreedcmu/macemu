@@ -18,20 +18,79 @@
 # To use this example as a standalone project using CMake:
 # mkdir build
 # cd build
-# cmake .. -DCMAKE_TOOLCHAIN_FILE=path/to/Retro68-build/toolchain/m68k-apple-macos/cmake/retro68.toolchain.cmake
+# cmake .. -DCMAKE_TOOLCHAIN_FILE=path/to/Retro68-build/toolchain/cmake/retro68.toolchain.cmake
 # make
 
-add_application(Dialog
-    dialog.c
-    dialog.r
+# This sample program contains a custom window definition procedure (WDEF) defined in wdef.c.
+# It is used in two different ways:
+# 1. The 80s way: compiled as a separate 'WDEF' code resource.
+# 2. The 90s way: compiled as part of the application.
+
+# First, let's build a separate code resource:
+add_executable(WDEF wdef.c)
+
+
+if(TARGET retrocrt)
+    # Hack: if we are building as part of the Retro68 source tree,
+    #       make sure the run-time library is already compiled
+    # (not needed for standalone projects)
+    add_dependencies(WDEF retrocrt)
+endif(TARGET retrocrt)
+
+
+if(CMAKE_SYSTEM_NAME MATCHES Retro68)
+    set_target_properties(WDEF PROPERTIES
+            # tell wdef.c that it is being compiled as a code resource
+        COMPILE_DEFINITIONS "COMPILING_AS_CODE_RESOURCE"
+
+        COMPILE_OPTIONS -ffunction-sections # make things smaller
+
+            # set a linker flag that says we want a flat piece
+            # of code in a data file, specify entry point,
+            # and add -Wl,-gc-sections to make things smaller.
+        LINK_FLAGS "-Wl,--mac-flat -Wl,-eMYWINDOWDEFPROC -Wl,-gc-sections")
+    set(WDEF_R wdef.r)
+    set(WDEF_RESOURCE WDEF)
+elseif(CMAKE_SYSTEM_NAME MATCHES RetroPPC)
+    set_target_properties(WDEF PROPERTIES
+        COMPILE_OPTIONS -ffunction-sections # make things smaller
+        # tell wdef.c that it is being compiled as a code resource
+        COMPILE_DEFINITIONS "COMPILING_AS_CODE_RESOURCE"
+        LINK_FLAGS " -Wl,-eMyWindowDefProc -Wl,-gc-sections"
+        )
+    set(WDEF_R wdefppc.r)
+
+    add_custom_command(
+        OUTPUT WDEF.pef
+        COMMAND ${MAKE_PEF} WDEF -o "WDEF.pef"
+        DEPENDS WDEF)
+    set(WDEF_RESOURCE WDEF.pef)
+endif()
+
+if (REZ_INCLUDE_PATH)
+    set(REZ_INCLUDE_FLAG -I${REZ_INCLUDE_PATH})
+endif()
+
+    # wrap the compiled WDEF into a resource
+add_custom_command(
+    OUTPUT WDEF.rsrc.bin
+    COMMAND ${REZ} ${REZ_INCLUDE_FLAG}
+                    ${CMAKE_CURRENT_SOURCE_DIR}/${WDEF_R}
+                    -o WDEF.rsrc.bin
+
+    DEPENDS ${WDEF_RESOURCE} ${WDEF_R})
+
+# Now build the application
+add_application(WDEFShell
+    wdefshell.c
+    wdefshell.r
+
+    wdef.c  # the WDEF as a plain source file in the application
+
+        # the separately compiled WDEF resource
+    ${CMAKE_CURRENT_BINARY_DIR}/WDEF.rsrc.bin
     )
 
-# Enable -ffunction-sections and -gc-sections to make the app as small as possible
-# On 68K, also enable --mac-single to build it as a single-segment app (so that this code path doesn't rot)
-set_target_properties(Dialog PROPERTIES COMPILE_OPTIONS -ffunction-sections)
-if(CMAKE_SYSTEM_NAME MATCHES Retro68)
-    set_target_properties(Dialog PROPERTIES LINK_FLAGS "-Wl,-gc-sections -Wl,--mac-single")
-
-else()
-    set_target_properties(Dialog PROPERTIES LINK_FLAGS "-Wl,-gc-sections")
-endif()
+# Again, add some options to make things smaller.
+set_target_properties(WDEFShell PROPERTIES COMPILE_OPTIONS -ffunction-sections)
+set_target_properties(WDEFShell PROPERTIES LINK_FLAGS "-Wl,-gc-sections")

@@ -5,10 +5,10 @@ bash:
 bashv:
 	docker run --rm -it -v "/home/jcreed/pgit/Retro68:/root" jcreed/retro68
 
-app.bin: Dockerfile
+app.bin: Dockerfile app/*.c app/*.r app/CMakeLists.txt
 	docker build . -t "jcreed/retro68:latest"
 	docker create --name tempcont "jcreed/retro68:latest"
-	docker cp "tempcont:/root/app/build/Dialog.bin" app.bin
+	docker cp "tempcont:/root/app/build/WDEFShell.bin" app.bin
 	touch app.bin
 	docker rm tempcont
 
