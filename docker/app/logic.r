@@ -86,18 +86,6 @@ resource 'WIND' (128) {
     noAutoCenter;
 };
 
-resource 'BNDL' (128) {
-  'TWLF', 0;
-  {
-    'FREF', { 0, 128 };
-    'ICN#', { 0, 128 };
-  }
-};
-
-resource 'FREF' (128) {
-  'APPL', 0, "";
-};
-
 resource 'SIZE' (-1) {
 	reserved,
 	acceptSuspendResumeEvents,
