@@ -40,10 +40,19 @@ img.forEach((pixel, ix) => {
 	 mask[ix] = 0;
   }
   else {
-	 icl8Bytes.push(0xff); // XXX look up best color
+	 icl8Bytes.push(0xe5); // XXX look up best color
 	 mask[ix] = 1;
   }
 });
+
+const maskBytes = [];
+for (let i = 0; i < mask.length / 8; i++) {
+  let b = 0;
+  for (let j = 0; j < 8; j++) {
+	 b = 2 * b + mask[i * 8 + j];
+  }
+  maskBytes.push(b);
+}
 
 function hexOfByte(x) {
   let s = x.toString(16);
@@ -52,10 +61,12 @@ function hexOfByte(x) {
   return s;
 }
 
-const icl8Body = icl8Bytes.map(x => {
-  const str = hexOfByte(x);
-  return `$"${str}"`
-}).join(" ");
+function rezOfBytes(bytes) {
+  return bytes.map(x => {
+	 const str = hexOfByte(x);
+	 return `$"${str}"`
+  }).join(" ");
+}
 
 console.log(`
 resource 'BNDL' (128) {
@@ -71,17 +82,15 @@ resource 'FREF' (128) {
 };
 `);
 
-const bwData = `$"FFFF FFFF 0000 0000 FFFF FFFF 0000 0000"`;
-const maskData = `$"EEEE EEEE EEEE EEEE EEEE EEEE EEEE EEEE"`;
 console.log(`
 resource 'ICN#' (128) {
   {
-  	 ${bwData},
-    ${maskData},
+    ${rezOfBytes(maskBytes)},
+    ${rezOfBytes(maskBytes)},
   }
 };
 
 resource 'icl8' (128) {
-  ${icl8Body}
+  ${rezOfBytes(icl8Bytes)}
 };
 `);
