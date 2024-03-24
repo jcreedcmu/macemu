@@ -86,6 +86,29 @@ resource 'WIND' (128) {
     noAutoCenter;
 };
 
+resource 'ICN#' (128) {
+  {
+  	 $"FFFF FFFF 0000 0000 FFFF FFFF 0000 0000", // actual icon
+    $"EEEE EEEE EEEE EEEE EEEE EEEE EEEE EEEE"  // mask
+  }
+};
+
+resource 'icl8' (128) {
+  	 $"FFFF FFFF 0000 0000 FFFF FFFF 0000 0000"
+};
+
+resource 'BNDL' (128) {
+  'TWLF', 0;
+  {
+    'FREF', { 0, 128 };
+    'ICN#', { 0, 128 };
+  }
+};
+
+resource 'FREF' (128) {
+  'APPL', 0, "";
+};
+
 resource 'SIZE' (-1) {
 	reserved,
 	acceptSuspendResumeEvents,
