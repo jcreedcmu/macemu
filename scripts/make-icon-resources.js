@@ -1,18 +1,6 @@
-// resource 'ICN#' (128) {
-//   {
-//   	 $"FFFF FFFF 0000 0000 FFFF FFFF 0000 0000", // actual icon
-//     $"EEEE EEEE EEEE EEEE EEEE EEEE EEEE EEEE"  // mask
-//   }
-// };
-
-// resource 'icl8' (128) {
-//   	 $"FFFF FFFF 0000 0000 FFFF FFFF 0000 0000"
-// };
-
-// Color palette information here:
-// http://belkadan.com/blog/2018/01/Color-Palette-8/
-
 const fs = require('fs');
+const palette = require('./palette');
+
 const toks = fs.readFileSync('/tmp/twelf-icon.ppm', 'utf8')
 		.split('\n')
 		.map(x => x.replace(/#.*/, ''))
@@ -40,7 +28,7 @@ img.forEach((pixel, ix) => {
 	 mask[ix] = 0;
   }
   else {
-	 icl8Bytes.push(0xe5); // XXX look up best color
+	 icl8Bytes.push(palette.getIndex(pixel));
 	 mask[ix] = 1;
   }
 });
