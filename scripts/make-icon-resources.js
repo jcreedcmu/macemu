@@ -2,17 +2,16 @@ const fs = require('fs');
 const palette = require('./palette');
 
 function iconsOfPpm(ppmFile) {
-  const toks = fs.readFileSync('/tmp/twelf-icon.ppm', 'utf8')
+  const toks = fs.readFileSync(ppmFile, 'utf8')
 		  .split('\n')
 		  .map(x => x.replace(/#.*/, ''))
 		  .filter(x => x.match(/\S/) && !x.match("#"))
 		  .join(' ').split(/\s+/)
 		  .filter(x => x.match(/\S/));
-  const width = toks[1];
-  const height = toks[2];
-  toks.splice(0,4); // P3 W H C
   const nums = toks.map(x => parseInt(x));
-
+  const width = nums[1];
+  const height = nums[2];
+  nums.splice(0,4); // P3 W H C
   const img = [];
   const mask = [];
   const ic8Bytes = [];
@@ -125,12 +124,27 @@ resource 'ICN#' (128) {
   }
 };
 
+resource 'ics#' (128) {
+  {
+    ${rezOfBytes(bytesOfBits(smallIcon.ic1Bits))},
+    ${rezOfBytes(bytesOfBits(smallIcon.mask))},
+  }
+};
+
 resource 'icl8' (128) {
   ${rezOfBytes(largeIcon.ic8Bytes)}
 };
 
+resource 'ics8' (128) {
+  ${rezOfBytes(smallIcon.ic8Bytes)}
+};
+
 resource 'icl4' (128) {
   ${rezOfBytes(bytesOfNybbles(largeIcon.ic4Nybs))}
+};
+
+resource 'ics4' (128) {
+  ${rezOfBytes(bytesOfNybbles(smallIcon.ic4Nybs))}
 };
 
 `);
