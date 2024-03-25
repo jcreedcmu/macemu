@@ -4,7 +4,7 @@ project(Twelf)
 add_application(Twelf
     logic.c
     logic.r
-	 CREATOR "TWLF"
+    CREATOR "TWLF"
     )
 
 set_target_properties(Twelf PROPERTIES COMPILE_OPTIONS -ffunction-sections)

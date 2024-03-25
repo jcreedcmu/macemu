@@ -3,6 +3,7 @@ app.bin: Dockerfile app/*.c app/*.r app/CMakeLists.txt app/icon.r
 	docker create --name tempcont "jcreed/retro68:latest"
 	docker cp "tempcont:/root/app/build/Twelf.bin" app.bin
 	touch app.bin
+	node ../scripts/set-bits.js app.bin
 	docker rm tempcont
 
 app/icon.r: ../scripts/*.js ../assets/twelf-icon.png ../assets/twelf-icon-small.png
