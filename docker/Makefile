@@ -7,6 +7,7 @@ app.bin: Dockerfile app/*.c app/*.r app/CMakeLists.txt app/icon.r
 
 app/icon.r: ../scripts/*.js ../assets/twelf-icon.png
 	convert  ../assets/twelf-icon.png -compress none /tmp/twelf-icon.ppm
+	convert  ../assets/twelf-icon-small.png -compress none /tmp/twelf-icon-small.ppm
 	node ../scripts/make-icon-resources.js >app/icon.r
 
 docker:
