@@ -3,6 +3,10 @@ cd "$(dirname "$0")"
 
 # -nic user,hostfwd=tcp::2121-:21,hostfwd=tcp::8080-:80 \
 
+# # Add these for install cd:
+# -device scsi-cd,scsi-id=3,drive=cd0 \
+# -drive file=MacOS7.5.3.iso,format=raw,media=disk,if=none,id=cd0 \
+
 qemu-system-m68k \
  -M q800 \
  -m 128 \
