@@ -27,9 +27,6 @@
 #include <Dialogs.h>
 #include <Devices.h>
 
-// in wdef.c
-extern pascal long MyWindowDefProc(short varCode, WindowRef window, short message, long param);
-
 static Rect initialWindowRect, nextWindowRect;
 
 enum
@@ -49,6 +46,14 @@ enum
     kItemQuit = 5
   };
 
+typedef struct {
+  WindowRecord	docWindow;
+  int          id;
+  TEHandle		docTE;
+} DocumentRecord, *DocumentPeek;
+
+static int windowCounter = 0;
+
 void MakeNewWindow(ConstStr255Param title, short procID)
 {
   if(nextWindowRect.bottom > qd.screenBits.bounds.bottom
@@ -57,7 +62,9 @@ void MakeNewWindow(ConstStr255Param title, short procID)
 		nextWindowRect = initialWindowRect;
     }
 
-  WindowRef w = NewWindow(NULL, &nextWindowRect, title, true, procID, (WindowPtr) -1, true, 0);
+  DocumentRecord *storage = (DocumentRecord *)NewPtr(sizeof(DocumentRecord));
+  storage->id = windowCounter++;
+  WindowPtr w = NewWindow(storage, &nextWindowRect, title, true, procID, (WindowPtr) -1, true, 0);
 
   OffsetRect(&nextWindowRect, 15, 15);
 }
@@ -65,7 +72,7 @@ void MakeNewWindow(ConstStr255Param title, short procID)
 
 void ShowAboutBox(void)
 {
-  WindowRef w = GetNewWindow(128, NULL, (WindowPtr) - 1);
+  WindowPtr w = GetNewWindow(128, NULL, (WindowPtr) - 1);
   MoveWindow(w,
 				 qd.screenBits.bounds.right/2 - w->portRect.right/2,
 				 qd.screenBits.bounds.bottom/2 - w->portRect.bottom/2,
@@ -91,7 +98,7 @@ void ShowAboutBox(void)
 void UpdateMenus(void)
 {
   MenuRef m = GetMenu(kMenuFile);
-  WindowRef w = FrontWindow();
+  WindowPtr w = FrontWindow();
   if(w) // Close menu item: enabled if there is a window
 	 EnableItem(m,kItemClose);
   else
@@ -122,7 +129,7 @@ void UpdateMenus(void)
 void DoMenuCommand(long menuCommand)
 {
   Str255 str;
-  WindowRef w;
+  WindowPtr w;
   short menuID = menuCommand >> 16;
   short menuItem = menuCommand & 0xFFFF;
   if(menuID == kMenuApple)
@@ -175,16 +182,18 @@ void DoMenuCommand(long menuCommand)
   HiliteMenu(0);
 }
 
-void DoUpdate(WindowRef w)
+void DoUpdate(WindowPtr w)
 {
   SetPort(w);
   BeginUpdate(w);
+
+  int id = ((DocumentPeek)w)->id;
 
   Rect r;
   SetRect(&r, 20,20,120,120);
   FrameOval(&r);
 
-  OffsetRect(&r, 32, 32);
+  OffsetRect(&r, 32 * id, 32 * id);
   FillRoundRect(&r, 16, 16, &qd.ltGray);
   FrameRoundRect(&r, 16, 16);
 
@@ -220,7 +229,7 @@ int main(void)
   for(;;)
     {
 		EventRecord e;
-		WindowRef win;
+		WindowPtr win;
 
 		SystemTask();
 		if(GetNextEvent(everyEvent, &e))
@@ -257,7 +266,7 @@ int main(void)
 					 }
 				  break;
 				case updateEvt:
-				  DoUpdate((WindowRef)e.message);
+				  DoUpdate((WindowPtr)e.message);
 				  break;
             }
         }
