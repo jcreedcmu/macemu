@@ -64,9 +64,25 @@ void MakeNewWindow(ConstStr255Param title, short procID)
 		nextWindowRect = initialWindowRect;
     }
 
+
   DocumentRecord *storage = (DocumentRecord *)NewPtr(sizeof(DocumentRecord));
-  storage->id = windowCounter++;
   WindowPtr w = NewWindow(storage, &nextWindowRect, title, true, procID, (WindowPtr) -1, true, 0);
+  DocumentPeek doc = (DocumentPeek)w;
+
+  Rect destRect, viewRect;
+  SetRect(&destRect, 0,0,100,100);
+  SetRect(&viewRect, 0,0,100,100);
+
+  doc->docTE = TENew(&destRect, &viewRect);
+  if (doc->docTE) {
+	 printf("Ok, we have a docTE\r");
+  }
+  else {
+	 printf("Oops, NULL docTE\r");
+  }
+  TEKey('h', doc->docTE);
+  //  TESetText("abcdefghij", 9, );
+  doc->id = windowCounter++;
 
   OffsetRect(&nextWindowRect, 15, 15);
 }
@@ -87,7 +103,6 @@ void ShowAboutBox(void)
   Rect r = w->portRect;
   InsetRect(&r, 10,10);
   TETextBox(*h, GetHandleSize(h), &r, teJustLeft);
-
   ReleaseResource(h);
   while(!Button())
 	 ;
@@ -184,36 +199,66 @@ void DoMenuCommand(long menuCommand)
   HiliteMenu(0);
 }
 
-void DoUpdate(WindowPtr w)
-{
-  SetPort(w);
-  BeginUpdate(w);
 
-  int id = ((DocumentPeek)w)->id;
+void DrawWindow (WindowPtr w) {
+  SetPort(w);
+
+  DocumentPeek doc = (DocumentPeek)w;
+
+
+  /* OffsetRect(&r, 32 * id, 32 * id); */
+  /* FillRoundRect(&r, 16, 16, &qd.ltGray); */
+  /* FrameRoundRect(&r, 16, 16); */
+
+  /* OffsetRect(&r, 32, 32); */
+  /* FillRect(&r, &qd.gray); */
+  /* FrameRect(&r); */
+
+  /* char buf[256]; */
+  /* sprintf(buf+1, "-- %d --", id); */
+  /* buf[0] = strlen(buf+1); */
+  /* MoveTo(120,10); */
+  /* DrawString(buf); */
+
+  EraseRect(&w->portRect);
+  int id = doc->id;
 
   Rect r;
   SetRect(&r, 20,20,120,120);
-  FrameOval(&r);
-
   OffsetRect(&r, 32 * id, 32 * id);
-  FillRoundRect(&r, 16, 16, &qd.ltGray);
-  FrameRoundRect(&r, 16, 16);
+  FrameOval(&r);
+  TEUpdate(&w->portRect, doc->docTE);
+}
 
-  OffsetRect(&r, 32, 32);
-  FillRect(&r, &qd.gray);
-  FrameRect(&r);
 
-  char buf[256];
-  sprintf(buf+1, "-- %d --", id);
-  buf[0] = strlen(buf+1);
-  MoveTo(120,10);
-  DrawString(buf);
+Boolean IsAppWindow(WindowPtr window) {
+  short		windowKind;
 
-  EndUpdate(w);
+  if (window == 0)
+	 return false;
+  else {	/* application windows have windowKinds = userKind (8) */
+	 windowKind = ((WindowPeek) window)->windowKind;
+	 return (windowKind == userKind);
+  }
+}
+
+
+void DoUpdate(WindowPtr window) {
+  if ( IsAppWindow(window) ) {
+	 BeginUpdate(window);				/* this sets up the visRgn */
+	 if ( ! EmptyRgn(window->visRgn) )	/* draw if updating needs to be done */
+		DrawWindow(window);
+	 EndUpdate(window);
+  }
 }
 
 int main(void)
 {
+  stdout = fopen("out", "w");
+  setbuf(stdout, NULL);
+
+  printf("Hello, World\r");
+
   InitGraf(&qd.thePort);
   InitFonts();
   InitWindows();
