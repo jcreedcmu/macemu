@@ -26,6 +26,8 @@
 #include <TextUtils.h>
 #include <Dialogs.h>
 #include <Devices.h>
+#include <string.h>
+#include <stdio.h>
 
 static Rect initialWindowRect, nextWindowRect;
 
@@ -201,8 +203,11 @@ void DoUpdate(WindowPtr w)
   FillRect(&r, &qd.gray);
   FrameRect(&r);
 
-  /* MoveTo(100,100); */
-  /* DrawString("\pHello, world."); */
+  char buf[256];
+  sprintf(buf+1, "-- %d --", id);
+  buf[0] = strlen(buf+1);
+  MoveTo(120,10);
+  DrawString(buf);
 
   EndUpdate(w);
 }
