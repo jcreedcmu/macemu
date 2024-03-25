@@ -65,7 +65,7 @@ resource 'MBAR' (128) {
 
 resource 'STR#' (128) {
     {
-        "Standard Document Window",
+        "Twelf Input Window",
         "Rounded Document Window",
     }
 };

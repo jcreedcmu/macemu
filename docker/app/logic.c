@@ -28,6 +28,7 @@
 #include <Devices.h>
 #include <string.h>
 #include <stdio.h>
+#include "logic.h"
 
 static Rect initialWindowRect, nextWindowRect;
 
@@ -56,9 +57,16 @@ typedef struct {
 
 static int windowCounter = 0;
 
+void GetTERect(WindowPtr window, Rect *teRect) {
+	*teRect = window->portRect;
+	InsetRect(teRect, 2, 2);	/* adjust for margin */
+	teRect->bottom = teRect->bottom - 15;		/* and for the scrollbars */
+	teRect->right = teRect->right - 15;
+}
+
 void MakeNewWindow(ConstStr255Param title, short procID)
 {
-  if(nextWindowRect.bottom > qd.screenBits.bounds.bottom
+  if (nextWindowRect.bottom > qd.screenBits.bounds.bottom
 	  || nextWindowRect.right > qd.screenBits.bounds.right)
     {
 		nextWindowRect = initialWindowRect;
@@ -70,8 +78,10 @@ void MakeNewWindow(ConstStr255Param title, short procID)
   DocumentPeek doc = (DocumentPeek) w;
 
   Rect destRect, viewRect;
-  SetRect(&destRect, 0,0,100,100);
-  SetRect(&viewRect, 0,0,100,100);
+  //  SetRect(&destRect, 0,0,400-MARGIN,260-MARGIN);
+  // SetRect(&viewRect, 0,0,400-MARGIN,260-MARGIN);
+  GetTERect(w, &destRect);
+  GetTERect(w, &viewRect);
 
   SetPort(w);
   doc->docTE = TENew(&destRect, &viewRect);
@@ -117,13 +127,13 @@ void UpdateMenus(void)
 {
   MenuRef m = GetMenu(kMenuFile);
   WindowPtr w = FrontWindow();
-  if(w) // Close menu item: enabled if there is a window
+  if (w) // Close menu item: enabled if there is a window
 	 EnableItem(m,kItemClose);
   else
 	 DisableItem(m,kItemClose);
 
   m = GetMenu(kMenuEdit);
-  if(w && GetWindowKind(w) < 0)
+  if (w && GetWindowKind(w) < 0)
     {
 		// Desk accessory in front: Enable edit menu items
 		EnableItem(m,1);
@@ -150,9 +160,9 @@ void DoMenuCommand(long menuCommand)
   WindowPtr w;
   short menuID = menuCommand >> 16;
   short menuItem = menuCommand & 0xFFFF;
-  if(menuID == kMenuApple)
+  if (menuID == kMenuApple)
     {
-		if(menuItem == kItemAbout)
+		if (menuItem == kItemAbout)
 		  ShowAboutBox();
 		else
         {
@@ -160,7 +170,7 @@ void DoMenuCommand(long menuCommand)
 			 OpenDeskAcc(str);
         }
     }
-  else if(menuID == kMenuFile)
+  else if (menuID == kMenuFile)
     {
 		switch(menuItem)
         {
@@ -175,9 +185,9 @@ void DoMenuCommand(long menuCommand)
 
 		  case kItemClose:    // close
 			 w = FrontWindow();
-			 if(w)
+			 if (w)
 				{
-				  if(GetWindowKind(w) < 0)
+				  if (GetWindowKind(w) < 0)
 					 CloseDeskAcc(GetWindowKind(w));
 				  else
 					 DisposeWindow(FrontWindow());
@@ -189,9 +199,9 @@ void DoMenuCommand(long menuCommand)
 			 break;
         }
     }
-  else if(menuID == kMenuEdit)
+  else if (menuID == kMenuEdit)
     {
-		if(!SystemEdit(menuItem - 1))
+		if (!SystemEdit(menuItem - 1))
         {
 			 // edit command not handled by desk accessory
         }
@@ -225,11 +235,11 @@ void DrawWindow (WindowPtr w) {
   /* MoveTo(10,10); */
   /* DrawString(buf); */
 
-  Rect r;
-  SetRect(&r, 0,0,120,120);
-  OffsetRect(&r, 32 * id, 32 * id);
-  FrameOval(&r);
   TEUpdate(&w->portRect, doc->docTE);
+  /* Rect r; */
+  /* SetRect(&r, 0,0,120,120); */
+  /* OffsetRect(&r, 32 * id, 32 * id); */
+  /* FrameOval(&r); */
 }
 
 
@@ -246,24 +256,107 @@ Boolean IsAppWindow(WindowPtr window) {
 
 
 void DoUpdate(WindowPtr window) {
-  if ( IsAppWindow(window) ) {
+  if (IsAppWindow(window)) {
 	 BeginUpdate(window);				/* this sets up the visRgn */
-	 if ( ! EmptyRgn(window->visRgn) )	/* draw if updating needs to be done */
+	 if (! EmptyRgn(window->visRgn) )	/* draw if updating needs to be done */
 		DrawWindow(window);
 	 EndUpdate(window);
   }
 }
 
 void DoIdle(void) {
-	WindowPtr window;
-	window = FrontWindow();
-	if ( IsAppWindow(window) )
-		TEIdle(((DocumentPeek) window)->docTE);
+  WindowPtr window;
+  window = FrontWindow();
+  if (IsAppWindow(window) )
+	 TEIdle(((DocumentPeek) window)->docTE);
 }
 
 
-int main(void)
-{
+void AdjustTE(WindowPtr	window) {
+  /* TEPtr		te; */
+
+  /* te = *((DocumentPeek)window)->docTE; */
+  /* TEScroll((te->viewRect.left - te->destRect.left) - */
+  /* 		GetControlValue(((DocumentPeek)window)->docHScroll), */
+  /* 		(te->viewRect.top - te->destRect.top) - */
+  /* 			(GetControlValue(((DocumentPeek)window)->docVScroll) * */
+  /* 			te->lineHeight), */
+  /* 		((DocumentPeek)window)->docTE); */
+}
+
+void DoKeyDown(EventRecord *event) {
+  WindowPtr	window;
+  char		key;
+  TEHandle	te;
+
+  window = FrontWindow();
+  if (IsAppWindow(window)) {
+	 te = ((DocumentPeek) window)->docTE;
+	 key = event->message & charCodeMask;
+	 /* we have a char. for our window; see if we are still below TextEdit's
+		 limit for the number of characters (but deletes are always rad) */
+	 if (key == kDelChar ||
+		  (*te)->teLength - ((*te)->selEnd - (*te)->selStart) + 1 <
+		  kMaxTELength) {
+		TEKey(key, te);
+		// AdjustScrollbars(window, false);
+		AdjustTE(window);
+	 } else {
+		//		AlertUser(eExceedChar);
+	 }
+  }
+}
+
+
+void DoContentClick(WindowPtr window, EventRecord *event) {
+  Point		    mouse;
+  ControlHandle control;
+  short		    part, value;
+  Boolean		 shiftDown;
+  DocumentPeek  doc;
+  Rect		    teRect;
+
+	if (IsAppWindow(window)) {
+		SetPort(window);
+		mouse = event->where;							/* get the click position */
+		GlobalToLocal(&mouse);
+		doc = (DocumentPeek) window;
+		/* see if we are in the viewRect. if so, we won't check the controls */
+		GetTERect(window, &teRect);
+		if (PtInRect(mouse, &teRect)) {
+			/* see if we need to extend the selection */
+			shiftDown = (event->modifiers & shiftKey) != 0;	/* extend if Shift is down */
+			TEClick(mouse, shiftDown, doc->docTE);
+		} else {
+			/* part = FindControl(mouse, window, &control); */
+			/* switch (part) { */
+			/* 	case 0:							/\* do nothing for viewRect case *\/ */
+			/* 		break; */
+			/* 	case kControlIndicatorPart: */
+			/* 		value = GetControlValue(control); */
+			/* 		part = TrackControl(control, mouse, nil); */
+			/* 		if (part != 0) { */
+			/* 			value -= GetControlValue(control); */
+			/* 			/\* value now has CHANGE in value; if value changed, scroll *\/ */
+			/* 			if (value != 0 ) */
+			/* 				if (control == doc->docVScroll ) */
+			/* 					TEScroll(0, value * (*doc->docTE)->lineHeight, doc->docTE); */
+			/* 				else */
+			/* 					TEScroll(value, 0, doc->docTE); */
+			/* 		} */
+			/* 		break; */
+			/* 	default:						/\* they clicked in an arrow, so track & scroll *\/ */
+			/* 		if (control == doc->docVScroll ) */
+			/* 			value = TrackControl(control, mouse, (ControlActionUPP) VActionProc); */
+			/* 		else */
+			/* 			value = TrackControl(control, mouse, (ControlActionUPP) HActionProc); */
+			/* 		break; */
+			/* } */
+		}
+	}
+}
+
+int main(void) {
   stdout = fopen("out", "w");
   setbuf(stdout, NULL);
 
@@ -286,53 +379,56 @@ int main(void)
   SetRect(&initialWindowRect,20,60,400,260);
   nextWindowRect = initialWindowRect;
 
-  for(;;)
-    {
-		EventRecord e;
-		WindowPtr win;
+  for(;;) {
+	 EventRecord e;
+	 WindowPtr win;
 
-		SystemTask();
-		if(GetNextEvent(everyEvent, &e))
-        {
-			 switch(e.what)
-            {
-				case keyDown:
-				  if(e.modifiers & cmdKey)
-					 {
-						UpdateMenus();
-						DoMenuCommand(MenuKey(e.message & charCodeMask));
-					 }
-				  break;
-				case mouseDown:
-				  switch(FindWindow(e.where, &win))
-					 {
-					 case inGoAway:
-						if(TrackGoAway(win, e.where))
-						  DisposeWindow(win);
-						break;
-					 case inDrag:
-						DragWindow(win, e.where, &qd.screenBits.bounds);
-						break;
-					 case inMenuBar:
-						UpdateMenus();
-						DoMenuCommand( MenuSelect(e.where) );
-						break;
-					 case inContent:
-						SelectWindow(win);
-						break;
-					 case inSysWindow:
-						SystemClick(&e, win);
-						break;
-					 }
-				  break;
-				case updateEvt:
-				  DoUpdate((WindowPtr)e.message);
-				  break;
-            }
-        }
-		else {
-		  DoIdle();
+	 SystemTask();
+	 if (GetNextEvent(everyEvent, &e)) {
+		switch(e.what) {
+		case keyDown: // intentional fallthrough
+		case autoKey:
+		  if (e.modifiers & cmdKey) {
+			 UpdateMenus();
+			 DoMenuCommand(MenuKey(e.message & charCodeMask));
+		  }
+		  else {
+			 DoKeyDown(&e);
+		  }
+		  break;
+		case mouseDown:
+		  switch(FindWindow(e.where, &win)) {
+		  case inGoAway:
+			 if (TrackGoAway(win, e.where))
+				DisposeWindow(win);
+			 break;
+		  case inDrag:
+			 DragWindow(win, e.where, &qd.screenBits.bounds);
+			 break;
+		  case inMenuBar:
+			 UpdateMenus();
+			 DoMenuCommand( MenuSelect(e.where) );
+			 break;
+		  case inContent:
+			 if (win != FrontWindow()) {
+				SelectWindow(win);
+				/*DoEvent(event);*/	/* uncomment this line for "do first click" */
+			 } else
+				DoContentClick(win, &e);
+			 break;
+		  case inSysWindow:
+			 SystemClick(&e, win);
+			 break;
+		  }
+		  break;
+		case updateEvt:
+		  DoUpdate((WindowPtr)e.message);
+		  break;
 		}
-    }
+	 }
+	 else {
+		DoIdle();
+	 }
+  }
   return 0;
 }
