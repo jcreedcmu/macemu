@@ -92,7 +92,7 @@ void MakeNewWindow(ConstStr255Param title, short procID)
   else {
 	 printf("Oops, NULL docTE\r");
   }
-  TESetText("abcdefghij", 10, doc->docTE);
+  // TESetText("abcdefghij", 10, doc->docTE);
   doc->id = id;
 
   OffsetRect(&nextWindowRect, 15, 15);
