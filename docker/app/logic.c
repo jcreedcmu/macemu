@@ -64,15 +64,16 @@ void MakeNewWindow(ConstStr255Param title, short procID)
 		nextWindowRect = initialWindowRect;
     }
 
-
-  DocumentRecord *storage = (DocumentRecord *)NewPtr(sizeof(DocumentRecord));
-  WindowPtr w = NewWindow(storage, &nextWindowRect, title, true, procID, (WindowPtr) -1, true, 0);
-  DocumentPeek doc = (DocumentPeek)w;
+  int id = windowCounter++;
+  Ptr storage = NewPtr(sizeof(DocumentRecord));
+  WindowPtr w = NewWindow(storage, &nextWindowRect, title, true, procID, (WindowPtr) -1, true, id);
+  DocumentPeek doc = (DocumentPeek) w;
 
   Rect destRect, viewRect;
   SetRect(&destRect, 0,0,100,100);
   SetRect(&viewRect, 0,0,100,100);
 
+  SetPort(w);
   doc->docTE = TENew(&destRect, &viewRect);
   if (doc->docTE) {
 	 printf("Ok, we have a docTE\r");
@@ -81,8 +82,12 @@ void MakeNewWindow(ConstStr255Param title, short procID)
 	 printf("Oops, NULL docTE\r");
   }
   TEKey('h', doc->docTE);
+  TEKey('e', doc->docTE);
+  TEKey('l', doc->docTE);
+  TEKey('l', doc->docTE);
+  TEKey('o', doc->docTE);
   //  TESetText("abcdefghij", 9, );
-  doc->id = windowCounter++;
+  doc->id = id;
 
   OffsetRect(&nextWindowRect, 15, 15);
 }
@@ -214,19 +219,21 @@ void DrawWindow (WindowPtr w) {
   /* FillRect(&r, &qd.gray); */
   /* FrameRect(&r); */
 
-  /* char buf[256]; */
-  /* sprintf(buf+1, "-- %d --", id); */
-  /* buf[0] = strlen(buf+1); */
-  /* MoveTo(120,10); */
-  /* DrawString(buf); */
 
   EraseRect(&w->portRect);
   int id = doc->id;
 
+  char buf[256];
+  sprintf(buf+1, "-- %d --", id);
+  buf[0] = strlen(buf+1);
+  MoveTo(10,10);
+  DrawString(buf);
+
   Rect r;
-  SetRect(&r, 20,20,120,120);
+  SetRect(&r, 0,0,120,120);
   OffsetRect(&r, 32 * id, 32 * id);
   FrameOval(&r);
+  TEKey('0' + doc->id, doc->docTE);
   TEUpdate(&w->portRect, doc->docTE);
 }
 
