@@ -75,18 +75,14 @@ void MakeNewWindow(ConstStr255Param title, short procID)
 
   SetPort(w);
   doc->docTE = TENew(&destRect, &viewRect);
+  TEActivate(doc->docTE);
   if (doc->docTE) {
 	 printf("Ok, we have a docTE\r");
   }
   else {
 	 printf("Oops, NULL docTE\r");
   }
-  TEKey('h', doc->docTE);
-  TEKey('e', doc->docTE);
-  TEKey('l', doc->docTE);
-  TEKey('l', doc->docTE);
-  TEKey('o', doc->docTE);
-  //  TESetText("abcdefghij", 9, );
+  TESetText("abcdefghij", 10, doc->docTE);
   doc->id = id;
 
   OffsetRect(&nextWindowRect, 15, 15);
@@ -223,17 +219,16 @@ void DrawWindow (WindowPtr w) {
   EraseRect(&w->portRect);
   int id = doc->id;
 
-  char buf[256];
-  sprintf(buf+1, "-- %d --", id);
-  buf[0] = strlen(buf+1);
-  MoveTo(10,10);
-  DrawString(buf);
+  /* char buf[256]; */
+  /* sprintf(buf+1, "-- %d --", id); */
+  /* buf[0] = strlen(buf+1); */
+  /* MoveTo(10,10); */
+  /* DrawString(buf); */
 
   Rect r;
   SetRect(&r, 0,0,120,120);
   OffsetRect(&r, 32 * id, 32 * id);
   FrameOval(&r);
-  TEKey('0' + doc->id, doc->docTE);
   TEUpdate(&w->portRect, doc->docTE);
 }
 
@@ -258,6 +253,14 @@ void DoUpdate(WindowPtr window) {
 	 EndUpdate(window);
   }
 }
+
+void DoIdle(void) {
+	WindowPtr window;
+	window = FrontWindow();
+	if ( IsAppWindow(window) )
+		TEIdle(((DocumentPeek) window)->docTE);
+}
+
 
 int main(void)
 {
@@ -327,6 +330,9 @@ int main(void)
 				  break;
             }
         }
+		else {
+		  DoIdle();
+		}
     }
   return 0;
 }
