@@ -340,16 +340,15 @@ void DoActivate(WindowPtr window, Boolean becomingActive) {
 		/* GetClip(clipRgn); */
 		/* DiffRgn(clipRgn, tempRgn, tempRgn);			/\* subtract updateRgn from clipRgn *\/ */
 		/* SetClip(tempRgn); */
-		printf("Activating text edit");
+		printf("Activating text edit\r");
 		TEActivate(doc->docTE);
 		/* SetClip(clipRgn);							/\* restore the full-blown clipRgn *\/ */
 		/* DisposeRgn(tempRgn); */
 		/* DisposeRgn(clipRgn); */
 
-		/* /\* the controls must be redrawn on activation: *\/ */
-		/* (*doc->docVScroll)->contrlVis = kControlVisible; */
-
-		/* InvalRect(&(*doc->docVScroll)->contrlRect); */
+		/* the controls must be redrawn on activation: */
+		(*doc->docVScroll)->contrlVis = kControlVisible;
+		InvalRect(&(*doc->docVScroll)->contrlRect);
 
 		/* /\* the growbox needs to be redrawn on activation: *\/ */
 		/* growRect = window->portRect; */
@@ -359,10 +358,10 @@ void DoActivate(WindowPtr window, Boolean becomingActive) {
 		/* InvalRect(&growRect); */
 	 }
 	 else {
-		printf("Deactivating text edit");
+		printf("Deactivating text edit\r");
 		TEDeactivate(doc->docTE);
 		/* the controls must be hidden on deactivation: */
-		//		HideControl(doc->docVScroll);
+		HideControl(doc->docVScroll);
 
 		/*  the growbox should be changed immediately on deactivation:  */
  		/* DrawGrowIcon(window); */
