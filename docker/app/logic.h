@@ -22,3 +22,12 @@
 /*	kScrollTweak compensates for off-by-one requirements of the scrollbars
  to have borders coincide with the growbox. */
 #define kScrollTweak			2
+
+#define kMainWidth 600
+#define kMainHeight 500
+
+#define kInputWidth 300
+#define kInputHeight 300
+
+#define kInputOffX 30
+#define kInputOffY 30

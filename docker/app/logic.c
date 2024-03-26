@@ -58,18 +58,23 @@ typedef struct {
 
 static int windowCounter = 0;
 
-void GetTERect(WindowPtr window, Rect *teRect) {
-	*teRect = window->portRect;
-	InsetRect(teRect, 2, 2);	/* adjust for margin */
-	teRect->bottom = teRect->bottom - 15;		/* and for the scrollbars */
-	teRect->right = teRect->right - 15;
+void GetTEContainerRect(Rect *teRect) {
+  SetRect(teRect, kInputOffX, kInputOffY, kInputOffX + kInputWidth, kInputOffY + kInputHeight);
+}
+
+void GetTERect(Rect *teRect) {
+  GetTEContainerRect(teRect);
+  InsetRect(teRect, 2, 2); // inset a little
+	/* *teRect = window->portRect; */
+	/* InsetRect(teRect, 2, 2);	/\* adjust for margin *\/ */
+	/* teRect->bottom = teRect->bottom - 15;		/\* and for the scrollbars *\/ */
+	/* teRect->right = teRect->right - 15; */
 }
 
 void AdjustScrollSizes(WindowPtr window) {
   DocumentPeek doc = (DocumentPeek) window;
-  MoveControl(doc->docVScroll, window->portRect.right - kScrollbarAdjust, -1);
-  SizeControl(doc->docVScroll, kScrollbarWidth, (window->portRect.bottom -
-																 window->portRect.top) - (kScrollbarAdjust - kScrollTweak));
+  MoveControl(doc->docVScroll, kInputOffX + kInputWidth - 1, kInputOffY);
+  SizeControl(doc->docVScroll, kScrollbarWidth, kInputHeight);
 }
 
 void AdjustScrollbars(WindowPtr window, Boolean	needsResize) {
@@ -91,7 +96,7 @@ void MakeNewWindow(ConstStr255Param title, short procID) {
   }
 
   Rect windowRect;
-  SetRect(&windowRect, 40, 40, 600, 600);
+  SetRect(&windowRect, 40, 40, kMainWidth, kMainHeight);
 
   int id = windowCounter++;
   Ptr storage = NewPtr(sizeof(DocumentRecord));
@@ -102,8 +107,8 @@ void MakeNewWindow(ConstStr255Param title, short procID) {
   Rect destRect, viewRect;
   //  SetRect(&destRect, 0,0,400-MARGIN,260-MARGIN);
   // SetRect(&viewRect, 0,0,400-MARGIN,260-MARGIN);
-  GetTERect(w, &destRect);
-  GetTERect(w, &viewRect);
+  GetTERect(&destRect);
+  GetTERect(&viewRect);
 
   SetPort(w);
   doc->docTE = TENew(&destRect, &viewRect);
@@ -250,23 +255,24 @@ void DrawWindow (WindowPtr w) {
   /* OffsetRect(&r, 32 * id, 32 * id); */
   /* FillRoundRect(&r, 16, 16, &qd.ltGray); */
   /* FrameRoundRect(&r, 16, 16); */
-
-  /* OffsetRect(&r, 32, 32); */
   /* FillRect(&r, &qd.gray); */
-  /* FrameRect(&r); */
-
 
   EraseRect(&w->portRect);
 
+  Rect r;
+  GetTEContainerRect(&r);
+  FrameRect(&r);
 
   DrawControls(w);
   int id = doc->id;
 
-  /* char buf[256]; */
-  /* sprintf(buf+1, "-- %d --", id); */
-  /* buf[0] = strlen(buf+1); */
-  /* MoveTo(10,10); */
-  /* DrawString(buf); */
+  char buf[256];
+  sprintf(buf+1, "Twelf Input", id);
+  buf[0] = strlen(buf+1);
+  MoveTo(kInputOffX + 10, kInputOffY - 2);
+  printf("font before: %d\r", ((GrafPort *)w)->txFont);
+  TextFont(0);
+  DrawString(buf);
 
   TEUpdate(&w->portRect, doc->docTE);
   /* Rect r; */
@@ -405,7 +411,7 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
 		GlobalToLocal(&mouse);
 		doc = (DocumentPeek) window;
 		/* see if we are in the viewRect. if so, we won't check the controls */
-		GetTERect(window, &teRect);
+		GetTERect(&teRect);
 		if (PtInRect(mouse, &teRect)) {
 			/* see if we need to extend the selection */
 			shiftDown = (event->modifiers & shiftKey) != 0;	/* extend if Shift is down */
