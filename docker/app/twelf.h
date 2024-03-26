@@ -35,3 +35,5 @@
 #define kChicago 0
 #define kGeneva 1
 #define kMonaco 4
+
+#define kAboutBox 1234 // A hack to prevent bad events from hitting about box

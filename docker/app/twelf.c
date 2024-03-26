@@ -32,18 +32,16 @@
 
 static Rect initialWindowRect, nextWindowRect;
 
-enum
-  {
-    kMenuApple = 128,
-    kMenuFile,
-    kMenuEdit
-  };
+enum {
+  kMenuApple = 128,
+  kMenuFile,
+  kMenuEdit
+};
 
-enum
-  {
-    kItemAbout = 1,
-    kItemQuit = 1
-  };
+enum {
+  kItemAbout = 1,
+  kItemQuit = 1
+};
 
 typedef struct {
   WindowRecord	 docWindow;
@@ -133,9 +131,9 @@ void MakeNewWindow(ConstStr255Param title, short procID) {
 }
 
 
-void ShowAboutBox(void)
-{
+void ShowAboutBox(void) {
   WindowPtr w = GetNewWindow(128, NULL, (WindowPtr) - 1);
+  ((WindowPeek)w)->refCon = kAboutBox;
   MoveWindow(w,
 				 qd.screenBits.bounds.right/2 - w->portRect.right/2,
 				 qd.screenBits.bounds.bottom/2 - w->portRect.bottom/2,
@@ -248,10 +246,16 @@ void DrawWindow (WindowPtr w) {
 
 
 Boolean IsAppWindow(WindowPtr window) {
-  short		windowKind;
+  short windowKind;
 
   if (window == 0)
 	 return false;
+
+  if (((WindowPeek)window)->refCon == kAboutBox) {
+	 printf("It worked... ish!\r");
+	 return false;
+  }
+
   else {	/* application windows have windowKinds = userKind (8) */
 	 windowKind = ((WindowPeek) window)->windowKind;
 	 return (windowKind == userKind);
