@@ -42,7 +42,11 @@ enum
 enum
   {
     kItemAbout = 1,
-    kItemQuit = 1
+
+    kItemNewDoc = 1,
+    kItemNewRounded = 2,
+    kItemClose = 3,
+    kItemQuit = 5
   };
 
 typedef struct {
@@ -133,7 +137,8 @@ void MakeNewWindow(ConstStr255Param title, short procID) {
 }
 
 
-void ShowAboutBox(void) {
+void ShowAboutBox(void)
+{
   WindowPtr w = GetNewWindow(128, NULL, (WindowPtr) - 1);
   MoveWindow(w,
 				 qd.screenBits.bounds.right/2 - w->portRect.right/2,
@@ -160,6 +165,10 @@ void UpdateMenus(void)
 {
   MenuRef m = GetMenu(kMenuFile);
   WindowPtr w = FrontWindow();
+  if (w) // Close menu item: enabled if there is a window
+	 EnableItem(m,kItemClose);
+  else
+	 DisableItem(m,kItemClose);
 
   m = GetMenu(kMenuEdit);
   if (w && GetWindowKind(w) < 0)
@@ -193,26 +202,35 @@ void DoMenuCommand(long menuCommand) {
     {
 		if (menuItem == kItemAbout)
 		  ShowAboutBox();
-		else {
-		  GetMenuItemText(GetMenu(128), menuItem, str);
-		  OpenDeskAcc(str);
-		}
+		else
+        {
+			 GetMenuItemText(GetMenu(128), menuItem, str);
+			 OpenDeskAcc(str);
+        }
     }
   else if (menuID == kMenuFile)
     {
 		switch(menuItem)
         {
+		  case kItemNewDoc:
+			 GetIndString(str,128,1);
+			 MakeNewWindow(str, documentProc); // plain document window
+			 break;
+		  case kItemNewRounded:
+			 GetIndString(str,128,2);
+			 MakeNewWindow(str, 16); // rounded document window
+			 break;
 
-		  /* case kItemClose:    // close */
-		  /* 	 w = FrontWindow(); */
-		  /* 	 if (w) */
-		  /* 		{ */
-		  /* 		  if (GetWindowKind(w) < 0) */
-		  /* 			 CloseDeskAcc(GetWindowKind(w)); */
-		  /* 		  else */
-		  /* 			 DisposeWindow(FrontWindow()); */
-		  /* 		} */
-		  /* 	 break; */
+		  case kItemClose:    // close
+			 w = FrontWindow();
+			 if (w)
+				{
+				  if (GetWindowKind(w) < 0)
+					 CloseDeskAcc(GetWindowKind(w));
+				  else
+					 DisposeWindow(FrontWindow());
+				}
+			 break;
 
 		  case kItemQuit:
 			 ExitToShell();
@@ -445,17 +463,12 @@ int main(void) {
   SetMenuBar(GetNewMBar(128));
   AppendResMenu(GetMenu(128), 'DRVR');
   DrawMenuBar();
+
   InitCursor();
 
-  // Deprecated
   Rect r;
   SetRect(&initialWindowRect,20,60,400,260);
   nextWindowRect = initialWindowRect;
-
-  // Make main window
-  Str255 str;
-  GetIndString(str,128,1);
-  MakeNewWindow(str, documentProc);
 
   for(;;) {
 	 EventRecord e;
