@@ -346,9 +346,15 @@ void DoActivate(WindowPtr window, Boolean becomingActive) {
 		/* DisposeRgn(tempRgn); */
 		/* DisposeRgn(clipRgn); */
 
-		/* the controls must be redrawn on activation: */
-		(*doc->docVScroll)->contrlVis = kControlVisible;
-		InvalRect(&(*doc->docVScroll)->contrlRect);
+		/* Somehow show controls on activation? This tends to crash if
+		 I have any other application windows open, however.*/
+		if (0) {
+		  // (*doc->docVScroll)->contrlVis = kControlVisible;
+		  Rect *crect = &(*doc->docVScroll)->contrlRect;
+		  printf("activate inval %d %d %d %d\r", crect->top, crect->left, crect->bottom, crect->right);
+		  InvalRect(crect);
+		  printf("activate invaled\r");
+		}
 
 		/* /\* the growbox needs to be redrawn on activation: *\/ */
 		/* growRect = window->portRect; */
@@ -360,8 +366,17 @@ void DoActivate(WindowPtr window, Boolean becomingActive) {
 	 else {
 		printf("Deactivating text edit\r");
 		TEDeactivate(doc->docTE);
-		/* the controls must be hidden on deactivation: */
-		HideControl(doc->docVScroll);
+
+		/* Somehow hide controls on deactivation? This tends to crash if
+		 I have any other application windows open, however.*/
+
+		if (0) {
+		  // (*doc->docVScroll)->contrlVis = kControlInvisible;
+		  Rect *crect = &(*doc->docVScroll)->contrlRect;
+		  printf("deactivate inval %d %d %d %d\r", crect->top, crect->left, crect->bottom, crect->right);
+		  InvalRect(crect);
+		  printf("deactivate invaled\r");
+		}
 
 		/*  the growbox should be changed immediately on deactivation:  */
  		/* DrawGrowIcon(window); */
@@ -445,12 +460,17 @@ int main(void) {
   GetIndString(str,128,1);
   MakeNewWindow(str, documentProc); // plain document window
 
+  int debug = 0;
   for(;;) {
 	 EventRecord e;
 	 WindowPtr win;
 
 	 SystemTask();
 	 if (GetNextEvent(everyEvent, &e)) {
+		if (debug > 0) {
+		  printf("event code: %d\r", e.what);
+		  debug--;
+		}
 		switch(e.what) {
 		case keyDown: // intentional fallthrough
 		case autoKey:
@@ -489,6 +509,7 @@ int main(void) {
 		  break;
 		case activateEvt:
 			DoActivate((WindowPtr)e.message, (e.modifiers & activeFlag) != 0);
+			printf("finished activate event, debugging next 3 events\r"); debug = 3;
 			break;
 		case updateEvt:
 		  DoUpdate((WindowPtr)e.message);
