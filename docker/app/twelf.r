@@ -28,7 +28,7 @@ resource 'MENU' (128) {
     allEnabled, enabled;
     apple;
     {
-        "About WDEF Shell...", noIcon, noKey, noMark, plain;
+        "About Twelf...", noIcon, noKey, noMark, plain;
         "-", noIcon, noKey, noMark, plain;
     }
 };
@@ -72,15 +72,18 @@ resource 'STR#' (128) {
 };
 
 data 'TEXT' (128) {
-    "About WDEF Shell\r\r"
-    "A Sample program that tries to show both how to write a basic classic Mac application, "
-    "and how to write a custom window definition procedure (WDEF) using Retro68.\r"
-    "Other code resources (CDEF, MDEF, LDEF, ...) aren't that much different.\r"
-    "\r\rWritten in 2018, so everything here has been obsolete for two decades."
+    "About Twelf\r\r"
+    "Twelf is a research project concerned with the design, implementation, "
+    "and application of logical frameworks funded by the National Science "
+    "Foundation under grants CCR-9619584 and CCR-9988281 Meta-Logical Frameworks, "
+    "CCR-0306313 Efficient Logical Frameworks (Principal Investigator: Frank Pfenning) "
+    "and by DARPA under the contract number F196268-95-C-0050 The Fox Project: Advanced "
+    " Languages for Systems Software (Principal Investigators: Robert Harper, Peter "
+	 "Lee, and Frank Pfenning)."
 };
 
 resource 'WIND' (128) {
-    {0, 0, 220, 320}, altDBoxProc;
+    {0, 0, 220, 400}, altDBoxProc;
     invisible;
     noGoAway;
     0, "";
