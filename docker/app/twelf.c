@@ -42,11 +42,7 @@ enum
 enum
   {
     kItemAbout = 1,
-
-    kItemNewDoc = 1,
-    kItemNewRounded = 2,
-    kItemClose = 3,
-    kItemQuit = 5
+    kItemQuit = 1
   };
 
 typedef struct {
@@ -165,10 +161,6 @@ void UpdateMenus(void)
 {
   MenuRef m = GetMenu(kMenuFile);
   WindowPtr w = FrontWindow();
-  if (w) // Close menu item: enabled if there is a window
-	 EnableItem(m,kItemClose);
-  else
-	 DisableItem(m,kItemClose);
 
   m = GetMenu(kMenuEdit);
   if (w && GetWindowKind(w) < 0)
@@ -189,62 +181,33 @@ void UpdateMenus(void)
 		DisableItem(m,5);
 		DisableItem(m,6);
     }
-
 }
-
 
 void DoMenuCommand(long menuCommand) {
   Str255 str;
   WindowPtr w;
   short menuID = menuCommand >> 16;
   short menuItem = menuCommand & 0xFFFF;
-  if (menuID == kMenuApple)
-    {
-		if (menuItem == kItemAbout)
-		  ShowAboutBox();
-		else
-        {
-			 GetMenuItemText(GetMenu(128), menuItem, str);
-			 OpenDeskAcc(str);
-        }
-    }
-  else if (menuID == kMenuFile)
-    {
-		switch(menuItem)
-        {
-		  case kItemNewDoc:
-			 GetIndString(str,128,1);
-			 MakeNewWindow(str, documentProc); // plain document window
-			 break;
-		  case kItemNewRounded:
-			 GetIndString(str,128,2);
-			 MakeNewWindow(str, 16); // rounded document window
-			 break;
-
-		  case kItemClose:    // close
-			 w = FrontWindow();
-			 if (w)
-				{
-				  if (GetWindowKind(w) < 0)
-					 CloseDeskAcc(GetWindowKind(w));
-				  else
-					 DisposeWindow(FrontWindow());
-				}
-			 break;
-
-		  case kItemQuit:
-			 ExitToShell();
-			 break;
-        }
-    }
-  else if (menuID == kMenuEdit)
-    {
-		if (!SystemEdit(menuItem - 1))
-        {
-			 // edit command not handled by desk accessory
-        }
-    }
-
+  if (menuID == kMenuApple) {
+	 if (menuItem == kItemAbout)
+		ShowAboutBox();
+	 else {
+		GetMenuItemText(GetMenu(128), menuItem, str);
+		OpenDeskAcc(str);
+	 }
+  }
+  else if (menuID == kMenuFile) {
+	 switch(menuItem) {
+	 case kItemQuit:
+		ExitToShell();
+		break;
+	 }
+  }
+  else if (menuID == kMenuEdit) {
+	 if (!SystemEdit(menuItem - 1)) {
+		// edit command not handled by desk accessory
+	 }
+  }
   HiliteMenu(0);
 }
 
@@ -448,6 +411,7 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
 }
 
 int main(void) {
+  // Debugging Log
   stdout = fopen("out", "w");
   setbuf(stdout, NULL);
 
@@ -469,6 +433,10 @@ int main(void) {
   Rect r;
   SetRect(&initialWindowRect,20,60,400,260);
   nextWindowRect = initialWindowRect;
+
+  Str255 str;
+  GetIndString(str,128,1);
+  MakeNewWindow(str, documentProc); // plain document window
 
   for(;;) {
 	 EventRecord e;
@@ -498,7 +466,7 @@ int main(void) {
 			 break;
 		  case inMenuBar:
 			 UpdateMenus();
-			 DoMenuCommand( MenuSelect(e.where) );
+			 DoMenuCommand(MenuSelect(e.where));
 			 break;
 		  case inContent:
 			 if (win != FrontWindow()) {

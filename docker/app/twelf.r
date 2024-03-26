@@ -38,10 +38,6 @@ resource 'MENU' (129) {
     allEnabled, enabled;
     "File";
     {
-        "New Document Window", noIcon, "N", noMark, plain;
-        "New Rounded Window", noIcon, "M", noMark, plain;
-        "Close", noIcon, "W", noMark, plain;
-        "-", noIcon, noKey, noMark, plain;
         "Quit", noIcon, "Q", noMark, plain;
     }
 };
@@ -67,7 +63,6 @@ resource 'MBAR' (128) {
 resource 'STR#' (128) {
     {
         "Twelf",
-        "Rounded Document Window",
     }
 };
 
@@ -128,6 +123,7 @@ type 'CNTL' {
   pstring;
 };
 
+/* Vertical scrollbar */
 resource 'CNTL' (rVScroll, preload, purgeable) {
 	{-1, 385, 236, 401},
 	0, visible, 0, 0, scrollBarProc, 0, ""
