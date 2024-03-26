@@ -327,42 +327,45 @@ void DoActivate(WindowPtr window, Boolean becomingActive) {
   RgnHandle	tempRgn, clipRgn;
   Rect      growRect;
   DocumentPeek doc;
-  printf("DoActivate %d\r", ((WindowPeek)window)->refCon);
+  printf("DoActivate %d %d\r", ((WindowPeek)window)->refCon, becomingActive);
   if (IsAppWindow(window)) {
 	 doc = (DocumentPeek) window;
 	 if (becomingActive) {
-		/*	since we don't want TEActivate to draw a selection in an area where
-			we're going to erase and redraw, we'll clip out the update region
-			before calling it. */
-		tempRgn = NewRgn();
-		clipRgn = NewRgn();
-		GetLocalUpdateRgn(window, tempRgn);			/* get localized update region */
-		GetClip(clipRgn);
-		DiffRgn(clipRgn, tempRgn, tempRgn);			/* subtract updateRgn from clipRgn */
-		SetClip(tempRgn);
+		/* /\*	since we don't want TEActivate to draw a selection in an area where */
+		/* 	we're going to erase and redraw, we'll clip out the update region */
+		/* 	before calling it. *\/ */
+		/* tempRgn = NewRgn(); */
+		/* clipRgn = NewRgn(); */
+		/* GetLocalUpdateRgn(window, tempRgn);			/\* get localized update region *\/ */
+		/* GetClip(clipRgn); */
+		/* DiffRgn(clipRgn, tempRgn, tempRgn);			/\* subtract updateRgn from clipRgn *\/ */
+		/* SetClip(tempRgn); */
+		printf("Activating text edit");
 		TEActivate(doc->docTE);
-		SetClip(clipRgn);							/* restore the full-blown clipRgn */
-		DisposeRgn(tempRgn);
-		DisposeRgn(clipRgn);
+		/* SetClip(clipRgn);							/\* restore the full-blown clipRgn *\/ */
+		/* DisposeRgn(tempRgn); */
+		/* DisposeRgn(clipRgn); */
 
-		/* the controls must be redrawn on activation: */
-		(*doc->docVScroll)->contrlVis = kControlVisible;
+		/* /\* the controls must be redrawn on activation: *\/ */
+		/* (*doc->docVScroll)->contrlVis = kControlVisible; */
 
-		InvalRect(&(*doc->docVScroll)->contrlRect);
+		/* InvalRect(&(*doc->docVScroll)->contrlRect); */
 
-		/* the growbox needs to be redrawn on activation: */
-		growRect = window->portRect;
-		/* adjust for the scrollbars */
-		growRect.top = growRect.bottom - kScrollbarAdjust;
-		growRect.left = growRect.right - kScrollbarAdjust;
-		InvalRect(&growRect);
+		/* /\* the growbox needs to be redrawn on activation: *\/ */
+		/* growRect = window->portRect; */
+		/* /\* adjust for the scrollbars *\/ */
+		/* growRect.top = growRect.bottom - kScrollbarAdjust; */
+		/* growRect.left = growRect.right - kScrollbarAdjust; */
+		/* InvalRect(&growRect); */
 	 }
 	 else {
+		printf("Deactivating text edit");
 		TEDeactivate(doc->docTE);
 		/* the controls must be hidden on deactivation: */
-		HideControl(doc->docVScroll);
-		/* the growbox should be changed immediately on deactivation: */
-		DrawGrowIcon(window);
+		//		HideControl(doc->docVScroll);
+
+		/*  the growbox should be changed immediately on deactivation:  */
+ 		/* DrawGrowIcon(window); */
 	 }
   }
 }
