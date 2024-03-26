@@ -2,8 +2,8 @@ cmake_minimum_required(VERSION 3.22)
 project(Twelf)
 
 add_application(Twelf
-    logic.c
-    logic.r
+    twelf.c
+    twelf.r
     CREATOR "TWLF"
     )
 

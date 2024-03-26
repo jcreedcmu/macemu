@@ -21,7 +21,7 @@
 #include "Menus.r"
 #include "Windows.r"
 #include "MacTypes.r"
-#include "logic.h"
+#include "twelf.h"
 
 resource 'MENU' (128) {
     128, textMenuProc;
@@ -66,7 +66,7 @@ resource 'MBAR' (128) {
 
 resource 'STR#' (128) {
     {
-        "Twelf Input Window",
+        "Twelf",
         "Rounded Document Window",
     }
 };

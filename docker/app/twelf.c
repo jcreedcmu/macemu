@@ -28,7 +28,7 @@
 #include <Devices.h>
 #include <string.h>
 #include <stdio.h>
-#include "logic.h"
+#include "twelf.h"
 
 static Rect initialWindowRect, nextWindowRect;
 
