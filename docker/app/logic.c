@@ -91,7 +91,7 @@ void MakeNewWindow(ConstStr255Param title, short procID) {
   }
 
   Rect windowRect;
-  SetRect(&windowRect, 0, 0, 600, 600);
+  SetRect(&windowRect, 40, 40, 600, 600);
 
   int id = windowCounter++;
   Ptr storage = NewPtr(sizeof(DocumentRecord));
