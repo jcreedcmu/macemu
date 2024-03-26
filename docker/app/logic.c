@@ -112,6 +112,8 @@ void MakeNewWindow(ConstStr255Param title, short procID) {
 
   SetPort(w);
   doc->docTE = TENew(&destRect, &viewRect);
+  (**(doc->docTE)).txFont = kMonaco;
+
   good = doc->docTE != NULL;
   if (good) {
 	 printf("Ok, we have a docTE id=%d\r", id);
@@ -269,9 +271,9 @@ void DrawWindow (WindowPtr w) {
   char buf[256];
   sprintf(buf+1, "Twelf Input", id);
   buf[0] = strlen(buf+1);
-  MoveTo(kInputOffX + 10, kInputOffY - 2);
+  MoveTo(kInputOffX + 10, kInputOffY - 4);
   printf("font before: %d\r", ((GrafPort *)w)->txFont);
-  TextFont(0);
+  TextFont(kChicago);
   DrawString(buf);
 
   TEUpdate(&w->portRect, doc->docTE);

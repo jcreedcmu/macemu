@@ -31,3 +31,7 @@
 
 #define kInputOffX 30
 #define kInputOffY 30
+
+#define kChicago 0
+#define kGeneva 1
+#define kMonaco 4
