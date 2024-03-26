@@ -231,7 +231,6 @@ resource 'WIND' (rDocWindow, preload, purgeable) {
 	zoomDocProc, invisible, goAway, 0x0, "untitled", noAutoCenter
 };
 
-
 resource 'CNTL' (rVScroll, preload, purgeable) {
 	{-1, 385, 236, 401},
 	0, visible, 0, 0, scrollBarProc, 0, ""

@@ -16,3 +16,9 @@
 	values for control positioning and sizing. */
 #define kScrollbarWidth			16
 #define kScrollbarAdjust		(kScrollbarWidth - 1)
+
+#define	rVScroll	128				/* vertical scrollbar control */
+
+/*	kScrollTweak compensates for off-by-one requirements of the scrollbars
+ to have borders coincide with the growbox. */
+#define kScrollTweak			2

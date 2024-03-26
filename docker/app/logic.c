@@ -65,18 +65,39 @@ void GetTERect(WindowPtr window, Rect *teRect) {
 	teRect->right = teRect->right - 15;
 }
 
-void MakeNewWindow(ConstStr255Param title, short procID)
-{
+void AdjustScrollSizes(WindowPtr window) {
+  DocumentPeek doc = (DocumentPeek) window;
+  MoveControl(doc->docVScroll, window->portRect.right - kScrollbarAdjust, -1);
+  SizeControl(doc->docVScroll, kScrollbarWidth, (window->portRect.bottom -
+																 window->portRect.top) - (kScrollbarAdjust - kScrollTweak));
+}
+
+void AdjustScrollbars(WindowPtr window, Boolean	needsResize) {
+  if (needsResize) {
+	 AdjustScrollSizes(window);
+  }
+}
+
+void ResizedWindow(WindowPtr window) {
+	AdjustScrollbars(window, true);
+	//	AdjustTE(window);
+	InvalRect(&window->portRect);
+}
+
+void MakeNewWindow(ConstStr255Param title, short procID) {
   if (nextWindowRect.bottom > qd.screenBits.bounds.bottom
-	  || nextWindowRect.right > qd.screenBits.bounds.right)
-    {
-		nextWindowRect = initialWindowRect;
-    }
+	  || nextWindowRect.right > qd.screenBits.bounds.right) {
+	 nextWindowRect = initialWindowRect;
+  }
+
+  Rect windowRect;
+  SetRect(&windowRect, 0, 0, 600, 600);
 
   int id = windowCounter++;
   Ptr storage = NewPtr(sizeof(DocumentRecord));
-  WindowPtr w = NewWindow(storage, &nextWindowRect, title, true, procID, (WindowPtr) -1, true, id);
+  WindowPtr w = NewWindow(storage, &windowRect, title, true, procID, (WindowPtr) -1, true, id);
   DocumentPeek doc = (DocumentPeek) w;
+  int good = 0;
 
   Rect destRect, viewRect;
   //  SetRect(&destRect, 0,0,400-MARGIN,260-MARGIN);
@@ -86,15 +107,24 @@ void MakeNewWindow(ConstStr255Param title, short procID)
 
   SetPort(w);
   doc->docTE = TENew(&destRect, &viewRect);
-  TEActivate(doc->docTE);
-  if (doc->docTE) {
-	 printf("Ok, we have a docTE\r");
+  good = doc->docTE != NULL;
+  if (good) {
+	 printf("Ok, we have a docTE id=%d\r", id);
+	 TEActivate(doc->docTE);
+	 doc->id = id;
+	 doc->docVScroll = GetNewControl(rVScroll, w);
+	 good = doc->docVScroll != NULL;
+  }
+  if (good) {
+	 AdjustScrollSizes(w);
+	 ShowWindow(w);
   }
   else {
-	 printf("Oops, NULL docTE\r");
+	 printf("Oops, closing window id=%d\r");
+	 CloseWindow(w);
   }
+
   // TESetText("abcdefghij", 10, doc->docTE);
-  doc->id = id;
 
   OffsetRect(&nextWindowRect, 15, 15);
 }
@@ -155,8 +185,8 @@ void UpdateMenus(void)
 
 }
 
-void DoMenuCommand(long menuCommand)
-{
+
+void DoMenuCommand(long menuCommand) {
   Str255 str;
   WindowPtr w;
   short menuID = menuCommand >> 16;
@@ -211,7 +241,6 @@ void DoMenuCommand(long menuCommand)
   HiliteMenu(0);
 }
 
-
 void DrawWindow (WindowPtr w) {
   SetPort(w);
 
@@ -228,6 +257,9 @@ void DrawWindow (WindowPtr w) {
 
 
   EraseRect(&w->portRect);
+
+
+  DrawControls(w);
   int id = doc->id;
 
   /* char buf[256]; */
@@ -472,6 +504,9 @@ int main(void) {
 			 break;
 		  }
 		  break;
+		case activateEvt:
+			DoActivate((WindowPtr)e.message, (e.modifiers & activeFlag) != 0);
+			break;
 		case updateEvt:
 		  DoUpdate((WindowPtr)e.message);
 		  break;

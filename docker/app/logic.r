@@ -21,6 +21,7 @@
 #include "Menus.r"
 #include "Windows.r"
 #include "MacTypes.r"
+#include "logic.h"
 
 resource 'MENU' (128) {
     128, textMenuProc;
@@ -110,6 +111,23 @@ resource 'SIZE' (-1) {
 	100 * 1024,
 	100 * 1024
 #endif
+};
+
+type 'CNTL' {
+  rect;
+  integer; // value
+  byte invisible, visible;
+  fill byte;
+  integer; // max
+  integer; // min
+  integer scrollBarProc = 16; // procID
+  unsigned longint;   // refCon
+  pstring;
+};
+
+resource 'CNTL' (rVScroll, preload, purgeable) {
+	{-1, 385, 236, 401},
+	0, visible, 0, 0, scrollBarProc, 0, ""
 };
 
 #include "icon.r"
