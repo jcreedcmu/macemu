@@ -265,9 +265,7 @@ Boolean IsAppWindow(WindowPtr window) {
 
 
 void DoUpdate(WindowPtr window) {
-  printf("DoUpdate\r");
   if (IsAppWindow(window)) {
-	 printf("DoUpdate AppWindow\r");
 	 BeginUpdate(window);				/* this sets up the visRgn */
 	 if (! EmptyRgn(window->visRgn) )	/* draw if updating needs to be done */
 		DrawWindow(window);
@@ -350,7 +348,7 @@ void DoActivate(WindowPtr window, Boolean becomingActive) {
 
 		/* Somehow show controls on activation? This tends to crash if
 		 I have any other application windows open, however.*/
-		if (1) {
+		if (0) {
 		  // (*doc->docVScroll)->contrlVis = kControlVisible;
 		  Rect *crect = &(*doc->docVScroll)->contrlRect;
 		  printf("activate inval %d %d %d %d\r", crect->top, crect->left, crect->bottom, crect->right);
@@ -372,7 +370,7 @@ void DoActivate(WindowPtr window, Boolean becomingActive) {
 		/* Somehow hide controls on deactivation? This tends to crash if
 		 I have any other application windows open, however.*/
 
-		if (1) {
+		if (0) {
 		  // (*doc->docVScroll)->contrlVis = kControlInvisible;
 		  Rect *crect = &(*doc->docVScroll)->contrlRect;
 		  printf("deactivate inval %d %d %d %d\r", crect->top, crect->left, crect->bottom, crect->right);
