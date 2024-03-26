@@ -1,10 +1,9 @@
 app.bin: Dockerfile app/*.c app/*.r app/CMakeLists.txt app/icon.r
 	docker build . -t "jcreed/retro68:latest"
-	docker create --name tempcont "jcreed/retro68:latest"
-	docker cp "tempcont:/root/app/build/Twelf.bin" app.bin
+	docker run --rm -v "./app:/root/app" "jcreed/retro68:latest" /root/build.sh
+	cp app/build/Twelf.bin app.bin
 	touch app.bin
 	node ../scripts/set-bits.js app.bin
-	docker rm tempcont
 
 app/icon.r: ../scripts/*.js ../assets/twelf-icon.png ../assets/twelf-icon-small.png
 	convert  ../assets/twelf-icon.png -compress none /tmp/twelf-icon.ppm
