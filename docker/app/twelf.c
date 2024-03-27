@@ -487,12 +487,21 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
 	}
 }
 
+unsigned long int osTypeOf(char *buf) {
+  return (buf[3]) | (buf[2] << 8) | (buf[1] << 16) | (buf[0] << 24);
+}
+
 int main(void) {
   // Debugging Log
   stdout = fopen("out", "w");
   setbuf(stdout, NULL);
 
-  printf("Hello, World\r");
+  FSSpec spec;
+  int err = FSMakeFSSpec(0, 0, "\p:foo", &spec);
+  printf("Making FSSpec: %d\r", err);
+  err = FSpCreate(&spec, osTypeOf("TWLF"), osTypeOf("TEXT"), smSystemScript);
+
+  printf("Creating file: %d\r", err);
 
   InitGraf(&qd.thePort);
   InitFonts();
