@@ -37,3 +37,13 @@
 #define kMonaco 4
 
 #define kAboutBox 1234 // A hack to prevent bad events from hitting about box
+
+// Got these values from
+// https://android.googlesource.com/platform/prebuilts/python/windows-x86/+/studio-master-release/x64/Lib/plat-mac/Carbon/Controls.py
+#define kControlIndicatorPart 129
+#define kControlUpButtonPart 20
+#define kControlDownButtonPart 21
+#define kControlPageUpPart 22
+#define kControlPageDownPart 23
+
+#define kScrollMax 100

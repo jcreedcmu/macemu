@@ -118,7 +118,7 @@ void MakeNewWindow(ConstStr255Param title, short procID) {
 	 good = doc->docVScroll != NULL;
   }
   if (good) {
-	 SetControlMaximum(doc->docVScroll, 100);
+	 SetControlMaximum(doc->docVScroll, kScrollMax);
 	 SetControlValue(doc->docVScroll, 20);
 	 AdjustScrollSizes(w);
 	 ShowWindow(w);
@@ -386,6 +386,30 @@ void DoActivate(WindowPtr window, Boolean becomingActive) {
   }
 }
 
+pascal void ScrollCallback(ControlHandle control, short part) {
+	short		delta;
+	if ( part != 0 ) {
+	  switch (part) {
+	  case kControlUpButtonPart:
+		 delta = -1;
+		 break;
+	  case kControlDownButtonPart:
+		 delta = 1;
+		 break;
+	  case kControlPageUpPart:
+		 delta = -10;
+		 break;
+	  case kControlPageDownPart:
+		 delta = 10;
+		 break;
+	  }
+	  short amount = GetControlValue(control) + delta;
+	  if (amount < 0) amount = 0;
+	  if (amount > kScrollMax) amount = kScrollMax;
+	  SetControlValue(control, amount);
+	}
+}
+
 void DoContentClick(WindowPtr window, EventRecord *event) {
   Point		    mouse;
   ControlHandle control;
@@ -406,30 +430,28 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
 			shiftDown = (event->modifiers & shiftKey) != 0;	/* extend if Shift is down */
 			TEClick(mouse, shiftDown, doc->docTE);
 		} else {
-			/* part = FindControl(mouse, window, &control); */
-			/* switch (part) { */
-			/* 	case 0:							/\* do nothing for viewRect case *\/ */
-			/* 		break; */
-			/* 	case kControlIndicatorPart: */
-			/* 		value = GetControlValue(control); */
-			/* 		part = TrackControl(control, mouse, nil); */
-			/* 		if (part != 0) { */
-			/* 			value -= GetControlValue(control); */
-			/* 			/\* value now has CHANGE in value; if value changed, scroll *\/ */
-			/* 			if (value != 0 ) */
-			/* 				if (control == doc->docVScroll ) */
-			/* 					TEScroll(0, value * (*doc->docTE)->lineHeight, doc->docTE); */
-			/* 				else */
-			/* 					TEScroll(value, 0, doc->docTE); */
-			/* 		} */
-			/* 		break; */
-			/* 	default:						/\* they clicked in an arrow, so track & scroll *\/ */
-			/* 		if (control == doc->docVScroll ) */
-			/* 			value = TrackControl(control, mouse, (ControlActionUPP) VActionProc); */
-			/* 		else */
-			/* 			value = TrackControl(control, mouse, (ControlActionUPP) HActionProc); */
-			/* 		break; */
-			/* } */
+			part = FindControl(mouse, window, &control);
+			switch (part) {
+				case 0:							/* do nothing for viewRect case */
+					break;
+				case kControlIndicatorPart:
+					value = GetControlValue(control);
+					part = TrackControl(control, mouse, nil);
+					if (part != 0) {
+						value -= GetControlValue(control);
+						/* value now has CHANGE in value; if value changed, scroll */
+						/* if (value != 0 ) */
+						/* 	if (control == doc->docVScroll ) */
+						/* 		TEScroll(0, value * (*doc->docTE)->lineHeight, doc->docTE); */
+						/* 	else */
+						/* 		TEScroll(value, 0, doc->docTE); */
+					}
+					break;
+				default:						/* they clicked in an arrow, so track & scroll */
+					if (control == doc->docVScroll )
+					  value = TrackControl(control, mouse, (ControlActionUPP) ScrollCallback );
+					break;
+			}
 		}
 	}
 }
