@@ -65,8 +65,10 @@ function iconsOfPpm(ppmFile) {
   };
 }
 
-const largeIcon = iconsOfPpm('/tmp/twelf-icon.ppm');
-const smallIcon = iconsOfPpm('/tmp/twelf-icon-small.ppm');
+const iconSources = [
+  {large: '/tmp/twelf-icon.ppm', small: '/tmp/twelf-icon-small.ppm', id: 128, tp: 'APPL'},
+  {large: '/tmp/twelf-doc.ppm', small: '/tmp/twelf-doc-small.ppm', id: 129, tp: 'TEXT'},
+]
 
 function bytesOfBits(bits) {
   const bytes = [];
@@ -110,45 +112,56 @@ console.log(`
 resource 'BNDL' (128) {
   'TWLF', 0;
   {
-    'FREF', { 0, 128 };
-    'ICN#', { 0, 128 };
+    'FREF', { 0, 128, 1, 129 };
+    'ICN#', { 0, 128, 1, 129 };
   }
 };
 
 resource 'FREF' (128) {
   'APPL', 0, "";
 };
+
+resource 'FREF' (129) {
+  'TEXT', 1, "";
+};
 `);
 
-console.log(`
-resource 'ICN#' (128) {
+iconSources.forEach(src => {
+  const {large, small, id} = src;
+  const largeIcon = iconsOfPpm(large);
+  const smallIcon = iconsOfPpm(small);
+
+  console.log(`
+resource 'ICN#' (${id}) {
   {
     ${rezOfBytes(bytesOfBits(largeIcon.ic1Bits))},
     ${rezOfBytes(bytesOfBits(largeIcon.mask))},
   }
 };
 
-resource 'ics#' (128) {
+resource 'ics#' (${id}) {
   {
     ${rezOfBytes(bytesOfBits(smallIcon.ic1Bits))},
     ${rezOfBytes(bytesOfBits(smallIcon.mask))},
   }
 };
 
-resource 'icl8' (128) {
+resource 'icl8' (${id}) {
   ${rezOfBytes(largeIcon.ic8Bytes)}
 };
 
-resource 'ics8' (128) {
+resource 'ics8' (${id}) {
   ${rezOfBytes(smallIcon.ic8Bytes)}
 };
 
-resource 'icl4' (128) {
+resource 'icl4' (${id}) {
   ${rezOfBytes(bytesOfNybbles(largeIcon.ic4Nybs))}
 };
 
-resource 'ics4' (128) {
+resource 'ics4' (${id}) {
   ${rezOfBytes(bytesOfNybbles(smallIcon.ic4Nybs))}
 };
 
 `);
+
+});

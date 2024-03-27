@@ -5,9 +5,11 @@ app.bin: Dockerfile app/*.c app/*.r app/CMakeLists.txt app/icon.r
 	touch app.bin
 	node ../scripts/set-bits.js app.bin
 
-app/icon.r: ../scripts/*.js ../assets/twelf-icon.png ../assets/twelf-icon-small.png
+app/icon.r: ../scripts/*.js ../assets/*.png
 	convert  ../assets/twelf-icon.png -compress none /tmp/twelf-icon.ppm
 	convert  ../assets/twelf-icon-small.png -compress none /tmp/twelf-icon-small.ppm
+	convert  ../assets/twelf-doc.png -compress none /tmp/twelf-doc.ppm
+	convert  ../assets/twelf-doc-small.png -compress none /tmp/twelf-doc-small.ppm
 	node ../scripts/make-icon-resources.js >app/icon.r
 
 docker:
