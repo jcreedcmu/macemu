@@ -18,6 +18,7 @@
 #define kScrollbarAdjust		(kScrollbarWidth - 1)
 
 #define	rVScroll	128				/* vertical scrollbar control */
+#define	rExecButton 129				/* execute button */
 
 /*	kScrollTweak compensates for off-by-one requirements of the scrollbars
  to have borders coincide with the growbox. */
@@ -27,7 +28,7 @@
 #define kMainHeight 500
 
 #define kInputWidth 300
-#define kInputHeight 300
+#define kInputHeight 150
 
 #define kInputOffX 30
 #define kInputOffY 30
@@ -46,4 +47,5 @@
 #define kControlPageUpPart 22
 #define kControlPageDownPart 23
 
+#define kMargin 10 /* between textbox and button */
 #define kScrollMax 100

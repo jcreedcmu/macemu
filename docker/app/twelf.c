@@ -48,6 +48,7 @@ typedef struct {
   int           id;
   TEHandle		 docTE;
   ControlHandle docVScroll;
+  ControlHandle docExecButton;
 } DocumentRecord, *DocumentPeek;
 
 static int windowCounter = 0;
@@ -115,7 +116,8 @@ void MakeNewWindow(ConstStr255Param title, short procID) {
 	 ((WindowPeek)w)->refCon = id + 100;
 	 doc->id = id;
 	 doc->docVScroll = GetNewControl(rVScroll, w);
-	 good = doc->docVScroll != NULL;
+	 doc->docExecButton = GetNewControl(rExecButton, w);
+	 good = doc->docVScroll != NULL && doc->docExecButton != NULL;
   }
   if (good) {
 	 SetControlMaximum(doc->docVScroll, kScrollMax);

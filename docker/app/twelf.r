@@ -118,7 +118,7 @@ type 'CNTL' {
   fill byte;
   integer; // max
   integer; // min
-  integer scrollBarProc = 16; // procID
+  integer buttonProc = 0, checkBoxProc = 1, radioButtonProc = 2, scrollBarProc = 16; // procID
   unsigned longint;   // refCon
   pstring;
 };
@@ -127,6 +127,13 @@ type 'CNTL' {
 resource 'CNTL' (rVScroll, preload, purgeable) {
 	{-1, 385, 236, 401},
 	0, visible, 0, 0, scrollBarProc, 0, ""
+};
+
+/* Execute button */
+resource 'CNTL' (rExecButton, preload, purgeable) {
+	{kInputOffY + kInputHeight + kMargin, kInputOffX,
+	kInputOffY + kInputHeight + kMargin + 20, kInputOffX + 70},
+	0, visible, 0, 0, buttonProc, 0, "Check"
 };
 
 #include "icon.r"
