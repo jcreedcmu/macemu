@@ -132,7 +132,7 @@ resource 'CNTL' (rVScroll, preload, purgeable) {
 /* Execute button */
 resource 'CNTL' (rExecButton, preload, purgeable) {
 	{kInputOffY + kInputHeight + kMargin, kInputOffX,
-	kInputOffY + kInputHeight + kMargin + 20, kInputOffX + 70},
+	kInputOffY + kInputHeight + kMargin + kButtonHeight, kInputOffX + kButtonWidth},
 	0, visible, 0, 0, buttonProc, 0, "Check"
 };
 

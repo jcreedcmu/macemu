@@ -46,19 +46,22 @@ enum {
 typedef struct {
   WindowRecord	 docWindow;
   int           id;
-  TEHandle		 docTE;
+  TEHandle		 docInputTE;
+  TEHandle		 docOutputTE;
   ControlHandle docVScroll;
   ControlHandle docExecButton;
 } DocumentRecord, *DocumentPeek;
 
-static int windowCounter = 0;
-
-void GetTEContainerRect(Rect *teRect) {
+void GetTEContainerRect(Rect *teRect, int which) {
   SetRect(teRect, kInputOffX, kInputOffY, kInputOffX + kInputWidth, kInputOffY + kInputHeight);
+  if (which) {
+	 teRect->top += 2 * kMargin + kButtonHeight + kInputHeight;
+	 teRect->bottom += 2 * kMargin + kButtonHeight + kInputHeight;
+  }
 }
 
-void GetTERect(Rect *teRect) {
-  GetTEContainerRect(teRect);
+void GetTERect(Rect *teRect, int which) {
+  GetTEContainerRect(teRect, which);
   InsetRect(teRect, 2, 2); // inset a little
 	/* *teRect = window->portRect; */
 	/* InsetRect(teRect, 2, 2);	/\* adjust for margin *\/ */
@@ -93,44 +96,51 @@ void MakeNewWindow(ConstStr255Param title, short procID) {
   Rect windowRect;
   SetRect(&windowRect, 40, 40, kMainWidth, kMainHeight);
 
-  int id = windowCounter++;
+  int id = 0;
   Ptr storage = NewPtr(sizeof(DocumentRecord));
   WindowPtr w = NewWindow(storage, &windowRect, title, true, procID, (WindowPtr) -1, true, id);
   DocumentPeek doc = (DocumentPeek) w;
   int good = 0;
 
+  printf("in MakeNewWindow\r");
   Rect destRect, viewRect;
-  //  SetRect(&destRect, 0,0,400-MARGIN,260-MARGIN);
-  // SetRect(&viewRect, 0,0,400-MARGIN,260-MARGIN);
-  GetTERect(&destRect);
-  GetTERect(&viewRect);
+  GetTERect(&destRect, 0);
+  GetTERect(&viewRect, 0);
 
   SetPort(w);
-  doc->docTE = TENew(&destRect, &viewRect);
-  (**(doc->docTE)).txFont = kMonaco;
+  doc->docInputTE = TENew(&destRect, &viewRect);
+  (**(doc->docInputTE)).txFont = kMonaco;
+  printf("created one textedit...\r");
+  GetTERect(&destRect, 1);
+  GetTERect(&viewRect, 1);
 
-  good = doc->docTE != NULL;
+  doc->docOutputTE = TENew(&destRect, &viewRect);
+  (**(doc->docOutputTE)).txFont = kMonaco;
+  printf("created a second textedit...\r");
+
+  good = (doc->docInputTE != NULL) && (doc->docOutputTE != NULL);
   if (good) {
-	 printf("Ok, we have a docTE id=%d\r", id);
-	 TEActivate(doc->docTE);
+	 printf("Ok, we have a docInputTE id=%d\r", id);
+	 TEActivate(doc->docInputTE);
 	 ((WindowPeek)w)->refCon = id + 100;
 	 doc->id = id;
 	 doc->docVScroll = GetNewControl(rVScroll, w);
 	 doc->docExecButton = GetNewControl(rExecButton, w);
-	 good = doc->docVScroll != NULL && doc->docExecButton != NULL;
+	 good = (doc->docVScroll != NULL) && (doc->docExecButton != NULL);
   }
   if (good) {
+	 printf("created scrollbar and execbutton\r");
 	 SetControlMaximum(doc->docVScroll, kScrollMax);
 	 SetControlValue(doc->docVScroll, 20);
+
+	 TESetText("o : type.\ra : o -> type.", 10, doc->docOutputTE);
 	 AdjustScrollSizes(w);
 	 ShowWindow(w);
   }
   else {
-	 printf("Oops, closing window id=%d\r");
+	 printf("Oops, didn't succeed at initializing window, closing window id=%d\r");
 	 CloseWindow(w);
   }
-
-  // TESetText("abcdefghij", 10, doc->docTE);
 
   OffsetRect(&nextWindowRect, 15, 15);
 }
@@ -228,7 +238,7 @@ void DrawWindow (WindowPtr w) {
   EraseRect(&w->portRect);
 
   Rect r;
-  GetTEContainerRect(&r);
+  GetTEContainerRect(&r, 0);
   FrameRect(&r);
 
   DrawControls(w); // Consider UpdateControls instead
@@ -242,7 +252,8 @@ void DrawWindow (WindowPtr w) {
   TextFont(kChicago);
   DrawString(buf);
 
-  TEUpdate(&w->portRect, doc->docTE);
+  TEUpdate(&w->portRect, doc->docInputTE);
+  TEUpdate(&w->portRect, doc->docOutputTE);
   /* Rect r; */
   /* SetRect(&r, 0,0,120,120); */
   /* OffsetRect(&r, 32 * id, 32 * id); */
@@ -280,8 +291,10 @@ void DoUpdate(WindowPtr window) {
 void DoIdle(void) {
   WindowPtr window;
   window = FrontWindow();
-  if (IsAppWindow(window) )
-	 TEIdle(((DocumentPeek) window)->docTE);
+  if (IsAppWindow(window) ) {
+	 TEIdle(((DocumentPeek) window)->docInputTE);
+	 TEIdle(((DocumentPeek) window)->docOutputTE);
+  }
 }
 
 
@@ -304,7 +317,7 @@ void DoKeyDown(EventRecord *event) {
 
   window = FrontWindow();
   if (IsAppWindow(window)) {
-	 te = ((DocumentPeek) window)->docTE;
+	 te = ((DocumentPeek) window)->docInputTE;
 	 key = event->message & charCodeMask;
 	 /* we have a char. for our window; see if we are still below TextEdit's
 		 limit for the number of characters (but deletes are always rad) */
@@ -345,7 +358,7 @@ void DoActivate(WindowPtr window, Boolean becomingActive) {
 		/* DiffRgn(clipRgn, tempRgn, tempRgn);			/\* subtract updateRgn from clipRgn *\/ */
 		/* SetClip(tempRgn); */
 		printf("Activating text edit\r");
-		TEActivate(doc->docTE);
+		TEActivate(doc->docInputTE);
 		/* SetClip(clipRgn);							/\* restore the full-blown clipRgn *\/ */
 		/* DisposeRgn(tempRgn); */
 		/* DisposeRgn(clipRgn); */
@@ -369,7 +382,7 @@ void DoActivate(WindowPtr window, Boolean becomingActive) {
 	 }
 	 else {
 		printf("Deactivating text edit\r");
-		TEDeactivate(doc->docTE);
+		TEDeactivate(doc->docInputTE);
 
 		/* Somehow hide controls on deactivation? This tends to crash if
 		 I have any other application windows open, however.*/
@@ -425,12 +438,12 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
 		mouse = event->where;							/* get the click position */
 		GlobalToLocal(&mouse);
 		doc = (DocumentPeek) window;
-		/* see if we are in the viewRect. if so, we won't check the controls */
-		GetTERect(&teRect);
+		/* see if we are in the input viewRect. if so, we won't check the controls */
+		GetTERect(&teRect, 0);
 		if (PtInRect(mouse, &teRect)) {
 			/* see if we need to extend the selection */
 			shiftDown = (event->modifiers & shiftKey) != 0;	/* extend if Shift is down */
-			TEClick(mouse, shiftDown, doc->docTE);
+			TEClick(mouse, shiftDown, doc->docInputTE);
 		} else {
 			part = FindControl(mouse, window, &control);
 			switch (part) {
@@ -452,6 +465,9 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
 				default:						/* they clicked in an arrow, so track & scroll */
 					if (control == doc->docVScroll )
 					  value = TrackControl(control, mouse, (ControlActionUPP) ScrollCallback );
+					if (control == doc->docExecButton) {
+					  printf("Got a click in button!\r");
+					}
 					break;
 			}
 		}
