@@ -55,8 +55,8 @@ typedef struct {
 void GetTEContainerRect(Rect *teRect, int which) {
   SetRect(teRect, kInputOffX, kInputOffY, kInputOffX + kInputWidth, kInputOffY + kInputHeight);
   if (which) {
-	 teRect->top += 2 * kMargin + kButtonHeight + kInputHeight;
-	 teRect->bottom += 2 * kMargin + kButtonHeight + kInputHeight;
+	 teRect->top += kInterTextboxHeight;
+	 teRect->bottom += kInterTextboxHeight;
   }
 }
 
@@ -241,15 +241,24 @@ void DrawWindow (WindowPtr w) {
   GetTEContainerRect(&r, 0);
   FrameRect(&r);
 
+  GetTEContainerRect(&r, 1);
+  FrameRect(&r);
+
   DrawControls(w); // Consider UpdateControls instead
   int id = doc->id;
+
+  TextFont(kChicago);
 
   char buf[256];
   sprintf(buf+1, "Twelf Input", id);
   buf[0] = strlen(buf+1);
   MoveTo(kInputOffX + 10, kInputOffY - 4);
-  printf("font before: %d\r", ((GrafPort *)w)->txFont);
-  TextFont(kChicago);
+
+  DrawString(buf);
+
+  sprintf(buf+1, "Twelf Output", id);
+  buf[0] = strlen(buf+1);
+  MoveTo(kInputOffX + 10, kInterTextboxHeight + kInputOffY - 4);
   DrawString(buf);
 
   TEUpdate(&w->portRect, doc->docInputTE);
@@ -466,7 +475,11 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
 					if (control == doc->docVScroll )
 					  value = TrackControl(control, mouse, (ControlActionUPP) ScrollCallback );
 					if (control == doc->docExecButton) {
-					  printf("Got a click in button!\r");
+					  printf("Got a click in button! part=%d\r", part);
+					  int clicked = TrackControl(control, mouse, NULL );
+					  if (clicked) {
+						 TEKey('x', doc->docInputTE);
+					  }
 					}
 					break;
 			}

@@ -52,3 +52,7 @@
 
 #define kButtonHeight 20
 #define kButtonWidth 70
+
+#define kLabelHeight 20
+
+#define kInterTextboxHeight (2 * kMargin + kButtonHeight + kInputHeight + kLabelHeight)
