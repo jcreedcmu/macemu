@@ -118,6 +118,8 @@ void MakeNewWindow(ConstStr255Param title, short procID) {
 	 good = doc->docVScroll != NULL;
   }
   if (good) {
+	 SetControlMaximum(doc->docVScroll, 100);
+	 SetControlValue(doc->docVScroll, 20);
 	 AdjustScrollSizes(w);
 	 ShowWindow(w);
   }
@@ -227,7 +229,7 @@ void DrawWindow (WindowPtr w) {
   GetTEContainerRect(&r);
   FrameRect(&r);
 
-  DrawControls(w);
+  DrawControls(w); // Consider UpdateControls instead
   int id = doc->id;
 
   char buf[256];
