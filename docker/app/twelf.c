@@ -28,7 +28,10 @@
 #include <Devices.h>
 #include <string.h>
 #include <stdio.h>
+// twelf.h is shared with twelf.r, so only #defines
 #include "twelf.h"
+// more stuff involving typedefs or toolbox function declarations should go here:
+#include "api.h"
 
 static Rect initialWindowRect, nextWindowRect;
 
@@ -49,6 +52,7 @@ typedef struct {
   TEHandle		 docInputTE;
   TEHandle		 docOutputTE;
   ControlHandle docVScroll;
+  ProcPtr			docClik;
   ControlHandle docExecButton;
 } DocumentRecord, *DocumentPeek;
 
@@ -86,6 +90,30 @@ void ResizedWindow(WindowPtr window) {
 	//	AdjustTE(window);
 	InvalRect(&window->portRect);
 }
+
+pascal void PascalClikLoop(void)
+{
+  // do nothing for now
+
+	/* WindowPtr	window; */
+	/* RgnHandle	region; */
+
+	/* window = FrontWindow(); */
+	/* region = NewRgn(); */
+	/* GetClip(region);					/\* save clip *\/ */
+	/* ClipRect(&window->portRect); */
+	/* AdjustScrollValues(window, true);	/\* pass true for canRedraw *\/ */
+	/* SetClip(region);					/\* restore clip *\/ */
+	/* DisposeRgn(region); */
+
+} /* Pascal/C ClikLoop */
+
+pascal ProcPtr GetOldClikLoop(void)
+{
+	return ((DocumentPeek)FrontWindow())->docClik;
+} /* GetOldClikLoop */
+
+extern pascal void AsmClikLoop(void);
 
 void MakeNewWindow(ConstStr255Param title, short procID) {
   if (nextWindowRect.bottom > qd.screenBits.bounds.bottom
@@ -127,6 +155,8 @@ void MakeNewWindow(ConstStr255Param title, short procID) {
 	 doc->docVScroll = GetNewControl(rVScroll, w);
 	 doc->docExecButton = GetNewControl(rExecButton, w);
 	 good = (doc->docVScroll != NULL) && (doc->docExecButton != NULL);
+	 doc->docClik = (ProcPtr) (*doc->docInputTE)->clikLoop;
+	 (*doc->docInputTE)->clikLoop = (TEClickLoopUPP) AsmClikLoop;
   }
   if (good) {
 	 printf("created scrollbar and execbutton\r");

@@ -1,9 +1,10 @@
 cmake_minimum_required(VERSION 3.22)
 project(Twelf)
-
+enable_language(ASM)
 add_application(Twelf
     twelf.c
     twelf.r
+	 clikloop.s
     CREATOR "TWLF"
     )
 
