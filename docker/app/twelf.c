@@ -94,7 +94,14 @@ void ResizedWindow(WindowPtr window) {
 
 pascal void PascalClikLoop(void)
 {
-  // do nothing for now
+	 WindowPtr	window;
+
+	 window = FrontWindow();
+	 DocumentPeek doc = (DocumentPeek)window;
+	 SetControlValue(doc->docDebugCheckbox, 1);
+	 Rect *crect = &(*doc->docDebugCheckbox)->contrlRect;
+	 InvalRect(crect);
+
 
 	/* WindowPtr	window; */
 	/* RgnHandle	region; */
