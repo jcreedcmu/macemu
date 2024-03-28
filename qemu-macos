@@ -1,13 +1,19 @@
 #!/bin/bash
 cd "$(dirname "$0")"
 
+# -nic user,hostfwd=tcp::2121-:21,hostfwd=tcp::8080-:80 \
+
+# # Add these for install cd:
+# -device scsi-cd,scsi-id=3,drive=cd0 \
+# -drive file=MacOS7.5.3.iso,format=raw,media=disk,if=none,id=cd0 \
+
 qemu-system-m68k \
  -M q800 \
  -m 128 \
  -bios "Quadra800.rom" \
- -netdev user,id=vnet \
  -display gtk \
  -g 1152x870x8 \
+ -nic user,hostfwd=tcp::1984-:1984,hostfwd=tcp::8001-:8001 \
  -drive file=pram-macos.img,format=raw,if=mtd \
  -device scsi-hd,scsi-id=0,drive=hd0 \
  -drive file=MacOS7.5.3.img,format=raw,media=disk,if=none,id=hd0 \
