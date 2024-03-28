@@ -15,7 +15,7 @@ app/icon.r: ../scripts/*.js ../assets/*.png
 docker:
 	docker build . -t jcreed/retro68
 bash:
-	docker run --rm -it jcreed/retro68
+	docker run --rm -v "./app:/root/app" -it jcreed/retro68
 bashv:
 	docker run --rm -it -v "/home/jcreed/pgit/Retro68:/root" jcreed/retro68
 
