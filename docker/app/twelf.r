@@ -136,4 +136,11 @@ resource 'CNTL' (rExecButton, preload, purgeable) {
 	0, visible, 0, 0, buttonProc, 0, "Check"
 };
 
+/* Debug checkbox */
+resource 'CNTL' (rDebugCheckbox, preload, purgeable) {
+	{kInputOffY + kInputHeight + kMargin, kInputOffX + kButtonWidth + kMargin,
+	kInputOffY + kInputHeight + kMargin + kButtonHeight, kInputOffX + kButtonWidth + kButtonWidth + kMargin},
+	0, visible, 0, 0, checkBoxProc, 0, "Debug"
+};
+
 #include "icon.r"

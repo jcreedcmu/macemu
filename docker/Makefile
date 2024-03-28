@@ -22,4 +22,4 @@ bashv:
 # local server that I can access from http://10.0.2.2:8000 on the client to
 # download app.bin and put it through stuffit
 serve:
-	python3 -m http.server
+	python3 ../server/server.py

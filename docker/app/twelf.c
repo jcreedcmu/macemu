@@ -54,6 +54,7 @@ typedef struct {
   ControlHandle docVScroll;
   ProcPtr			docClik;
   ControlHandle docExecButton;
+  ControlHandle docDebugCheckbox;
 } DocumentRecord, *DocumentPeek;
 
 void GetTEContainerRect(Rect *teRect, int which) {
@@ -154,14 +155,21 @@ void MakeNewWindow(ConstStr255Param title, short procID) {
 	 doc->id = id;
 	 doc->docVScroll = GetNewControl(rVScroll, w);
 	 doc->docExecButton = GetNewControl(rExecButton, w);
-	 good = (doc->docVScroll != NULL) && (doc->docExecButton != NULL);
+	 doc->docDebugCheckbox = GetNewControl(rDebugCheckbox, w);
 	 doc->docClik = (ProcPtr) (*doc->docInputTE)->clikLoop;
 	 (*doc->docInputTE)->clikLoop = (TEClickLoopUPP) AsmClikLoop;
+
+	 good = (doc->docVScroll != NULL)
+		&& (doc->docExecButton != NULL)
+		&& (doc->docDebugCheckbox != NULL)
+		;
   }
   if (good) {
-	 printf("created scrollbar and execbutton\r");
+	 printf("created scrollbar and other controls\r");
 	 SetControlMaximum(doc->docVScroll, kScrollMax);
 	 SetControlValue(doc->docVScroll, 20);
+	 SetControlMaximum(doc->docDebugCheckbox, 1);
+	 SetControlValue(doc->docDebugCheckbox, 1);
 
 	 TESetText("o : type.\ra : o -> type.", 10, doc->docOutputTE);
 	 AdjustScrollSizes(w);
@@ -504,11 +512,23 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
 				default:						/* they clicked in an arrow, so track & scroll */
 					if (control == doc->docVScroll )
 					  value = TrackControl(control, mouse, (ControlActionUPP) ScrollCallback );
-					if (control == doc->docExecButton) {
+					else if (control == doc->docExecButton) {
 					  printf("Got a click in button! part=%d\r", part);
-					  int clicked = TrackControl(control, mouse, NULL );
+					  int clicked = TrackControl(control, mouse, nil);
 					  if (clicked) {
-						 TEKey('x', doc->docInputTE);
+						 ShowCursor();
+						 //TEKey('x', doc->docInputTE);
+					  }
+					}
+					else if (control == doc->docDebugCheckbox) {
+					  printf("nil is: %d\r", (int)nil);
+					  printf("NULL is: %d\r", (int)NULL);
+					  printf("-1 is: %d\r", (int)-1);
+					  printf("Got a click in checkbox! part=%d\r", part);
+					  int clicked = TrackControl(control, mouse, nil);
+					  if (clicked) {
+						 int v = GetControlValue(doc->docDebugCheckbox);
+						 SetControlValue(doc->docDebugCheckbox, !v);
 					  }
 					}
 					break;

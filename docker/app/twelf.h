@@ -19,6 +19,7 @@
 
 #define	rVScroll	128				/* vertical scrollbar control */
 #define	rExecButton 129				/* execute button */
+#define	rDebugCheckbox 130				/* debug checkbox */
 
 /*	kScrollTweak compensates for off-by-one requirements of the scrollbars
  to have borders coincide with the growbox. */
