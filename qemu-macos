@@ -5,6 +5,7 @@ qemu-system-m68k \
  -M q800 \
  -m 128 \
  -bios "Quadra800.rom" \
+ -netdev user,id=vnet \
  -display gtk \
  -g 1152x870x8 \
  -drive file=pram-macos.img,format=raw,if=mtd \
