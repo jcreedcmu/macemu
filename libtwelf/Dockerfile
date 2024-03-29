@@ -52,6 +52,8 @@ RUN cd mlton && \
     make all && \
     make PREFIX=$MLTON install
 
+RUN ln -s /Retro68-INSTALL/bin/m68k-apple-macos-gcc /Retro68-INSTALL/bin/m68k-apple-macos-cc
+
 # build m68k runtime
 RUN cd mlton && \
     git checkout mac && \
