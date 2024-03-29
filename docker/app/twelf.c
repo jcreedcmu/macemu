@@ -174,7 +174,7 @@ void MakeNewWindow(ConstStr255Param title, short procID) {
   if (good) {
 	 printf("created scrollbar and other controls\r");
 	 SetControlMaximum(doc->docVScroll, kScrollMax);
-	 SetControlValue(doc->docVScroll, 20);
+	 SetControlValue(doc->docVScroll, 0);
 	 SetControlMaximum(doc->docDebugCheckbox, 1);
 	 SetControlValue(doc->docDebugCheckbox, 1);
 
@@ -466,16 +466,23 @@ pascal void ScrollCallback(ControlHandle control, short part) {
 		 delta = 1;
 		 break;
 	  case kControlPageUpPart:
-		 delta = -10;
+		 delta = -3;
 		 break;
 	  case kControlPageDownPart:
-		 delta = 10;
+		 delta = 3;
 		 break;
 	  }
-	  short amount = GetControlValue(control) + delta;
-	  if (amount < 0) amount = 0;
-	  if (amount > kScrollMax) amount = kScrollMax;
-	  SetControlValue(control, amount);
+	  short oldVal = GetControlValue(control);
+	  short newVal = GetControlValue(control) + delta;
+	  if (newVal < 0) newVal = 0;
+	  if (newVal > kScrollMax) newVal = kScrollMax;
+	  SetControlValue(control, GetControlValue(control) + delta);
+	  short actualDelta = oldVal - newVal;
+	  if (actualDelta != 0) {
+		 WindowPtr window = (*control)->contrlOwner;
+		 TEHandle te = ((DocumentPeek)window)->docInputTE;
+		 TEScroll(0, actualDelta * (*te)->lineHeight, te);
+	  }
 	}
 }
 
@@ -508,12 +515,12 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
 					part = TrackControl(control, mouse, nil);
 					if (part != 0) {
 						value -= GetControlValue(control);
-						/* value now has CHANGE in value; if value changed, scroll */
-						/* if (value != 0 ) */
-						/* 	if (control == doc->docVScroll ) */
-						/* 		TEScroll(0, value * (*doc->docTE)->lineHeight, doc->docTE); */
-						/* 	else */
-						/* 		TEScroll(value, 0, doc->docTE); */
+
+						// value now has CHANGE in value; if value changed, scroll
+						if (value != 0 ) {
+						  TEHandle te = doc->docInputTE;
+						  TEScroll(0, value * (*te)->lineHeight, te);
+						}
 					}
 					break;
 				default:						/* they clicked in an arrow, so track & scroll */

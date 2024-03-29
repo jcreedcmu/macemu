@@ -49,7 +49,7 @@
 #define kControlPageDownPart 23
 
 #define kMargin 10 /* between textbox and button */
-#define kScrollMax 100
+#define kScrollMax 10
 
 #define kButtonHeight 20
 #define kButtonWidth 70
