@@ -11,7 +11,7 @@ RINCLUDES=$(PREFIX)/RIncludes
 REZFLAGS=-I$(RINCLUDES)
 
 Twelf.code.bin: twelf.o
-	$(CC) $< -o $@ $(LDFLAGS) -L/root/libtwelf -lgmp -ltwelf
+	$(CC) $< -o $@ $(LDFLAGS) -L/root/libtwelf  -ltwelf -lgmp -lm
 
 Twelf.bin: Twelf.code.bin
 	$(REZ) $(REZFLAGS) --copy $^ twelf.r -t "APPL" -c "TWLF" -o $@
