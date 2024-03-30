@@ -42,23 +42,27 @@ RUN wget https://github.com/MLton/mlton/releases/download/on-20210117-release/ml
     cd $BUILD/mlton-20210117-1.amd64-linux-glibc2.31 && make install
 
 ADD https://api.github.com/repos/agoode/mlton/git/refs/heads/mac mlton-version.json
-RUN git clone --depth 2 --branch mac https://github.com/agoode/mlton.git
+RUN git clone --depth 1 --branch mac https://github.com/agoode/mlton.git
 
 # build mlton binary
 # for boostrapping to work, we have to build at an earlier commit
 RUN cd mlton && \
-    git checkout mac^ && \
     export MLTON=$BUILD/mlton-INSTALL && \
     make all && \
     make PREFIX=$MLTON install
 
 RUN ln -s /Retro68-INSTALL/bin/m68k-apple-macos-gcc /Retro68-INSTALL/bin/m68k-apple-macos-cc
 
+# # Horrible hack
+# RUN perl -pe 's,clock_t times \(struct tms \*\);,,' /Retro68-INSTALL/m68k-apple-macos/include/sys/times.h > /tmp/times.h && \
+#     perl -i -pe 's,#define times times_,,' /build/mlton/runtime/platform/macos.h && \
+#     perl -i -pe 'BEGIN{open IN, "/tmp/times.h" or die $!; undef $/; $repl = <IN>;} s,#include <sys/times.h>,$repl,' /build/mlton/runtime/platform/macos.h
+
 # build m68k runtime
 RUN cd mlton && \
-    git checkout mac && \
     git clean -dfx && \
     make \
+        USE_PREGEN=true \
 		  TARGET_OS=macos \
 		  TARGET_ARCH=m68k \
 		  TARGET=m68k-apple-macos \
@@ -75,8 +79,8 @@ ADD https://api.github.com/repos/agoode/twelf/git/refs/heads/main twelf-version.
 RUN git clone --branch mac --depth 1 https://github.com/agoode/twelf
 
 # build twelf library
-# RUN cd twelf && \
-#     make mlton="$BUILD/mlton-INSTALL/bin/mlton \
-#         -default-ann 'nonexhaustiveMatch ignore' \
-#         -default-ann 'nonexhaustiveBind ignore'" \
-#         wasi
+RUN cd twelf && \
+    make mlton="$BUILD/mlton-INSTALL/bin/mlton \
+        -default-ann 'nonexhaustiveMatch ignore' \
+        -default-ann 'nonexhaustiveBind ignore'" \
+        classic-mac

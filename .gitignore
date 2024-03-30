@@ -8,3 +8,4 @@ docker/app/icon.r
 docker/app/build
 *.bin
 *.img.bak
+libtwelf/dist
