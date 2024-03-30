@@ -32,6 +32,8 @@
 #include "twelf.h"
 // more stuff involving typedefs or toolbox function declarations should go here:
 #include "api.h"
+// Twelf language core
+#include "libtwelf.h"
 
 static Rect initialWindowRect, nextWindowRect;
 
@@ -556,6 +558,13 @@ unsigned long int osTypeOf(char *buf) {
 }
 
 int main(void) {
+
+  int argc = 1;
+  const char * argv[] = {
+    "twelf",
+  };
+  twelf_server_open(argc, argv);
+
   // Debugging Log
   stdout = fopen("out", "w");
   setbuf(stdout, NULL);
