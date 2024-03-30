@@ -1,4 +1,4 @@
 #!/bin/bash
 
 cd /root/app
-make
+make Twelf.bin

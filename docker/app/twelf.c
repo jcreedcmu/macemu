@@ -559,11 +559,6 @@ unsigned long int osTypeOf(char *buf) {
 
 int main(void) {
 
-  int argc = 1;
-  const char * argv[] = {
-    "twelf",
-  };
-  twelf_server_open(argc, argv);
 
   // Debugging Log
   stdout = fopen("out", "w");
@@ -596,6 +591,19 @@ int main(void) {
   Str255 str;
   GetIndString(str,128,1);
   MakeNewWindow(str, documentProc); // plain document window
+
+  // Do some twelf
+  int argc = 1;
+  const char * argv[] = {
+    "twelf",
+  };
+  twelf_server_open(argc, argv);
+  char inputStr[] = "o:type.";
+  char *buffer = (char *)allocate(strlen(inputStr) + 1);
+  strcpy(buffer, inputStr);
+  printf("Twelf response: %d\r", execute());
+  return 0;
+
 
   int debug = 0;
   for(;;) {
@@ -657,5 +665,7 @@ int main(void) {
 		DoIdle();
 	 }
   }
+
+  twelf_server_close();
   return 0;
 }
