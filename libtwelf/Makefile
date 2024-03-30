@@ -5,11 +5,13 @@ docker:
 bash:
 	docker run --rm -it $(TAG)
 
-dist/twelf.a: Dockerfile
+dist/libtwelf.a dist/libtwelf.h dist/libgmp.a: Dockerfile
 	mkdir -p dist
 	docker create --name tempcont "$(TAG):latest"
-	docker cp "tempcont:/build/twelf/bin/twelf-server.a" dist/twelf.a
-	docker cp "tempcont:/build/twelf/bin/twelf_server.h" dist/twelf.h
-	touch dist/twelf.a
-	touch dist/twelf.h
+	docker cp "tempcont:/build/gmp-m68k-INSTALL/lib/libgmp.a" dist/libgmp.a
+	docker cp "tempcont:/build/twelf/bin/twelf-server.a" dist/libtwelf.a
+	docker cp "tempcont:/build/twelf/bin/twelf_server.h" dist/libtwelf.h
+	touch dist/libgmp.a
+	touch dist/libtwelf.a
+	touch dist/libtwelf.h
 	docker rm tempcont

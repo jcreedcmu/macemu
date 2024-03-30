@@ -33,7 +33,7 @@
 // more stuff involving typedefs or toolbox function declarations should go here:
 #include "api.h"
 // Twelf language core
-#include "libtwelf.h"
+#include <libtwelf.h>
 
 static Rect initialWindowRect, nextWindowRect;
 
