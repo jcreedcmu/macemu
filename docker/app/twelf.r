@@ -86,29 +86,24 @@ resource 'WIND' (128) {
 };
 
 resource 'SIZE' (-1) {
-	reserved,
-	acceptSuspendResumeEvents,
-	reserved,
-	canBackground,
-	doesActivateOnFGSwitch,
-	backgroundAndForeground,
-	dontGetFrontClicks,
-	ignoreChildDiedEvents,
-	is32BitCompatible,
-	isHighLevelEventAware,
-	onlyLocalHLEvents,
-	notStationeryAware,
-	dontUseTextEditServices,
-	reserved,
-	reserved,
-	reserved,
-#ifdef TARGET_API_MAC_CARBON
-	500 * 1024,	// Carbon apparently needs additional memory.
-	500 * 1024
-#else
-	100 * 1024,
-	100 * 1024
-#endif
+    reserved,
+    acceptSuspendResumeEvents,
+    reserved,
+    canBackground,
+    doesActivateOnFGSwitch,
+    backgroundAndForeground,
+    dontGetFrontClicks,
+    ignoreChildDiedEvents,
+    is32BitCompatible,
+    isHighLevelEventAware,
+    onlyLocalHLEvents,
+    notStationeryAware,
+    dontUseTextEditServices,
+    reserved,
+    reserved,
+    reserved,
+    90 * 1024 * 1024,
+    32 * 1024 * 1024
 };
 
 type 'CNTL' {

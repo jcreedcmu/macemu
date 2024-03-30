@@ -557,12 +557,17 @@ unsigned long int osTypeOf(char *buf) {
   return (buf[3]) | (buf[2] << 8) | (buf[1] << 16) | (buf[0] << 24);
 }
 
+/* ssize_t _consolewrite(int fd, const void *buf, size_t count) { */
+/*   return count; */
+/* } */
+
 int main(void) {
 
 
   // Debugging Log
-  stdout = fopen("out", "w");
+  stdout = stderr = fopen("out", "w");
   setbuf(stdout, NULL);
+  setbuf(stderr, NULL);
 
   FSSpec spec;
   int err = FSMakeFSSpec(0, 0, "\p:foo", &spec);
@@ -597,12 +602,14 @@ int main(void) {
   const char * argv[] = {
     "twelf",
   };
+  printf("about to twelf\r");
   twelf_server_open(argc, argv);
-  char inputStr[] = "o:type.";
-  char *buffer = (char *)allocate(strlen(inputStr) + 1);
-  strcpy(buffer, inputStr);
-  printf("Twelf response: %d\r", execute());
-  return 0;
+  printf("twelfed\r");
+  /* char inputStr[] = "o:type."; */
+  /* char *buffer = (char *)allocate(strlen(inputStr) + 1); */
+  /* strcpy(buffer, inputStr); */
+  /* printf("Twelf response: %d\r", execute()); */
+
 
 
   int debug = 0;
