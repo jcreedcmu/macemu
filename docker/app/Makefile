@@ -10,8 +10,11 @@ CFLAGS=-I/root/libtwelf
 RINCLUDES=$(PREFIX)/RIncludes
 REZFLAGS=-I$(RINCLUDES)
 
-Twelf.code.bin: twelf.o
-	$(CC) $< -o $@ $(LDFLAGS) -L/root/libtwelf  -ltwelf -lgmp -lm
+Twelf.code.bin: twelf.o clikloop.o
+	$(CC) $^ -o $@ $(LDFLAGS) -L/root/libtwelf  -ltwelf -lgmp -lm
+
+clikloop.o: clikloop.s
+	$(CC) -ffunction-sections -c clikloop.s -o $@
 
 Twelf.bin: Twelf.code.bin
 	$(REZ) $(REZFLAGS) --copy $^ twelf.r -t "APPL" -c "TWLF" -o $@
