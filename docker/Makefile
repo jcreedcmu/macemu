@@ -1,4 +1,4 @@
-app.bin: Dockerfile app/*.c app/*.r app/CMakeLists.txt app/icon.r
+app.bin: Dockerfile app/*.c app/*.r app/Makefile app/icon.r
 	docker build . -t "jcreed/retro68:latest"
 	docker run --rm -v "./app:/root/app" -v "./../libtwelf/dist:/root/libtwelf" "jcreed/retro68:latest" /root/build.sh
 	cp app/build/Twelf.bin app.bin

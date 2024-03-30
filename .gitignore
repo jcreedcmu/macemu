@@ -9,3 +9,5 @@ docker/app/build
 *.bin
 *.img.bak
 libtwelf/dist
+*.gdb
+*.o
