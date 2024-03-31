@@ -585,7 +585,7 @@ int main(void) {
   const char * argv[] = {
     "twelf",
   };
-  printf("about to twelf\r");
+  printf("about to twelf-open\r");
   if (INVOKE_MACSBUG) {
   DebugStr("\ps mbug g dm $07FA4200 \r"
 			  "sl 07FA4244 30000\r"
@@ -594,12 +594,11 @@ int main(void) {
 			  "mbgTopOfMacsBugMemory - mbgHistoryBuffer - mbgHistorySize f fl \r");
   }
   twelf_server_open(argc, argv);
-  printf("twelfed\r");
-  /* char inputStr[] = "o:type."; */
-  /* char *buffer = (char *)allocate(strlen(inputStr) + 1); */
-  /* strcpy(buffer, inputStr); */
-  /* printf("Twelf response: %d\r", execute()); */
-
+  printf("twelf-opened\r");
+  char inputStr[] = "o:type.";
+  char *buffer = (char *)allocate(strlen(inputStr) + 1);
+  strcpy(buffer, inputStr);
+  printf("Twelf response: %d\r", execute());
 
 
   int debug = 0;
