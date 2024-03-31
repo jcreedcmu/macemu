@@ -10,8 +10,8 @@ CFLAGS=-I/build/twelf/bin -g
 RINCLUDES=$(PREFIX)/RIncludes
 REZFLAGS=-I$(RINCLUDES)
 
-Twelf.code.bin: twelf.o clikloop.o libRetroConsole.a
-	$(CC) $^ -o $@ $(LDFLAGS) -L/build/twelf/bin -L/build/gmp-m68k-INSTALL/lib -ltwelf -lgmp -lm libRetroConsole.a
+Twelf.code.bin: twelf.o clikloop.o console.o
+	$(CC) $^ -o $@ $(LDFLAGS) -L/build/twelf/bin -L/build/gmp-m68k-INSTALL/lib -ltwelf -lgmp -lm
 
 clikloop.o: clikloop.s
 	$(CC) -ffunction-sections -c clikloop.s -o $@
@@ -22,9 +22,6 @@ Twelf.bin: Twelf.code.bin
 console.o: console.c
 	$(CC) -ffunction-sections -c console.c -o $@
 
-libRetroConsole.a: console.o
-	ar rcs libRetroConsole.a console.o
-
 .PHONY: clean
 clean:
-	rm -f Twelf.bin Twelf.APPL Twelf.dsk Twelf.code.bin Twelf.code.bin.gdb twelf.o clikloop.o console.o libRetroConsole.a
+	rm -f Twelf.bin Twelf.APPL Twelf.dsk Twelf.code.bin Twelf.code.bin.gdb twelf.o clikloop.o console.o
