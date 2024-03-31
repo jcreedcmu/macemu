@@ -72,7 +72,7 @@ RUN echo '#!/bin/bash\ngit rev-parse HEAD' > /usr/bin/svnversion && \
     chmod +x /usr/bin/svnversion
 
 # check out agoode's twelf branch
-ADD https://api.github.com/repos/agoode/twelf/git/refs/heads/main twelf-version.json
+ADD https://api.github.com/repos/agoode/twelf/git/refs/heads/mac twelf-version.json
 RUN git clone --branch mac --depth 1 https://github.com/agoode/twelf
 
 # build twelf library
