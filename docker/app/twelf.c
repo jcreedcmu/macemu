@@ -515,7 +515,27 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
 					  printf("Got a click in button! part=%d\r", part);
 					  int clicked = TrackControl(control, mouse, nil);
 					  if (clicked) {
-						 ShowCursor();
+						 // ShowCursor();
+						 TESetText("", 0, doc->docOutputTE);
+
+						 unsigned char **textHandle = TEGetText(doc->docInputTE);
+						 TERec *tePtr = *(doc->docInputTE);
+
+						 printf("got the text: \"%.*s\"\r", tePtr->teLength, *textHandle);
+
+						 char inputStr[] = "o : type.\n";
+						 printf("about to allocate\r");
+						 int len = strlen(inputStr);
+						 char *buffer = (char *)allocate(len);
+						 printf("allocated\r");
+						 strncpy(buffer, inputStr, len);
+						 int resp = execute();
+						 printf("Twelf response: %d\r", resp);
+
+						 TEInsert("input", 5, doc->docInputTE);
+						 char *abortStr = "Server ABORT\r";
+						 char *okStr = "Server OK\r";
+						 TEInsert(resp ? abortStr : okStr, resp ? strlen(abortStr) : strlen(okStr), doc->docOutputTE);
 						 //TEKey('x', doc->docInputTE);
 					  }
 					}
@@ -603,14 +623,6 @@ int main(void) {
   }
   twelf_server_open(argc, argv);
   printf("twelf-opened\r");
-  char inputStr[] = "o : type.\n";
-  printf("about to allocate\r");
-  int len = strlen(inputStr);
-  char *buffer = (char *)allocate(len);
-  printf("allocated\r");
-  strncpy(buffer, inputStr, len);
-  printf("Twelf response: %d\r", execute());
-
 
   int debug = 0;
   for(;;) {
