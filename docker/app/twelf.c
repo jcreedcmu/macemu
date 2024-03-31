@@ -524,15 +524,15 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
 						 printf("got the text: \"%.*s\"\r", tePtr->teLength, *textHandle);
 
 						 char inputStr[] = "o : type.\n";
-						 printf("about to allocate\r");
-						 int len = strlen(inputStr);
+						 int len = tePtr->teLength;
+						 printf("about to allocate %d bytes...\r", len);
 						 char *buffer = (char *)allocate(len);
 						 printf("allocated\r");
-						 strncpy(buffer, inputStr, len);
+						 strncpy(buffer, *textHandle, len);
+						 printf("copied %d bytes to buffer\r", len);
 						 int resp = execute();
 						 printf("Twelf response: %d\r", resp);
 
-						 TEInsert("input", 5, doc->docInputTE);
 						 char *abortStr = "Server ABORT\r";
 						 char *okStr = "Server OK\r";
 						 TEInsert(resp ? abortStr : okStr, resp ? strlen(abortStr) : strlen(okStr), doc->docOutputTE);
