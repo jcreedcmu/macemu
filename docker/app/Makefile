@@ -10,7 +10,7 @@ CFLAGS=-I/build/twelf/bin -g
 RINCLUDES=$(PREFIX)/RIncludes
 REZFLAGS=-I$(RINCLUDES)
 
-Twelf.code.bin: twelf.o clikloop.o console.o
+Twelf.code.bin: twelf.o clikloop.o
 	$(CC) $^ -o $@ $(LDFLAGS) -L/build/twelf/bin -L/build/gmp-m68k-INSTALL/lib -ltwelf -lgmp -lm
 
 clikloop.o: clikloop.s
@@ -21,4 +21,4 @@ Twelf.bin: Twelf.code.bin
 
 .PHONY: clean
 clean:
-	rm -f Twelf.bin Twelf.APPL Twelf.dsk Twelf.code.bin Twelf.code.bin.gdb twelf.o clikloop.o console.o
+	rm -f Twelf.bin Twelf.APPL Twelf.dsk Twelf.code.bin Twelf.code.bin.gdb twelf.o clikloop.o

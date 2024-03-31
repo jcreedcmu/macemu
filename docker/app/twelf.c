@@ -1,3 +1,4 @@
+#include <sys/types.h>
 #include <Quickdraw.h>
 #include <Windows.h>
 #include <Menus.h>
@@ -17,6 +18,31 @@
 #include <libtwelf.h>
 
 #define INVOKE_MACSBUG 0
+
+/***
+ * We need to define *both* _consolewrite and _consoleread to somehow
+ * override the ones in default libRetroConsole.a, I don't understand
+ * why yet.
+ */
+
+TEHandle outputDest = NULL;
+
+extern ssize_t _consolewrite(int fd, const void *buf, size_t count) {
+  if (outputDest != NULL) {
+	 // Probably want to convert \n to \r in buf
+	 TEInsert((char *)buf, count, outputDest);
+	 return count;
+  }
+  else {
+	 // send to /dev/null
+    return count;
+  }
+}
+
+extern ssize_t _consoleread(int fd, void *buf, size_t count) {
+    return count;
+}
+
 
 static Rect initialWindowRect, nextWindowRect;
 
@@ -517,6 +543,7 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
 					  if (clicked) {
 						 // ShowCursor();
 						 TESetText("", 0, doc->docOutputTE);
+						 outputDest = doc->docOutputTE;
 
 						 unsigned char **textHandle = TEGetText(doc->docInputTE);
 						 TERec *tePtr = *(doc->docInputTE);
@@ -533,10 +560,10 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
 						 int resp = execute();
 						 printf("Twelf response: %d\r", resp);
 
-						 char *abortStr = "Server ABORT\r";
-						 char *okStr = "Server OK\r";
+						 char *abortStr = "\rServer ABORT";
+						 char *okStr = "\rServer OK";
 						 TEInsert(resp ? abortStr : okStr, resp ? strlen(abortStr) : strlen(okStr), doc->docOutputTE);
-						 //TEKey('x', doc->docInputTE);
+						 outputDest = NULL;
 					  }
 					}
 					else if (control == doc->docDebugCheckbox) {
