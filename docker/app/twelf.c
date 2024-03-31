@@ -540,6 +540,14 @@ unsigned long int osTypeOf(char *buf) {
   return (buf[3]) | (buf[2] << 8) | (buf[1] << 16) | (buf[0] << 24);
 }
 
+
+ssize_t _consolewrite(int fd, const void *buf, size_t count);
+
+ssize_t consoleWriteTest(int fd, const void *buf, size_t count) {
+	return _consolewrite(fd, buf, count);
+}
+
+
 /* ssize_t _consolewrite(int fd, const void *buf, size_t count) { */
 /*   return count; */
 /* } */
