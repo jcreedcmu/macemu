@@ -603,7 +603,7 @@ int main(void) {
   }
   twelf_server_open(argc, argv);
   printf("twelf-opened\r");
-  char inputStr[] = "o:type.";
+  char inputStr[] = "o : type.";
   printf("about to allocate\r");
   char *buffer = (char *)allocate(strlen(inputStr) + 1);
   printf("allocated\r");
