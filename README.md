@@ -32,10 +32,9 @@ I needed to put in this directory:
 Building and Running the App
 ----------------------------
 
-Currently starting with the `Dialog` example from https://github.com/autc04/Retro68
 ```shell
 cd docker
-make app.bin
+make
 make serve # spawns a local web server
 ```
 
