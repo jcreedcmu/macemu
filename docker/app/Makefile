@@ -19,9 +19,6 @@ clikloop.o: clikloop.s
 Twelf.bin: Twelf.code.bin
 	$(REZ) $(REZFLAGS) --copy $^ twelf.r -t "APPL" -c "TWLF" -o $@
 
-console.o: console.c
-	$(CC) -ffunction-sections -c console.c -o $@
-
 .PHONY: clean
 clean:
 	rm -f Twelf.bin Twelf.APPL Twelf.dsk Twelf.code.bin Twelf.code.bin.gdb twelf.o clikloop.o console.o
