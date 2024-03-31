@@ -1,6 +1,6 @@
 app.bin: Dockerfile app/*.c app/*.r app/Makefile app/icon.r
 	docker build . -t "jcreed/retro68:latest"
-	docker run --rm -v "./app:/root/app" -v "./../libtwelf/dist:/root/libtwelf" "jcreed/retro68:latest" /root/build.sh
+	docker run --rm -v "./app:/root/app" "jcreed/retro68:latest" /root/build.sh
 	cp app/Twelf.bin app.bin
 	touch app.bin
 # node ../scripts/set-bits.js app.bin
@@ -15,7 +15,7 @@ app/icon.r: ../scripts/*.js ../assets/*.png
 docker:
 	docker build . -t jcreed/retro68
 bash:
-	docker run --rm -v "./app:/root/app" -v "../libtwelf/dist:/root/libtwelf" -it jcreed/retro68
+	docker run --rm -v "./app:/root/app" -it jcreed/retro68
 
 # local server that I can access from http://10.0.2.2:8000 on the client to
 # download app.bin and put it through stuffit

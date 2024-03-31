@@ -1,22 +1,3 @@
-/*
-  Copyright 2017 Wolfgang Thaller.
-
-  This file is part of Retro68.
-
-  Retro68 is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-
-  Retro68 is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with Retro68.  If not, see <http://www.gnu.org/licenses/>.
-*/
-
 #include <Quickdraw.h>
 #include <Windows.h>
 #include <Menus.h>
@@ -34,6 +15,8 @@
 #include "api.h"
 // Twelf language core
 #include <libtwelf.h>
+
+#define INVOKE_MACSBUG 0
 
 static Rect initialWindowRect, nextWindowRect;
 
@@ -603,11 +586,13 @@ int main(void) {
     "twelf",
   };
   printf("about to twelf\r");
+  if (INVOKE_MACSBUG) {
   DebugStr("\ps mbug g dm $07FA4200 \r"
 			  "sl 07FA4244 30000\r"
 			  "sl 07FA4240 30000\r"
 			  "mbgDefStartRate mbgDefRepeatRate\r"
 			  "mbgTopOfMacsBugMemory - mbgHistoryBuffer - mbgHistorySize f fl \r");
+  }
   twelf_server_open(argc, argv);
   printf("twelfed\r");
   /* char inputStr[] = "o:type."; */
