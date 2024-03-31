@@ -21,4 +21,4 @@ Twelf.bin: Twelf.code.bin
 
 .PHONY: clean
 clean:
-	rm -f Twelf.bin Twelf.APPL Twelf.dsk Twelf.code.bin Twelf.code.bin.gdb twelf.o
+	rm -f Twelf.bin Twelf.APPL Twelf.dsk Twelf.code.bin Twelf.code.bin.gdb twelf.o clikloop.o
