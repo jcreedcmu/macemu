@@ -603,6 +603,11 @@ int main(void) {
     "twelf",
   };
   printf("about to twelf\r");
+  DebugStr("\ps mbug g dm $07FA4200 \r"
+			  "sl 07FA4244 30000\r"
+			  "sl 07FA4240 30000\r"
+			  "mbgDefStartRate mbgDefRepeatRate\r"
+			  "mbgTopOfMacsBugMemory - mbgHistoryBuffer - mbgHistorySize f fl \r");
   twelf_server_open(argc, argv);
   printf("twelfed\r");
   /* char inputStr[] = "o:type."; */
