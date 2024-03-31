@@ -71,9 +71,9 @@ RUN cd mlton && \
 RUN echo '#!/bin/bash\ngit rev-parse HEAD' > /usr/bin/svnversion && \
     chmod +x /usr/bin/svnversion
 
-# check out my twelf branch
-ADD https://api.github.com/repos/jcreedcmu/twelf/git/refs/heads/classic-mac twelf-version.json
-RUN git clone --branch classic-mac --depth 1 https://github.com/jcreedcmu/twelf
+# check out agoode's twelf branch
+ADD https://api.github.com/repos/agoode/twelf/git/refs/heads/mac twelf-version.json
+RUN git clone --branch mac --depth 1 https://github.com/agoode/twelf
 
 # build twelf library
 RUN cd twelf && \
