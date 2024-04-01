@@ -59,4 +59,4 @@ Start MacOS guest with `./qemu-macos`. Inside MacOS guest:
 - Launch Netscape Navigator from `Saved HD`.
 - Go to `http://10.0.2.2:8000/` (this is the host-local web server)
 - Download `app.bin`
-- Expand it in Stuffit Expander to create app named `Dialog`.
+- Expand it in Stuffit Expander to create app named `Twelf`.
