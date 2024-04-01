@@ -1,3 +1,9 @@
+// set-bits.js
+//
+// Modifies some fixed-offset bits in MacBinary files to set the HFS
+// flags to "not inited" and "has a BNDL resource". It's not clear if
+// this is necessary to get application icons to show up correctly.
+
 const fs = require('fs');
 
 const filePath = process.argv[2];

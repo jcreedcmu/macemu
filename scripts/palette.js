@@ -1,3 +1,17 @@
+// palette.js
+//
+// Some utilities to provide the standard 8-bit and 4-bit color
+// palettes (used for examplein icl8 and icl4 resources) on classic MacOS.
+//
+// exports:
+//
+// getIndex(color: [number, number, number]: clut: Clut): number
+//    returns the index of the closest match color to `color` in the lookup table `clut`
+// clut4: Clut
+//    the 16-color palette
+// clut8: Clut
+//    the 256-color palette
+
 // 4-bit palette extracted from
 // https://en.wikipedia.org/wiki/List_of_software_palettes#Apple_Macintosh_default_16-color_palette
 const clut4 = [

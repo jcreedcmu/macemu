@@ -1,3 +1,9 @@
+// make-icon-resources.js
+//
+// Generates an .r file (on stdout) from icon files assumed to exist
+// in text PPM format in /tmp. See the definition of `iconSources`
+// below for configuration details.
+
 const fs = require('fs');
 const palette = require('./palette');
 
