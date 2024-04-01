@@ -1,7 +1,24 @@
-MacOS emulation & dev notes
-===========================
+Twelf on Classic Mac
+====================
 
-Thanks a million to [agoode](https://github.com/agoode) for explaining a lot of this.
+The purpose of this repository is to build a version of the
+[Twelf](https://en.wikipedia.org/wiki/Twelf) logical framework that
+can be run in the "Classic Mac" environment of approximately [System
+7](https://en.wikipedia.org/wiki/System_7) era. The current emulation
+target is a Quadra 800 running System 7.5.3.
+
+Status:
+ - :white_check_mark: Twelf runs and can typecheck simple signatures that are typed in by hand
+ - :white_check_mark: Application and document icons exist
+ - :no_entry: File IO (open, save) is not implemented yet
+ - :no_entry: Scrolling of the text box is not implemented very well yet
+ - :no_entry: Selection of output text is not implemented
+ - :no_entry: Copy/Paste is not implemented
+
+Setup Notes
+-----------
+
+Much thanks to [agoode](https://github.com/agoode) for explaining a lot of this.
 
 I'm using [Retro68](https://github.com/autc04/Retro68) to compile C to run on an emulated mac. I build qemu 8.2.2 from source with
 ```
