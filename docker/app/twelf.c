@@ -1,4 +1,6 @@
 #include <sys/types.h>
+#include <stdlib.h>
+
 #include <Quickdraw.h>
 #include <Windows.h>
 #include <Menus.h>
@@ -29,8 +31,16 @@ TEHandle outputDest = NULL;
 
 extern ssize_t _consolewrite(int fd, const void *buf, size_t count) {
   if (outputDest != NULL) {
-	 // Probably want to convert \n to \r in buf
-	 TEInsert((char *)buf, count, outputDest);
+	 char *tmpBuf = malloc(count);
+	 strncpy(tmpBuf, (char *)buf, count);
+	 for (size_t i = 0; i < count; i++) {
+		// Convert from unix to macos conventional EOL-character
+		if (tmpBuf[i] == '\n') {
+		  tmpBuf[i] = '\r';
+		}
+	 }
+	 TEInsert(tmpBuf, count, outputDest);
+	 free(tmpBuf);
 	 return count;
   }
   else {
@@ -560,8 +570,8 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
 						 int resp = execute();
 						 printf("Twelf response: %d\r", resp);
 
-						 char *abortStr = "\rServer ABORT";
-						 char *okStr = "\rServer OK";
+						 char *abortStr = "%% ABORT %%";
+						 char *okStr = "%% OK %%";
 						 TEInsert(resp ? abortStr : okStr, resp ? strlen(abortStr) : strlen(okStr), doc->docOutputTE);
 						 outputDest = NULL;
 					  }
