@@ -27,7 +27,7 @@
  * why yet.
  */
 
-TEHandle outputDest = NULL;
+static TEHandle outputDest = NULL;
 
 extern ssize_t _consolewrite(int fd, const void *buf, size_t count) {
   if (outputDest != NULL) {
@@ -66,7 +66,10 @@ enum {
   kItemAbout = 1,
 
   kItemNew = 1,
-  kItemQuit = 3,
+  kItemOpen = 2,
+  kItemSave = 4,
+  kItemSaveAs = 5,
+  kItemQuit = 7,
 };
 
 typedef struct {
@@ -97,6 +100,8 @@ static void runTwelf(DocumentPeek doc) {
   printf("allocated\r");
   strncpy(buffer, *textHandle, len);
   printf("copied %d bytes to buffer\r", len);
+
+  
   int resp = execute();
   printf("Twelf response: %d\r", resp);
   
@@ -292,6 +297,33 @@ void UpdateMenus(void)
     }
 }
 
+static void openElf(TEHandle te) {
+  StandardFileReply reply;
+  SFTypeList types = { 'TEXT' };
+
+  StandardGetFile(NULL, 1, types, &reply);
+  if (reply.sfGood) {
+    TESetText("", 0, te);
+
+    int16_t refNum;
+    long textLength;
+    OSErr err = FSpOpenDF(&reply.sfFile, fsCurPerm, &refNum);
+    err = SetFPos(refNum, fsFromStart, 0);
+    err = GetEOF(refNum, &textLength);
+    if (textLength > kMaxTELength) {
+      textLength = kMaxTELength;
+    }
+    Handle buf = NewHandle(textLength);
+    err = FSRead(refNum, &textLength, *buf);
+    MoveHHi(buf);
+    HLock(buf); 
+    TESetText(*buf, textLength, te);
+    HUnlock(buf);
+    DisposeHandle(buf);
+    err = FSClose(refNum);
+  }
+}
+
 void DoMenuCommand(long menuCommand) {
   Str255 str;
   WindowPtr w;
@@ -308,10 +340,15 @@ void DoMenuCommand(long menuCommand) {
   else if (menuID == kMenuFile) {
 	 switch(menuItem) {
 	 case kItemNew:
-           TESetSelect(0, 32767, theDoc->docInputTE);
-           TEDelete(theDoc->docInputTE);
-           TESetSelect(0, 32767, theDoc->docOutputTE);
-           TEDelete(theDoc->docOutputTE);
+           TESetText("", 0, theDoc->docInputTE);
+           TESetText("", 0, theDoc->docOutputTE);
+           break;
+	 case kItemOpen:
+           openElf(theDoc->docInputTE);
+           break;
+	 case kItemSave:
+           break;
+	 case kItemSaveAs:
            break;
 	 case kItemQuit:
            ExitToShell();

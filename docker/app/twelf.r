@@ -20,6 +20,10 @@ resource 'MENU' (129) {
     "File";
     {
         "New", noIcon, "N", noMark, plain;
+        "Open...", noIcon, "O", noMark, plain;
+        "-", noIcon, noKey, noMark, plain;
+        "Save", noIcon, "S", noMark, plain;
+        "Save As...", noIcon, noKey, noMark, plain;
         "-", noIcon, noKey, noMark, plain;
         "Quit", noIcon, "Q", noMark, plain;
     }
@@ -85,8 +89,8 @@ resource 'SIZE' (-1) {
     reserved,
     reserved,
     reserved,
-    90 * 1024 * 1024,
-    32 * 1024 * 1024
+    16 * 1024 * 1024,
+    8 * 1024 * 1024
 };
 
 type 'CNTL' {
