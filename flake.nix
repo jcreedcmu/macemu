@@ -32,7 +32,9 @@
               patchShebangs bin/host-arch
               patchShebangs bin/host-os
               patchShebangs bin/platform
+              patchShebangs bin/clean
               patchShebangs mlnlffigen/gen-cppcmd
+              patchShebangs bin/find-ignore
               '';
 
               buildPhase = ''
