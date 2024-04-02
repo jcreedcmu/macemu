@@ -1,4 +1,4 @@
-FROM ubuntu:latest
+FROM debian:unstable
 
 ENV BUILD=/build
 
@@ -9,7 +9,7 @@ WORKDIR $BUILD
 # ninja-build wget xz-utils curl
 RUN apt-get update && \
     apt-get install -y git cmake clang ninja-build wget xz-utils libgmp-dev curl \
-                       libmpfr-dev libmpc-dev libboost-all-dev bison flex texinfo ruby
+                       libmpfr-dev libmpc-dev libboost-all-dev bison flex texinfo ruby mlton
 
 # Checkout Retro68
 ADD https://api.github.com/repos/agoode/Retro68/git/refs/heads/mlton Retro68-version.json
@@ -36,12 +36,6 @@ RUN cd $BUILD/gmp-6.3.0 && \
     ./configure --host=m68k-apple-macos \
 		  --prefix=$BUILD/gmp-m68k-INSTALL && \
     make && make install
-
-# install mlton binaries (for bootstrapping custom mlton)
-WORKDIR $BUILD
-RUN wget https://github.com/MLton/mlton/releases/download/on-20210117-release/mlton-20210117-1.amd64-linux-glibc2.31.tgz && \
-    tar xvzf mlton-20210117-1.amd64-linux-glibc2.31.tgz && \
-    cd $BUILD/mlton-20210117-1.amd64-linux-glibc2.31 && make install
 
 ADD https://api.github.com/repos/agoode/mlton/git/refs/heads/mac mlton-version.json
 RUN git clone --depth 1 --branch mac https://github.com/agoode/mlton.git
