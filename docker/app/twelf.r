@@ -19,6 +19,8 @@ resource 'MENU' (129) {
     allEnabled, enabled;
     "File";
     {
+        "New", noIcon, "N", noMark, plain;
+        "-", noIcon, noKey, noMark, plain;
         "Quit", noIcon, "Q", noMark, plain;
     }
 };
