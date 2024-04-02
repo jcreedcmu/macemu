@@ -78,6 +78,32 @@ typedef struct {
   ControlHandle docDebugCheckbox;
 } DocumentRecord, *DocumentPeek;
 
+static void runTwelf(DocumentPeek doc) {
+  // ShowCursor();
+  TESetText("", 0, doc->docOutputTE);
+  outputDest = doc->docOutputTE;
+
+  unsigned char **textHandle = TEGetText(doc->docInputTE);
+  TERec *tePtr = *(doc->docInputTE);
+
+  printf("got the text: \"%.*s\"\r", tePtr->teLength, *textHandle);
+
+  char inputStr[] = "o : type.\n";
+  int len = tePtr->teLength;
+  printf("about to allocate %d bytes...\r", len);
+  char *buffer = (char *)allocate(len);
+  printf("allocated\r");
+  strncpy(buffer, *textHandle, len);
+  printf("copied %d bytes to buffer\r", len);
+  int resp = execute();
+  printf("Twelf response: %d\r", resp);
+  
+  char *abortStr = "%% ABORT %%";
+  char *okStr = "%% OK %%";
+  TEInsert(resp ? abortStr : okStr, resp ? strlen(abortStr) : strlen(okStr), doc->docOutputTE);
+  outputDest = NULL;
+}
+
 void GetTEContainerRect(Rect *teRect, int which) {
   SetRect(teRect, kInputOffX, kInputOffY, kInputOffX + kInputWidth, kInputOffY + kInputHeight);
   if (which) {
@@ -144,6 +170,8 @@ pascal ProcPtr GetOldClikLoop(void)
 
 extern pascal void AsmClikLoop(void);
 
+static DocumentPeek theDoc;
+
 void MakeNewWindow(ConstStr255Param title, short procID) {
   if (nextWindowRect.bottom > qd.screenBits.bounds.bottom
 	  || nextWindowRect.right > qd.screenBits.bounds.right) {
@@ -156,7 +184,7 @@ void MakeNewWindow(ConstStr255Param title, short procID) {
   int id = 0;
   Ptr storage = NewPtr(sizeof(DocumentRecord));
   WindowPtr w = NewWindow(storage, &windowRect, title, true, procID, (WindowPtr) -1, true, id);
-  DocumentPeek doc = (DocumentPeek) w;
+  theDoc = (DocumentPeek) w;
   int good = 0;
 
   printf("in MakeNewWindow\r");
@@ -165,6 +193,7 @@ void MakeNewWindow(ConstStr255Param title, short procID) {
   GetTERect(&viewRect, 0);
 
   SetPort(w);
+  DocumentPeek doc = theDoc;
   doc->docInputTE = TENew(&destRect, &viewRect);
   (**(doc->docInputTE)).txFont = kMonaco;
   printf("created one textedit...\r");
@@ -199,7 +228,6 @@ void MakeNewWindow(ConstStr255Param title, short procID) {
 	 SetControlMaximum(doc->docDebugCheckbox, 1);
 	 SetControlValue(doc->docDebugCheckbox, 1);
 
-	 TESetText("o : type.\ra : o -> type.", 10, doc->docOutputTE);
 	 AdjustScrollSizes(w);
 	 ShowWindow(w);
   }
@@ -551,29 +579,7 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
 					  printf("Got a click in button! part=%d\r", part);
 					  int clicked = TrackControl(control, mouse, nil);
 					  if (clicked) {
-						 // ShowCursor();
-						 TESetText("", 0, doc->docOutputTE);
-						 outputDest = doc->docOutputTE;
-
-						 unsigned char **textHandle = TEGetText(doc->docInputTE);
-						 TERec *tePtr = *(doc->docInputTE);
-
-						 printf("got the text: \"%.*s\"\r", tePtr->teLength, *textHandle);
-
-						 char inputStr[] = "o : type.\n";
-						 int len = tePtr->teLength;
-						 printf("about to allocate %d bytes...\r", len);
-						 char *buffer = (char *)allocate(len);
-						 printf("allocated\r");
-						 strncpy(buffer, *textHandle, len);
-						 printf("copied %d bytes to buffer\r", len);
-						 int resp = execute();
-						 printf("Twelf response: %d\r", resp);
-
-						 char *abortStr = "%% ABORT %%";
-						 char *okStr = "%% OK %%";
-						 TEInsert(resp ? abortStr : okStr, resp ? strlen(abortStr) : strlen(okStr), doc->docOutputTE);
-						 outputDest = NULL;
+                                            runTwelf(doc);
 					  }
 					}
 					else if (control == doc->docDebugCheckbox) {
@@ -660,6 +666,9 @@ int main(void) {
   }
   twelf_server_open(argc, argv);
   printf("twelf-opened\r");
+
+  // Empty input is %% OK %%.
+  runTwelf(theDoc);
 
   int debug = 0;
   for(;;) {
