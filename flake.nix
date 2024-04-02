@@ -42,6 +42,26 @@
             make PREFIX=$out install
             '';
           };
+          # gmp-m68k-from-source = pkgs.stdenv.mkDerivation {
+          #   name = "gmp-m68k";
+          #   src = builtins.fetchTarball {
+          #     url = "https://gmplib.org/download/gmp/gmp-6.3.0.tar.xz";
+          #     sha256 = "";
+          #   };
+
+          #   buildInputs = [
+          #     Retro68.packages.${system}.standalone
+          #   ];
+
+          #   configurePhase = ''
+          #     ./configure --host=m68k-apple-macos \
+          #       --prefix=$BUILD/gmp-m68k-INSTALL
+          #     '';
+
+          #     installPhase = ''
+          #   make PREFIX=$out install
+          #   '';
+          #   };
           gmp-m68k = Retro68.legacyPackages.${system}.pkgsCross.m68k.gmp;
       in
         {
