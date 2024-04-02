@@ -9,13 +9,46 @@
 
 
   outputs = { self, nixpkgs, Retro68, flake-utils }: (
+    with builtins;
     flake-utils.lib.eachDefaultSystem (system:
       let pkgs = nixpkgs.legacyPackages.${system};
+          mlton-m68k-deriv = pkgs.stdenv.mkDerivation {
+            name = "mlton-m68k";
+            src = builtins.fetchGit {
+              url = "https://github.com/agoode/mlton.git";
+              rev = "8401144962437491018343888a3eaa20b1b8fe37";
+              ref = "mac";
+            };
+
+            buildInputs = [
+              pkgs.mlton
+              pkgs.gmp
+            ];
+
+            patchPhase = ''
+            patchShebangs bin/host-arch
+            patchShebangs bin/host-os
+            patchShebangs bin/platform
+            patchShebangs bin/clean
+            patchShebangs mlnlffigen/gen-cppcmd
+            patchShebangs bin/find-ignore
+            '';
+
+            buildPhase = ''
+            make all
+            '';
+
+            installPhase = ''
+            make PREFIX=$out install
+            '';
+          };
+          gmp-m68k = Retro68.legacyPackages.${system}.pkgsCross.m68k.gmp;
       in
         {
           packages = rec {
-            mlton-m68k = pkgs.stdenv.mkDerivation {
-              name = "mlton-m68k";
+            mlton-m68k = mlton-m68k-deriv;
+            mlton-m68k-runtime = pkgs.stdenv.mkDerivation {
+              name = "mlton-m68k-runtime";
               src = builtins.fetchGit {
                 url = "https://github.com/agoode/mlton.git";
                 rev = "8401144962437491018343888a3eaa20b1b8fe37";
@@ -23,10 +56,12 @@
               };
 
               buildInputs = [
-                # Retro68.packages.${system}.standalone
-                pkgs.mlton
-                pkgs.gmp
+                mlton-m68k
+                gmp-m68k
+                Retro68.packages.${system}.standalone
               ];
+
+              configurePhase = "true";
 
               patchPhase = ''
               patchShebangs bin/host-arch
@@ -38,11 +73,20 @@
               '';
 
               buildPhase = ''
-              make all
+              make \
+                  CC=gcc \
+                  AR=gcc-ar \
+                  RANLIB=gcc-ranlib \
+                  USE_PREGEN=true \
+                  TARGET_OS=macos \
+                  TARGET_ARCH=m68k \
+                  TARGET=m68k-apple-macos \
+                  WITH_GMP_DIR=${ gmp-m68k } \
+                  dirs runtime
               '';
 
               installPhase = ''
-              make PREFIX=$out install
+              make PREFIX=$out install-runtime
               '';
             };
 
