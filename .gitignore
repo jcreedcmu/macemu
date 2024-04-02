@@ -12,3 +12,5 @@ libtwelf/dist
 *.gdb
 *.o
 *.a
+result
+source

@@ -7,15 +7,16 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1711565267,
-        "narHash": "sha256-HOTlfoT7ifreo/m200Rdi5odZkIDbBmDgBjm7AkqT6M=",
-        "owner": "autc04",
+        "lastModified": 1711822907,
+        "narHash": "sha256-xohWyQWGWR89057JQAnOAXmkrOvV+tk3wNwLKru+IR8=",
+        "owner": "agoode",
         "repo": "Retro68",
-        "rev": "6c1dad390a1109e26a0fc00c4a06cbc6c00f1d45",
+        "rev": "e3af78010b9cc608d2bbe41124d8930c157bcd5d",
         "type": "github"
       },
       "original": {
-        "owner": "autc04",
+        "owner": "agoode",
+        "ref": "mlton",
         "repo": "Retro68",
         "type": "github"
       }
@@ -59,15 +60,16 @@
     "multiversal": {
       "flake": false,
       "locked": {
-        "lastModified": 1703617805,
-        "narHash": "sha256-GngLWR9i+hC7hJ+ZkKlRK4K63lIJ4D/CMXZwefcVAqw=",
-        "owner": "autc04",
+        "lastModified": 1711824898,
+        "narHash": "sha256-IHju+sVLsY0eE+r+4sKlYsrDufxNupFRJ0Ank881mj0=",
+        "owner": "agoode",
         "repo": "multiversal",
-        "rev": "27c08c654bbd48d23f025741e3a584b59374904a",
+        "rev": "dc57dbce1e56070be7561cd0d275f143b66186cf",
         "type": "github"
       },
       "original": {
-        "owner": "autc04",
+        "owner": "agoode",
+        "ref": "fonts",
         "repo": "multiversal",
         "type": "github"
       }
