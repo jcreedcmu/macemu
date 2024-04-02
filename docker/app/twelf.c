@@ -64,7 +64,9 @@ enum {
 
 enum {
   kItemAbout = 1,
-  kItemQuit = 1
+
+  kItemNew = 1,
+  kItemQuit = 3,
 };
 
 typedef struct {
@@ -305,9 +307,15 @@ void DoMenuCommand(long menuCommand) {
   }
   else if (menuID == kMenuFile) {
 	 switch(menuItem) {
+	 case kItemNew:
+           TESetSelect(0, 32767, theDoc->docInputTE);
+           TEDelete(theDoc->docInputTE);
+           TESetSelect(0, 32767, theDoc->docOutputTE);
+           TEDelete(theDoc->docOutputTE);
+           break;
 	 case kItemQuit:
-		ExitToShell();
-		break;
+           ExitToShell();
+           break;
 	 }
   }
   else if (menuID == kMenuEdit) {
