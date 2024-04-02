@@ -21,21 +21,16 @@
               buildInputs = [
                 Retro68.packages.${system}.standalone
               ];
-              unpackPhase = "true";
 
               buildPhase = ''
-true
+              cd docker/app
+              make -f Makefile.nix
               '';
 
               configurePhase = "true";
 
-              installPhase =
-                ''
-                # mkdir -p $out/bin
-                # cp $src/hello-flake $out/bin/hello-flake
-                # chmod +x $out/bin/hello-flake
-                mkdir -p $out/files
-                echo ${ builtins.toString (builtins.attrNames Retro68.packages.${system}.standalone) } > $out/files/outputfile
+              installPhase = ''
+              mkdir -p $out
               '';
             };
             default = twelf-bin;
