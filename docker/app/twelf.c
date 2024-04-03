@@ -303,8 +303,6 @@ static void openElf(TEHandle te) {
 
   StandardGetFile(NULL, 1, types, &reply);
   if (reply.sfGood) {
-    TESetText("", 0, te);
-
     int16_t refNum;
     long textLength;
     OSErr err = FSpOpenDF(&reply.sfFile, fsCurPerm, &refNum);
@@ -315,6 +313,11 @@ static void openElf(TEHandle te) {
     }
     Handle buf = NewHandle(textLength);
     err = FSRead(refNum, &textLength, *buf);
+    for (int i = 0; i < textLength; i++) {
+      if ((*buf)[i] == '\n') {
+        (*buf)[i] = '\r';
+      }
+    }
     MoveHHi(buf);
     HLock(buf); 
     TESetText(*buf, textLength, te);
