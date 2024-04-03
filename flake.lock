@@ -57,6 +57,23 @@
         "type": "github"
       }
     },
+    "mlton-src": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1711823952,
+        "narHash": "sha256-CNetO/BPQn5p7/QInNL0a/Ub1SjyVdCGcU9iBoBDhcw=",
+        "owner": "agoode",
+        "repo": "mlton",
+        "rev": "8401144962437491018343888a3eaa20b1b8fe37",
+        "type": "github"
+      },
+      "original": {
+        "owner": "agoode",
+        "ref": "mac",
+        "repo": "mlton",
+        "type": "github"
+      }
+    },
     "multiversal": {
       "flake": false,
       "locked": {
@@ -127,6 +144,7 @@
       "inputs": {
         "Retro68": "Retro68",
         "flake-utils": "flake-utils",
+        "mlton-src": "mlton-src",
         "nixpkgs": "nixpkgs_2"
       }
     },

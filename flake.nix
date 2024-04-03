@@ -5,20 +5,17 @@
     nixpkgs.url = "github:NixOS/nixpkgs";
     Retro68.url = "github:agoode/Retro68/mlton";
     flake-utils.url = "github:numtide/flake-utils";
+    mlton-src = { url = "github:agoode/mlton/mac"; flake = false; };
   };
 
 
-  outputs = { self, nixpkgs, Retro68, flake-utils }: (
+  outputs = { self, nixpkgs, Retro68, flake-utils, mlton-src }: (
     with builtins;
     flake-utils.lib.eachDefaultSystem (system:
       let pkgs = nixpkgs.legacyPackages.${system};
           mlton-m68k-deriv = pkgs.stdenv.mkDerivation {
             name = "mlton-m68k";
-            src = builtins.fetchGit {
-              url = "https://github.com/agoode/mlton.git";
-              rev = "8401144962437491018343888a3eaa20b1b8fe37";
-              ref = "mac";
-            };
+            src = mlton-src;
 
             buildInputs = [
               pkgs.mlton
