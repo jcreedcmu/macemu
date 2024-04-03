@@ -46,11 +46,7 @@
             mlton-m68k = mlton-m68k-deriv;
             mlton-m68k-runtime = pkgs.stdenv.mkDerivation {
               name = "mlton-m68k-runtime";
-              src = builtins.fetchGit {
-                url = "https://github.com/agoode/mlton.git";
-                rev = "8401144962437491018343888a3eaa20b1b8fe37";
-                ref = "mac";
-              };
+              src = mlton-src
 
               buildInputs = [
                 mlton-m68k
