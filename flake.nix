@@ -46,7 +46,7 @@
             mlton-m68k = mlton-m68k-deriv;
             mlton-m68k-runtime = pkgs.stdenv.mkDerivation {
               name = "mlton-m68k-runtime";
-              src = mlton-src
+              src = mlton-src;
 
               buildInputs = [
                 mlton-m68k
