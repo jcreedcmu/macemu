@@ -18,7 +18,7 @@
         {
           packages = rec {
             gmp-m68k = Retro68.legacyPackages.${system}.pkgsCross.m68k.gmp.dev;
-            mlton-m68k-bin = import ./nix/mlton-m68k-bin.nix { inherit pkgs mlton-src; };
+            mlton = import ./nix/mlton.nix { inherit pkgs mlton-src; }; # mlton with some more patches
             mlton-m68k-runtime = import ./nix/mlton-m68k-runtime.nix { inherit pkgs gmp-m68k mlton-src retro68; };
             twelf-bin = import ./nix/twelf-bin.nix { inherit pkgs retro68; };
             default = twelf-bin;
