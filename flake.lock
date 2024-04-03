@@ -7,15 +7,15 @@
         "nixpkgs": "nixpkgs"
       },
       "locked": {
-        "lastModified": 1711822907,
-        "narHash": "sha256-xohWyQWGWR89057JQAnOAXmkrOvV+tk3wNwLKru+IR8=",
-        "owner": "agoode",
+        "lastModified": 1712187909,
+        "narHash": "sha256-G7G/zuP4+1hfyH7fT6hjlFgC48jTm6h5iUQw+F2v9Uc=",
+        "owner": "jcreedcmu",
         "repo": "Retro68",
-        "rev": "e3af78010b9cc608d2bbe41124d8930c157bcd5d",
+        "rev": "c90cdebf95e4c697de3b335e6310d82288c5f1e3",
         "type": "github"
       },
       "original": {
-        "owner": "agoode",
+        "owner": "jcreedcmu",
         "ref": "mlton",
         "repo": "Retro68",
         "type": "github"

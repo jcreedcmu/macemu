@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs";
-    Retro68.url = "github:agoode/Retro68/mlton";
+    Retro68.url = "github:jcreedcmu/Retro68/mlton";
     flake-utils.url = "github:numtide/flake-utils";
     mlton-src = { url = "github:agoode/mlton/mac"; flake = false; };
   };
