@@ -13,7 +13,8 @@
     with builtins;
     flake-utils.lib.eachDefaultSystem (system:
       let pkgs = nixpkgs.legacyPackages.${system};
-          retro68 = Retro68.packages.${system}.standalone;
+          pkgs-retro68 = import nixpkgs { inherit system; overlays = [ Retro68.overlays.default ]; };
+          retro68 = pkgs-retro68.retro68.monolithic;
       in
         {
           packages = rec {
