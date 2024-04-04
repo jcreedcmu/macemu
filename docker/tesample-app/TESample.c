@@ -89,30 +89,35 @@
    the import/export would be in the activate/deactivate event and suspend/resume
    event routines. */
 
+// We are trying to compile with multiversal interface
+#define UNIVERSAL_INTERFACE 0
+
 /* A/UX is case sensitive, so use correct case for include file names */
 #include <Types.h>
 #include <limits.h>
 #include <Quickdraw.h>
 #include <Fonts.h>
 #include <Events.h>
-#include <Controls.h>
 #include <Windows.h>
-#include <ControlDefinitions.h>
 #include <Menus.h>
 #include <TextEdit.h>
 #include <Dialogs.h>
 #include <Devices.h>
-#include <Scrap.h>
 #include <ToolUtils.h>
 #include <Memory.h>
 #include <SegLoad.h>
 #include <Files.h>
 #include <OSUtils.h>
+#include "TESample.h"		/* bring in all the #defines for TESample */
+#include "api.h"		/* bring in all the #defines for TESample */
+#include <Traps.h>
+#if UNIVERSAL_INTERFACE
+#include <Controls.h>
+#include <ControlDefinitions.h>
+#include <Scrap.h>
 #include <DiskInit.h>
 #include <Packages.h>
-#include "TESample.h"		/* bring in all the #defines for TESample */
-#include <Traps.h>
-
+#endif
 
 void AlertUser( short error );
 void EventLoop( void );
@@ -149,7 +154,7 @@ void AdjustHV( Boolean isVert, ControlHandle control, TEHandle docTE,
 void AdjustScrollValues( WindowPtr window, Boolean canRedraw );
 void AdjustScrollSizes( WindowPtr window );
 void AdjustScrollbars( WindowPtr window, Boolean needsResize );
-pascal void PascalClickLoop();
+pascal void PascalClikLoop();
 pascal TEClickLoopUPP GetOldClickLoop();
 Boolean IsAppWindow( WindowPtr window );
 Boolean IsDAWindow( WindowPtr window );
@@ -181,7 +186,6 @@ short		gNumDocuments;		/* maintained by Initialize, DoNew, and DoCloseWindow */
    dependency on the ordering of fields within a Rect */
 #define TopLeft(aRect)	(* (Point *) &(aRect).top)
 #define BotRight(aRect)	(* (Point *) &(aRect).bottom)
-
 
 /* A DocumentRecord contains the WindowRecord for one of our document windows,
    as well as the TEHandle for the text we are editing. Other document fields
@@ -215,7 +219,7 @@ void Initialize()
 
 	gInBackground = false;
 
-	InitGraf((Ptr) &qd.thePort);
+	InitGraf(&qd.thePort);
 	InitFonts();
 	InitWindows();
 	InitMenus();
@@ -268,7 +272,9 @@ void Initialize()
 		being set smaller than the minimum size by the user. This extra check acts to
 		insure that your application is starting from a solid memory foundation. */
 
+#if UNIVERSAL_INTERFACE
 	if ((long) GetApplLimit() - (long) ApplicationZone() < kMinHeap) BigBadError(eSmallSize);
+#endif
 
 	/*	Next, make sure that enough memory is free for your application to run. It
 		is possible for a situation to arise where the heap may have been of required
@@ -770,7 +776,7 @@ void DoContentClick(WindowPtr window, EventRecord *event)
 						else
 							upp = NewControlActionProc(HActionProc);
 						value = TrackControl(control, mouse, upp);
-						DisposeRoutineDescriptor(upp);
+						DisposeRoutineDescriptor((UniversalProcPtr)upp);
 					}
 					break;
 			}
@@ -812,6 +818,7 @@ void DoKeyDown(EventRecord *event)
 
 unsigned long GetSleep()
 {
+#if UNIVERSAL_INTERFACE
 	long		sleep;
 	WindowPtr	window;
 	TEHandle	te;
@@ -826,6 +833,9 @@ unsigned long GetSleep()
 		}
 	}
 	return sleep;
+#else
+	return 0;
+#endif
 } /*GetSleep*/
 
 
@@ -1004,6 +1014,16 @@ void AdjustMenus()
 } /*AdjustMenus*/
 
 
+#if !UNIVERSAL_INTERFACE
+pascal OSErr TEFromScrap() {
+  return noErr;
+}
+
+pascal long int TEGetScrapLength() {
+  return 0;
+}
+#endif
+
 /*	This is called when an item is chosen from the menu bar (after calling
 	MenuSelect or MenuKey). It does the right thing for each command. */
 
@@ -1060,20 +1080,24 @@ void DoMenuCommand(long menuResult)
 							else
 							    {
 								TECut(te);
+#if UNIVERSAL_INTERFACE
 								if ( TEToScrap() != noErr ) {
 									AlertUser(eNoCut);
 									ZeroScrap();
 								}
+#endif
 							}
 						}
 						break;
 					case iCopy:
 						if ( ZeroScrap() == noErr ) {
 							TECopy(te);	/* after copying, export the TE scrap */
+#if UNIVERSAL_INTERFACE
 							if ( TEToScrap() != noErr ) {
 								AlertUser(eNoCopy);
 								ZeroScrap();
 							}
+#endif
 						}
 						break;
 					case iPaste:	/* import the TE scrap before pasting */
@@ -1136,7 +1160,7 @@ void DoNew()
 			if ( good ) {				/* 1.02 - good document? Ñ proceed */
 				AdjustViewRect(doc->docTE);
 				TEAutoView(true, doc->docTE);
-				doc->docClick = (*doc->docTE)->clickLoop;
+				doc->docClick = (*doc->docTE)->clikLoop;
 				// (*doc->docTE)->clickLoop = gClickLoopUPP;
 			}
 
@@ -1391,7 +1415,7 @@ void AdjustScrollbars(WindowPtr window, Boolean needsResize)
 	amount, then restores the clip region. */
 
 #ifndef AUX
-   pascal void PascalClickLoop()
+   pascal void PascalClikLoop()
 #else
    void CClickLoop ()
 #endif
@@ -1414,11 +1438,7 @@ void AdjustScrollbars(WindowPtr window, Boolean needsResize)
 	default clickLoop routine that was put into the TERec by TEAutoView to
 	AsmClickLoop so that it can call it. */
 
-#ifndef AUX
-  pascal
-#endif
-TEClickLoopUPP GetOldClickLoop()
-{
+pascal ProcPtr GetOldClikLoop() {
 	return ((DocumentPeek)FrontWindow())->docClick;
 } /* GetOldClickLoop */
 

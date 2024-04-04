@@ -101,10 +101,10 @@ static void runTwelf(DocumentPeek doc) {
   strncpy(buffer, *textHandle, len);
   printf("copied %d bytes to buffer\r", len);
 
-  
+
   int resp = execute();
   printf("Twelf response: %d\r", resp);
-  
+
   char *abortStr = "%% ABORT %%";
   char *okStr = "%% OK %%";
   TEInsert(resp ? abortStr : okStr, resp ? strlen(abortStr) : strlen(okStr), doc->docOutputTE);
@@ -319,7 +319,7 @@ static void openElf(TEHandle te) {
       }
     }
     MoveHHi(buf);
-    HLock(buf); 
+    HLock(buf);
     TESetText(*buf, textLength, te);
     HUnlock(buf);
     DisposeHandle(buf);
