@@ -949,6 +949,11 @@ void DrawWindow(WindowPtr window)
 } /*DrawWindow*/
 
 
+unsigned long int osTypeOf(char *buf) {
+  return (buf[3]) | (buf[2] << 8) | (buf[1] << 16) | (buf[0] << 24);
+}
+
+
 /*	Enable and disable menus based on the current state.
 	The user can only select enabled menu items. We set up all the menu items
 	before calling MenuSelect or MenuKey, since these are the only times that
@@ -994,7 +999,7 @@ void AdjustMenus()
 		if ( (*te)->selStart < (*te)->selEnd )
 			cutCopyClear = true;
 			/* Cut, Copy, and Clear is enabled for app. windows with selections */
-		if ( GetScrap(nil, 'TEXT', &offset)  > 0)
+		if ( GetScrap(nil, osTypeOf("TEXT"), &offset)  > 0)
 			paste = true;			/* if there’s any text in the clipboard, paste is enabled */
 	}
 	if ( undo )
@@ -1018,43 +1023,25 @@ void AdjustMenus()
 
 
 #if !UNIVERSAL_INTERFACE
-unsigned long int osTypeOf(char *buf) {
-  return (buf[3]) | (buf[2] << 8) | (buf[1] << 16) | (buf[0] << 24);
-}
-
 Ptr somePtr;
 Handle someHndl = &somePtr;
 
-void debugTEScrap() {
-  size_t len = LMGetTEScrpLength();
-  printf("TELength is %ld\r", len);
-  Handle h = LMGetTEScrpHandle();
-  printf("TEHandle Contents is\r");
-  for (size_t i = 0; i < len; i++) {
-	 printf("%02x ", (*h)[i]);
-  }
-  printf("\r");
-}
-
+// Adapted from
+// https://github.com/autc04/executor/blob/27c8ef28bc0ea29e7621466068c4e30aea664562/src/textedit/teScrap.cpp#L17-L30
 pascal OSErr TEFromScrap() {
-  long offset;
-  GetScrap (nil, osTypeOf("TEXT"), &offset);
-  printf("offset is %ld\r", offset);
-
-  PScrapStuff scrapInfo =  InfoScrap();
-  printf("scrapSize is %ld\r", scrapInfo->scrapSize);
-  printf("scrapHandle Contents is\r");
-  for (size_t i = 0; i < scrapInfo->scrapSize; i++) {
-	 printf("%02x ", (*(scrapInfo->scrapHandle))[i]);
+  long unused_offset;
+  long len;
+  Handle sh = LMGetTEScrpHandle();
+  len = GetScrap(sh, osTypeOf("TEXT"), &unused_offset);
+  if (len < 0) {
+	 EmptyHandle(sh);
+	 LMSetTEScrpLength(0);
+	 return len;
   }
-  printf("\r");
-  long realLength = *((long *)(*scrapInfo->scrapHandle + offset - 4));
-  printf("computed length is %ld\r", realLength);
-
-  LMSetTEScrpLength(realLength);
-  *someHndl = 8 + *scrapInfo->scrapHandle;
-  LMSetTEScrpHandle(someHndl);
-  return noErr;
+  else {
+	 LMSetTEScrpLength(len);
+	 return noErr;
+  }
 }
 
 pascal OSErr TEToScrap() {
@@ -1131,7 +1118,6 @@ void DoMenuCommand(long menuResult)
 							else
 							    {
 								TECut(te);
-								debugTEScrap();
 								if ( TEToScrap() != noErr ) {
 									AlertUser(eNoCut);
 									ZeroScrap();
@@ -1142,7 +1128,6 @@ void DoMenuCommand(long menuResult)
 					case iCopy:
 						if ( ZeroScrap() == noErr ) {
 							TECopy(te);	/* after copying, export the TE scrap */
-							debugTEScrap();
 							if ( TEToScrap() != noErr ) {
 								AlertUser(eNoCopy);
 								ZeroScrap();
