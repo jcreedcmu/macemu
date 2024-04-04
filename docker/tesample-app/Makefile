@@ -10,15 +10,15 @@ CFLAGS=-I/build/twelf/bin -g
 RINCLUDES=$(PREFIX)/RIncludes
 REZFLAGS=-I$(RINCLUDES)
 
-Twelf.bin: Twelf.code.bin
-	$(REZ) $(REZFLAGS) --copy $^ twelf.r -t "APPL" -c "TWLF" -o $@
+TESample.bin: TESample.code.bin
+	$(REZ) $(REZFLAGS) --copy $^ TESample.r -t "APPL" -c "TSMP" -o $@
 
-Twelf.code.bin: twelf.o clikloop.o
-	$(CC) $^ -o $@ $(LDFLAGS) -L/build/twelf/bin -L/opt/gmp-m68k-INSTALL/lib -ltwelf -lgmp -lm
+TESample.code.bin: TESample.o clikloop.o
+	$(CC) $^ -o $@ $(LDFLAGS) -L/opt/gmp-m68k-INSTALL/lib -lgmp -lm
 
 clikloop.o: clikloop.s
 	$(CC) -ffunction-sections -c clikloop.s -o $@
 
 .PHONY: clean
 clean:
-	rm -f Twelf.bin Twelf.APPL Twelf.dsk Twelf.code.bin Twelf.code.bin.gdb twelf.o clikloop.o
+	rm -f TESample.bin TESample.APPL TESample.dsk TESample.code.bin TESample.code.bin.gdb twelf.o clikloop.o

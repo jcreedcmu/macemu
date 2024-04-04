@@ -11,6 +11,12 @@ twelf-app/icon.r: ../scripts/*.js ../assets/*.png
 	convert  ../assets/twelf-doc-small.png -compress none /tmp/twelf-doc-small.ppm
 	node ../scripts/make-icon-resources.js >twelf-app/icon.r
 
+TESample.bin: Dockerfile tesample-app/*.c tesample-app/*.r tesample-app/Makefile
+	docker build . -t "jcreed/retro68:latest"
+	docker run --rm -v "./tesample-app:/root/app" "jcreed/retro68:latest" /root/build.sh
+	cp tesample-app/TESample.bin TESample.bin
+	touch TESample.bin
+
 docker:
 	docker build . -t jcreed/retro68
 

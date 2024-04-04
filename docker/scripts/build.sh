@@ -1,4 +1,7 @@
 #!/bin/bash
 
+set -e
+
 cd /root/app
-make clean && make Twelf.bin
+make clean
+make
