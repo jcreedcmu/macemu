@@ -1012,11 +1012,16 @@ void AdjustMenus()
 
 #if !UNIVERSAL_INTERFACE
 pascal OSErr TEFromScrap() {
+  PScrapStuff scrapInfo =  InfoScrap();
+  LMSetTEScrpLength(scrapInfo->scrapSize);
+  LMSetTEScrpHandle(scrapInfo->scrapHandle);
   return noErr;
 }
 
+extern long int TEScrpLength;
+
 pascal long int TEGetScrapLength() {
-  return 0;
+  return LMGetTEScrpLength();
 }
 #endif
 
@@ -1157,7 +1162,7 @@ void DoNew()
 				AdjustViewRect(doc->docTE);
 				TEAutoView(true, doc->docTE);
 				doc->docClick = (*doc->docTE)->clikLoop;
-				(*doc->docTE)->clikLoop = AsmClikLoop;
+				(*doc->docTE)->clikLoop = (ProcPtr) AsmClikLoop;
 			}
 
 			if ( good ) {				/* good document? Ñ get scrollbars */
