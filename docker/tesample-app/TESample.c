@@ -1,3 +1,5 @@
+#include <stdio.h>
+
 /*------------------------------------------------------------------------------
 #
 #	Apple Macintosh Developer Technical Support
@@ -377,6 +379,11 @@ extern pascal void AsmClikLoop();
 
 int main()
 {
+  // Debugging Log
+  stdout = stderr = fopen("out", "w");
+  setbuf(stdout, NULL);
+  setbuf(stderr, NULL);
+
 	/* 1.01 - call to ForceEnvirons removed */
 
 	/*	If you have stack requirements that differ from the default,
@@ -1011,15 +1018,32 @@ void AdjustMenus()
 
 
 #if !UNIVERSAL_INTERFACE
-pascal OSErr TEFromScrap() {
-  PScrapStuff scrapInfo =  InfoScrap();
-  LMSetTEScrpLength(scrapInfo->scrapSize);
-  LMSetTEScrpHandle(scrapInfo->scrapHandle);
-  return noErr;
-}
-
 unsigned long int osTypeOf(char *buf) {
   return (buf[3]) | (buf[2] << 8) | (buf[1] << 16) | (buf[0] << 24);
+}
+
+Ptr somePtr;
+Handle someHndl = &somePtr;
+
+pascal OSErr TEFromScrap() {
+  long offset;
+  GetScrap (nil, osTypeOf("TEXT"), &offset);
+  printf("offset is %ld\r", offset);
+
+  PScrapStuff scrapInfo =  InfoScrap();
+  printf("scrapSize is %ld\r", scrapInfo->scrapSize);
+  printf("scrapHandle Contents is\r");
+  for (size_t i = 0; i < scrapInfo->scrapSize; i++) {
+	 printf("%02x ", (*(scrapInfo->scrapHandle))[i]);
+  }
+  printf("\r");
+  long realLength = *((long *)(*scrapInfo->scrapHandle + offset - 4));
+  printf("computed length is %ld\r", realLength);
+
+  LMSetTEScrpLength(realLength);
+  *someHndl = 8 + *scrapInfo->scrapHandle;
+  LMSetTEScrpHandle(someHndl);
+  return noErr;
 }
 
 pascal OSErr TEToScrap() {
