@@ -1025,6 +1025,17 @@ unsigned long int osTypeOf(char *buf) {
 Ptr somePtr;
 Handle someHndl = &somePtr;
 
+void debugTEScrap() {
+  size_t len = LMGetTEScrpLength();
+  printf("TELength is %ld\r", len);
+  Handle h = LMGetTEScrpHandle();
+  printf("TEHandle Contents is\r");
+  for (size_t i = 0; i < len; i++) {
+	 printf("%02x ", (*h)[i]);
+  }
+  printf("\r");
+}
+
 pascal OSErr TEFromScrap() {
   long offset;
   GetScrap (nil, osTypeOf("TEXT"), &offset);
@@ -1120,6 +1131,7 @@ void DoMenuCommand(long menuResult)
 							else
 							    {
 								TECut(te);
+								debugTEScrap();
 								if ( TEToScrap() != noErr ) {
 									AlertUser(eNoCut);
 									ZeroScrap();
@@ -1130,6 +1142,7 @@ void DoMenuCommand(long menuResult)
 					case iCopy:
 						if ( ZeroScrap() == noErr ) {
 							TECopy(te);	/* after copying, export the TE scrap */
+							debugTEScrap();
 							if ( TEToScrap() != noErr ) {
 								AlertUser(eNoCopy);
 								ZeroScrap();
