@@ -351,33 +351,29 @@ Boolean TrapAvailable(short tNumber, TrapType tType)
 	return NGetTrapAddress(tNumber, tType) != NGetTrapAddress(_Unimplemented, ToolTrap);
 } /*TrapAvailable*/
 
+extern pascal void AsmClikLoop();
 
+// Inline assembly causes a crash on click, whereas external assembly
+// does not, not sure why yet.
 
+/* pascal void AsmClickLoop() { */
+/*   asm ( */
+/* 		 "movem.l		%d1-%d2/%a1,-(%sp)\n" */
+/* 		 "clr.l			-(%sp)\n" */
+/* 		 "jsr			GETOLDCLIKLOOP\n" */
+/* 		 "movea.l		(%sp)+,%a0\n" */
+/* 		 "movem.l		(%sp)+,%d1-%d2/%a1\n" */
 
-/* A reference to our assembly language routine that gets attached to the clickLoop
-field of our TE record. */
+/* 		 "jsr			(%a0)\n" */
 
-// void AsmClickLoop()
-// {
-// 	asm {
-// 			MOVEM.L		D1-D2/A1,-(SP)		; D0 and A0 need not be saved
-// 			CLR.L		-(SP)				; make space for procedure pointer
-// 			JSR			GetOldClickLoop		; get the old clickLoop
-// 			MOVEA.L		(SP)+,A0			; into A0
-// 			MOVEM.L		(SP)+,D1-D2/A1		; restore the world as it was
+/* 		 "movem.l		%d1-%d2/%a1,-(%sp)\n" */
+/* 		 "jsr			PASCALCLIKLOOP\n" */
+/* 		 "movem.l		(%sp)+,%d1-%d2/%a1\n" */
+/* 		 "moveq			#1,%d0\n" */
+/* 		 "rts\n" */
+/* 		 ); */
+/* } */
 
-// 			JSR			(A0)				; and execute old clickLoop
-
-// 			MOVEM.L		D1-D2/A1,-(SP)		; D0 and A0 need not be saved
-// 			JSR			PascalClickLoop		; do our clickLoop
-// 			MOVEM.L		(SP)+,D1-D2/A1		; restore the world as it was
-// 			MOVEQ		#1,D0				; clear the zero flag so TextEdit keeps going
-// 			RTS
-// 	}
-// }
-
-
-// TEClickLoopUPP gClickLoopUPP = NewTEClickLoopProc(AsmClickLoop);
 
 int main()
 {
@@ -1161,7 +1157,7 @@ void DoNew()
 				AdjustViewRect(doc->docTE);
 				TEAutoView(true, doc->docTE);
 				doc->docClick = (*doc->docTE)->clikLoop;
-				// (*doc->docTE)->clickLoop = gClickLoopUPP;
+				(*doc->docTE)->clikLoop = AsmClikLoop;
 			}
 
 			if ( good ) {				/* good document? Ñ get scrollbars */
@@ -1414,12 +1410,7 @@ void AdjustScrollbars(WindowPtr window, Boolean needsResize)
 	sets it to the portRect, adjusts the scrollbar values to match the TE scroll
 	amount, then restores the clip region. */
 
-#ifndef AUX
-   pascal void PascalClikLoop()
-#else
-   void CClickLoop ()
-#endif
-{
+pascal void PascalClikLoop() {
 	WindowPtr	window;
 	RgnHandle	region;
 
