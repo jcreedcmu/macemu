@@ -770,13 +770,13 @@ void DoContentClick(WindowPtr window, EventRecord *event)
 					break;
 				default:						/* they clicked in an arrow, so track & scroll */
 					{
-						ControlActionUPP upp;
-						if ( control == doc->docVScroll )
-							upp = NewControlActionProc(VActionProc);
-						else
-							upp = NewControlActionProc(HActionProc);
-						value = TrackControl(control, mouse, upp);
-						DisposeRoutineDescriptor((UniversalProcPtr)upp);
+						if ( control == doc->docVScroll ) {
+						  value = TrackControl(control, mouse, VActionProc );
+						}
+						else if ( control == doc->docVScroll ) {
+						  value = TrackControl(control, mouse, HActionProc );
+						}
+
 					}
 					break;
 			}
