@@ -19,8 +19,7 @@ FROM base AS mlton-bootstrap
 
 RUN apt-get install -y mlton
 
-ADD https://api.github.com/repos/agoode/mlton/git/refs/heads/mac mlton-version.json
-RUN git clone --depth 1 --branch mac https://github.com/agoode/mlton.git
+ADD https://github.com/agoode/mlton.git#mac mlton
 
 
 #####
@@ -29,8 +28,7 @@ RUN git clone --depth 1 --branch mac https://github.com/agoode/mlton.git
 FROM base AS retro68
 
 # Checkout Retro68
-ADD https://api.github.com/repos/agoode/Retro68/git/refs/heads/mlton Retro68-version.json
-RUN git clone --depth 1 --branch mlton https://github.com/agoode/Retro68.git
+ADD --keep-git-dir https://github.com/agoode/Retro68.git#mlton Retro68
 RUN cd Retro68 && git submodule update --init --recursive
 
 # Build Retro68
@@ -51,8 +49,8 @@ ENV PATH="/opt/Retro68-INSTALL/bin:${PATH}"
 FROM retro68 AS gmp-m68k
 
 # build gmp library for m68k target
-RUN curl -O https://gmplib.org/download/gmp/gmp-6.3.0.tar.xz && \
-    tar xvf gmp-6.3.0.tar.xz
+ADD https://gmplib.org/download/gmp/gmp-6.3.0.tar.xz gmp-6.3.0.tar.xz
+RUN tar xvf gmp-6.3.0.tar.xz
 RUN cd $BUILD/gmp-6.3.0 && \
     ./configure --host=m68k-apple-macos \
                 --prefix=/opt/gmp-m68k-INSTALL && \
@@ -104,8 +102,7 @@ RUN echo '#!/bin/bash\ngit rev-parse HEAD' > /usr/bin/svnversion && \
     chmod +x /usr/bin/svnversion
 
 # check out agoode's twelf branch
-ADD https://api.github.com/repos/agoode/twelf/git/refs/heads/mac twelf-version.json
-RUN git clone --branch mac --depth 1 https://github.com/agoode/twelf
+ADD https://github.com/agoode/twelf#mac twelf
 
 # build twelf library
 RUN cd twelf && \
