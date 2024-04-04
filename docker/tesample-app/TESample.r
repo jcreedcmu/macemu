@@ -235,6 +235,17 @@ resource 'WIND' (rDocWindow, preload, purgeable) {
 	centerMainScreen
 };
 
+type 'CNTL' {
+  rect;
+  integer; // value
+  byte invisible, visible;
+  fill byte;
+  integer; // max
+  integer; // min
+  integer buttonProc = 0, checkBoxProc = 1, radioButtonProc = 2, scrollBarProc = 16; // procID
+  unsigned longint;   // refCon
+  pstring;
+};
 
 resource 'CNTL' (rVScroll, preload, purgeable) {
 	{-1, 385, 236, 401},
@@ -266,9 +277,9 @@ resource 'STR#' (kErrStrings, purgeable) {
 /* here is the quintessential MultiFinder friendliness device, the SIZE resource */
 
 resource 'SIZE' (-1) {
-	dontSaveScreen,
+   reserved,
 	acceptSuspendResumeEvents,
-	enableOptionSwitch,
+   reserved,
 	canBackground,				/* we can background; we don't currently, but our sleep value */
 								/* guarantees we don't hog the Mac while we are in the background */
 	multiFinderAware,			/* this says we do our own activate/deactivate; don't fake us out */
