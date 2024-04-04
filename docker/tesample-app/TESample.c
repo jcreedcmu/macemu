@@ -1018,9 +1018,24 @@ pascal OSErr TEFromScrap() {
   return noErr;
 }
 
-extern long int TEScrpLength;
+unsigned long int osTypeOf(char *buf) {
+  return (buf[3]) | (buf[2] << 8) | (buf[1] << 16) | (buf[0] << 24);
+}
 
-pascal long int TEGetScrapLength() {
+pascal OSErr TEToScrap() {
+  PScrapStuff scrapInfo =  InfoScrap();
+  // XXX how detect whether scrap hasn't been initialized?
+  // Is checking for length = 0 enough?
+  // should return noScrapErr = -100 in that case
+  long scrapLength = LMGetTEScrpLength();
+  if (scrapLength == 0) {
+	 return noScrapErr;
+  }
+  Handle h = LMGetTEScrpHandle();
+  return PutScrap(scrapLength, osTypeOf("TEXT"), *h);
+}
+
+pascal long TEGetScrapLength() {
   return LMGetTEScrpLength();
 }
 #endif
@@ -1081,24 +1096,20 @@ void DoMenuCommand(long menuResult)
 							else
 							    {
 								TECut(te);
-#if UNIVERSAL_INTERFACE
 								if ( TEToScrap() != noErr ) {
 									AlertUser(eNoCut);
 									ZeroScrap();
 								}
-#endif
 							}
 						}
 						break;
 					case iCopy:
 						if ( ZeroScrap() == noErr ) {
 							TECopy(te);	/* after copying, export the TE scrap */
-#if UNIVERSAL_INTERFACE
 							if ( TEToScrap() != noErr ) {
 								AlertUser(eNoCopy);
 								ZeroScrap();
 							}
-#endif
 						}
 						break;
 					case iPaste:	/* import the TE scrap before pasting */
