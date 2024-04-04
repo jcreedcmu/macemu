@@ -948,12 +948,6 @@ void DrawWindow(WindowPtr window)
 	TEUpdate(&window->portRect, ((DocumentPeek) window)->docTE);
 } /*DrawWindow*/
 
-
-unsigned long int osTypeOf(char *buf) {
-  return (buf[3]) | (buf[2] << 8) | (buf[1] << 16) | (buf[0] << 24);
-}
-
-
 /*	Enable and disable menus based on the current state.
 	The user can only select enabled menu items. We set up all the menu items
 	before calling MenuSelect or MenuKey, since these are the only times that
@@ -999,7 +993,7 @@ void AdjustMenus()
 		if ( (*te)->selStart < (*te)->selEnd )
 			cutCopyClear = true;
 			/* Cut, Copy, and Clear is enabled for app. windows with selections */
-		if ( GetScrap(nil, osTypeOf("TEXT"), &offset)  > 0)
+		if ( GetScrap(nil, 'TEXT', &offset)  > 0)
 			paste = true;			/* if there’s any text in the clipboard, paste is enabled */
 	}
 	if ( undo )
@@ -1032,7 +1026,7 @@ pascal OSErr TEFromScrap() {
   long unused_offset;
   long len;
   Handle sh = LMGetTEScrpHandle();
-  len = GetScrap(sh, osTypeOf("TEXT"), &unused_offset);
+  len = GetScrap(sh, 'TEXT', &unused_offset);
   if (len < 0) {
 	 EmptyHandle(sh);
 	 LMSetTEScrpLength(0);
@@ -1054,7 +1048,7 @@ pascal OSErr TEToScrap() {
 	 return noScrapErr;
   }
   Handle h = LMGetTEScrpHandle();
-  return PutScrap(scrapLength, osTypeOf("TEXT"), *h);
+  return PutScrap(scrapLength, 'TEXT', *h);
 }
 
 pascal long TEGetScrapLength() {
