@@ -49,14 +49,36 @@ I needed to put in this directory:
 Building and Running the App
 ----------------------------
 
+### Build
+
+On linux cross-compile host:
+
 ```shell
 cd docker
-make
+make Twelf.app
+```
+
+### Install
+
+On linux cross-compile host:
+
+```shell
 make serve # spawns a local web server
 ```
 
 Start MacOS guest with `./qemu-macos`. Inside MacOS guest:
 - Launch Netscape Navigator from `Saved HD`.
 - Go to `http://10.0.2.2:8000/` (this is the host-local web server)
-- Download `app.bin`
+- Download `Twelf.bin`
 - Expand it in Stuffit Expander to create app named `Twelf`.
+
+Building and Running TESample
+-----------------------------
+
+I'm also trying to adapt https://github.com/CamHenlin/TESample to work
+with purely multiversal interfaces. To build,
+
+```shell
+cd docker
+make TESample.app
+```
