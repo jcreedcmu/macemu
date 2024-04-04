@@ -4,8 +4,8 @@ MacOS7.5.3.iso
 pram-macos.img
 Quadra800.rom
 Saved.hda
-docker/app/icon.r
-docker/app/build
+docker/*/icon.r
+docker/*/build
 *.bin
 *.img.bak
 libtwelf/dist
