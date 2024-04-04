@@ -1,5 +1,5 @@
 # path to RETRO68
-RETRO68=/Retro68-INSTALL
+RETRO68=/opt/Retro68-INSTALL
 
 PREFIX=$(RETRO68)/m68k-apple-macos
 CC=$(RETRO68)/bin/m68k-apple-macos-gcc
@@ -11,7 +11,7 @@ RINCLUDES=$(PREFIX)/RIncludes
 REZFLAGS=-I$(RINCLUDES)
 
 Twelf.code.bin: twelf.o clikloop.o
-	$(CC) $^ -o $@ $(LDFLAGS) -L/build/twelf/bin -L/build/gmp-m68k-INSTALL/lib -ltwelf -lgmp -lm
+	$(CC) $^ -o $@ $(LDFLAGS) -L/build/twelf/bin -L/opt/gmp-m68k-INSTALL/lib -ltwelf -lgmp -lm
 
 clikloop.o: clikloop.s
 	$(CC) -ffunction-sections -c clikloop.s -o $@
