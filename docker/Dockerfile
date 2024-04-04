@@ -102,7 +102,7 @@ RUN echo '#!/bin/bash\ngit rev-parse HEAD' > /usr/bin/svnversion && \
     chmod +x /usr/bin/svnversion
 
 # check out agoode's twelf branch
-ADD https://github.com/agoode/twelf#mac twelf
+ADD https://github.com/agoode/twelf.git#mac twelf
 
 # build twelf library
 RUN cd twelf && \
