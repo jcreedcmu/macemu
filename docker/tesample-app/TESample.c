@@ -1,7 +1,7 @@
 // We are trying to compile with multiversal interface
 #define UNIVERSAL_INTERFACE 0
 
-#include "TESample.h" /* bring in all the #defines for TESample */
+#include "TESample.h"
 
 #include <Devices.h>
 #include <Dialogs.h>
@@ -21,8 +21,11 @@
 #include <limits.h>
 #include <stdio.h>
 
-#include "api.h" /* bring in all the #defines for TESample */
+#include "api.h"
+#include "asmclikloop.h"
 #include "clikloop.h"
+#include "document.h"
+
 #if UNIVERSAL_INTERFACE
 #include <ControlDefinitions.h>
 #include <Controls.h>
@@ -66,8 +69,6 @@ void AdjustHV(Boolean isVert, ControlHandle control, TEHandle docTE,
 void AdjustScrollValues(WindowPtr window, Boolean canRedraw);
 void AdjustScrollSizes(WindowPtr window);
 void AdjustScrollbars(WindowPtr window, Boolean needsResize);
-pascal void PascalClikLoop();
-pascal TEClickLoopUPP GetOldClickLoop();
 Boolean IsAppWindow(WindowPtr window);
 Boolean IsDAWindow(WindowPtr window);
 Boolean TrapAvailable(short tNumber, TrapType tType);
@@ -96,18 +97,6 @@ short gNumDocuments; /* maintained by Initialize, DoNew, and DoCloseWindow */
    dependency on the ordering of fields within a Rect */
 #define TopLeft(aRect) (*(Point *)&(aRect).top)
 #define BotRight(aRect) (*(Point *)&(aRect).bottom)
-
-/* A DocumentRecord contains the WindowRecord for one of our document windows,
-   as well as the TEHandle for the text we are editing. Other document fields
-   can be added to this record as needed. For a similar example, see how the
-   Window Manager and Dialog Manager add fields after the GrafPort. */
-typedef struct {
-  WindowRecord docWindow;
-  TEHandle docTE;
-  ControlHandle docVScroll;
-  ControlHandle docHScroll;
-  TEClickLoopUPP docClick;
-} DocumentRecord, *DocumentPeek;
 
 /*	Set up the whole world, including global variables, Toolbox managers,
         menus, and a single blank document. */
@@ -1269,37 +1258,6 @@ void AdjustScrollbars(WindowPtr window, Boolean needsResize) {
         turn called by the TEClick toolbox routine. Saves the windows clip
    region, sets it to the portRect, adjusts the scrollbar values to match the TE
    scroll amount, then restores the clip region. */
-
-pascal void PascalClikLoop() {
-  WindowPtr window;
-  RgnHandle region;
-
-  window = FrontWindow();
-  region = NewRgn();
-  GetClip(region); /* save clip */
-  ClipRect(&window->portRect);
-  AdjustScrollValues(window, true); /* pass true for canRedraw */
-  SetClip(region);                  /* restore clip */
-  DisposeRgn(region);
-} /* Pascal/C ClickLoop */
-
-/* Gets called from our assembly language routine, AsmClickLoop, which is in
-        turn called by the TEClick toolbox routine. It returns the address of
-   the default clickLoop routine that was put into the TERec by TEAutoView to
-        AsmClickLoop so that it can call it. */
-
-pascal ProcPtr GetOldClikLoop() {
-  return ((DocumentPeek)FrontWindow())->docClick;
-} /* GetOldClickLoop */
-
-/*	Check to see if a window belongs to the application. If the window
-   pointer passed was NIL, then it could not be an application window.
-   WindowKinds that are negative belong to the system and windowKinds less than
-   userKind are reserved by Apple except for windowKinds equal to dialogKind,
-   which mean it is a dialog. 1.02 - In order to reduce the chance of
-   accidentally treating some window as an AppWindow that shouldn't be, we'll
-   only return true if the windowkind is userKind. If you add different kinds of
-   windows to Sample you'll need to change how this all works. */
 
 Boolean IsAppWindow(WindowPtr window) {
   short windowKind;
