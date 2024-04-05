@@ -8,3 +8,7 @@ void AdjustHV(Boolean isVert, ControlHandle control, TEHandle docTE,
 void AdjustScrollValues(WindowPtr window, Boolean canRedraw);
 void AdjustScrollSizes(WindowPtr window);
 void AdjustScrollbars(WindowPtr window, Boolean needsResize);
+
+// Scrolling callbacks
+pascal void VActionProc(ControlHandle control, short part);
+pascal void HActionProc(ControlHandle control, short part);

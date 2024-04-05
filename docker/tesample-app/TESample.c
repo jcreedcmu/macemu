@@ -51,9 +51,6 @@ void DoActivate(WindowPtr window, Boolean becomingActive);
 void DoContentClick(WindowPtr window, EventRecord *event);
 void DoKeyDown(EventRecord *event);
 unsigned long GetSleep(void);
-void CommonAction(ControlHandle control, short *amount);
-pascal void VActionProc(ControlHandle control, short part);
-pascal void HActionProc(ControlHandle control, short part);
 void DoIdle(void);
 void DrawWindow(WindowPtr window);
 void AdjustMenus(void);
@@ -682,81 +679,6 @@ unsigned long GetSleep() {
   return 0;
 #endif
 } /*GetSleep*/
-
-/*	Common algorithm for pinning the value of a control. It returns the
-   actual amount the value of the control changed. Note the pinning is done for
-   the sake of returning the amount the control value changed. */
-
-void CommonAction(ControlHandle control, short *amount) {
-  short value, max;
-
-  value = GetControlValue(control); /* get current value */
-  max = GetControlMaximum(control); /* and maximum value */
-  *amount = value - *amount;
-  if (*amount < 0)
-    *amount = 0;
-  else if (*amount > max)
-    *amount = max;
-  SetControlValue(control, *amount);
-  *amount = value - *amount; /* calculate the real change */
-} /* CommonAction */
-
-/* Determines how much to change the value of the vertical scrollbar by and how
-        much to scroll the TE record. */
-
-pascal void VActionProc(ControlHandle control, short part) {
-  short amount;
-  WindowPtr window;
-  TEPtr te;
-
-  if (part != 0) { /* if it was actually in the control */
-    window = (*control)->contrlOwner;
-    te = *((DocumentPeek)window)->docTE;
-    switch (part) {
-      case kControlUpButtonPart:
-      case kControlDownButtonPart: /* one line */
-        amount = 1;
-        break;
-      case kControlPageUpPart: /* one page */
-      case kControlPageDownPart:
-        amount = (te->viewRect.bottom - te->viewRect.top) / te->lineHeight;
-        break;
-    }
-    if ((part == kControlDownButtonPart) || (part == kControlPageDownPart))
-      amount = -amount; /* reverse direction for a downer */
-    CommonAction(control, &amount);
-    if (amount != 0)
-      TEScroll(0, amount * te->lineHeight, ((DocumentPeek)window)->docTE);
-  }
-} /* VActionProc */
-
-/* Determines how much to change the value of the horizontal scrollbar by and
-how much to scroll the TE record. */
-
-pascal void HActionProc(ControlHandle control, short part) {
-  short amount;
-  WindowPtr window;
-  TEPtr te;
-
-  if (part != 0) {
-    window = (*control)->contrlOwner;
-    te = *((DocumentPeek)window)->docTE;
-    switch (part) {
-      case kControlUpButtonPart:
-      case kControlDownButtonPart: /* a few pixels */
-        amount = kButtonScroll;
-        break;
-      case kControlPageUpPart: /* a page */
-      case kControlPageDownPart:
-        amount = te->viewRect.right - te->viewRect.left;
-        break;
-    }
-    if ((part == kControlDownButtonPart) || (part == kControlPageDownPart))
-      amount = -amount; /* reverse direction */
-    CommonAction(control, &amount);
-    if (amount != 0) TEScroll(amount, 0, ((DocumentPeek)window)->docTE);
-  }
-} /* VActionProc */
 
 /* This is called whenever we get a null event et al.
  It takes care of necessary periodic actions. For this program, it calls TEIdle.
