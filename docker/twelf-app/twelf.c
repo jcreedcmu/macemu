@@ -282,7 +282,7 @@ void UpdateMenus(void) {
   }
 }
 
-static void openElf(WindowPtr w, TEHandle te) {
+static void openElf(TEHandle te) {
   StandardFileReply reply;
   SFTypeList types = {'TEXT'};
 
@@ -309,7 +309,6 @@ static void openElf(WindowPtr w, TEHandle te) {
     HUnlock(buf);
     DisposeHandle(buf);
     err = FSClose(refNum);
-    TEUpdate(&w->portRect, te);
   }
 }
 
@@ -332,7 +331,7 @@ void DoMenuCommand(long menuCommand) {
         TESetText("", 0, theDoc->docOutputTE);
         break;
       case kItemOpen:
-        openElf(w, theDoc->docInputTE);
+        openElf(theDoc->docInputTE);
         break;
       case kItemSave:
         break;

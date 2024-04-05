@@ -138,10 +138,10 @@ void DoOpen() {
     MoveHHi(buf);
     HLock(buf);
     TESetText(*buf, textLength, te);
-    TEUpdate(&window->portRect, te);
     HUnlock(buf);
     DisposeHandle(buf);
     err = FSClose(refNum);
+    InvalRect(&window->portRect);
   }
 }
 
