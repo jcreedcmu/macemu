@@ -13,12 +13,9 @@ REZFLAGS=-I$(RINCLUDES)
 TESample.bin: TESample.code.bin
 	$(REZ) $(REZFLAGS) --copy $^ TESample.r -t "APPL" -c "TSMP" -o $@
 
-TESample.code.bin: TESample.o clikloop.o
+TESample.code.bin: TESample.o
 	$(CC) $^ -o $@ $(LDFLAGS) -L/build/twelf/bin -L/opt/gmp-m68k-INSTALL/lib -ltwelf -lgmp -lm
-
-clikloop.o: clikloop.s
-	$(CC) -ffunction-sections -c clikloop.s -o $@
 
 .PHONY: clean
 clean:
-	rm -f TESample.bin TESample.APPL TESample.dsk TESample.code.bin TESample.code.bin.gdb TESample.o clikloop.o
+	rm -f TESample.bin TESample.APPL TESample.dsk TESample.code.bin TESample.code.bin.gdb TESample.o

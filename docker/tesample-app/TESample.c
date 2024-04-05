@@ -355,27 +355,22 @@ Boolean TrapAvailable(short tNumber, TrapType tType)
 
 extern pascal void AsmClikLoop();
 
-// Inline assembly causes a crash on click, whereas external assembly
-// does not, not sure why yet.
+asm (
+	  "ASMCLIKLOOP:\n"
+	  "movem.l		%d1-%d2/%a1,-(%sp)\n"
+	  "clr.l			-(%sp)\n"
+	  "jsr			GETOLDCLIKLOOP\n"
+	  "movea.l		(%sp)+,%a0\n"
+	  "movem.l		(%sp)+,%d1-%d2/%a1\n"
 
-/* pascal void AsmClickLoop() { */
-/*   asm ( */
-/* 		 "movem.l		%d1-%d2/%a1,-(%sp)\n" */
-/* 		 "clr.l			-(%sp)\n" */
-/* 		 "jsr			GETOLDCLIKLOOP\n" */
-/* 		 "movea.l		(%sp)+,%a0\n" */
-/* 		 "movem.l		(%sp)+,%d1-%d2/%a1\n" */
+	  "jsr			(%a0)\n"
 
-/* 		 "jsr			(%a0)\n" */
-
-/* 		 "movem.l		%d1-%d2/%a1,-(%sp)\n" */
-/* 		 "jsr			PASCALCLIKLOOP\n" */
-/* 		 "movem.l		(%sp)+,%d1-%d2/%a1\n" */
-/* 		 "moveq			#1,%d0\n" */
-/* 		 "rts\n" */
-/* 		 ); */
-/* } */
-
+	  "movem.l		%d1-%d2/%a1,-(%sp)\n"
+	  "jsr			PASCALCLIKLOOP\n"
+	  "movem.l		(%sp)+,%d1-%d2/%a1\n"
+	  "moveq			#1,%d0\n"
+	  "rts\n"
+	  );
 
 int main()
 {
