@@ -24,6 +24,7 @@ OBJS = \
   scrap.o \
   scrolling.o \
   view-rects.o \
+  windows.o \
   #
 
 TESample.code.bin: $(OBJS)

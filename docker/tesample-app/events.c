@@ -6,11 +6,10 @@
 #include "consts.h"
 #include "global-state.h"
 #include "handlers.h"
+#include "windows.h"
 
 void AdjustMenus(void);
 void DoMenuCommand(long menuResult);
-Boolean IsAppWindow(WindowPtr window);
-void DrawWindow(WindowPtr window);
 
 /* Do the right thing for an event. Determine what kind of event it is, and call
  the appropriate routines. */

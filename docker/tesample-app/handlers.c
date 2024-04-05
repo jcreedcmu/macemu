@@ -5,12 +5,7 @@
 #include "document.h"
 #include "scrolling.h"
 #include "view-rects.h"
-
-Boolean IsAppWindow(WindowPtr window);
-void AdjustMenus(void);
-Boolean DoCloseWindow(WindowPtr window);
-void DrawWindow(WindowPtr window);
-void AlertUser(short error);
+#include "windows.h"
 
 /*	Get the global coordinates of the mouse. When you call OSEventAvail
         it will return either a pending event or a null event. In either case,
