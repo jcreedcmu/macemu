@@ -14,7 +14,7 @@
    or created. We keep track of the number of open documents, and disable the
    menu items that create a new document when the maximum is reached. If the
    number of documents falls below the maximum, the items are enabled again. */
-#define kMaxOpenDocuments 1
+#define kMaxOpenDocuments 32
 
 /*	kMaxDocWidth is an arbitrary number used to specify the width of the
    TERec's destination rectangle so that word wrap and horizontal scrolling can

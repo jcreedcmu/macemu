@@ -1,3 +1,4 @@
+
 # path to RETRO68
 RETRO68=/opt/Retro68-INSTALL
 
@@ -13,22 +14,27 @@ REZFLAGS=-I$(RINCLUDES)
 TESample.bin: TESample.code.bin
 	$(REZ) $(REZFLAGS) --copy $^ TESample.r -t "APPL" -c "TSMP" -o $@
 
+-include Makefile.deps
+
 # remove scrap.o if we use universal interface
 OBJS = \
-  TESample.o \
-  asmclikloop.o \
-  clikloop.o \
-  events.o \
-  global-state.o \
-  handlers.o \
-  menus.o \
-  scrap.o \
-  scrolling.o \
-  view-rects.o \
-  windows.o \
-  #
+	 TESample.o \
+	 asmclikloop.o \
+	 clikloop.o \
+	 events.o \
+	 global-state.o \
+	 handlers.o \
+	 menus.o \
+	 scrap.o \
+	 scrolling.o \
+	 view-rects.o \
+	 windows.o \
+	 #
 
-TESample.code.bin: $(OBJS)
+Makefile.deps:
+	gcc $(CFLAGS) -MM *.c > $@
+
+TESample.code.bin: $(OBJS) $(HEADERS)
 	$(CC) $^ -o $@ $(LDFLAGS) -L/build/twelf/bin -L/opt/gmp-m68k-INSTALL/lib -ltwelf -lgmp -lm
 
 asmclikloop.o: asmclikloop.s
