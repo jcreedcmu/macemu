@@ -16,7 +16,9 @@ TESample.bin: TESample.code.bin
 OBJS = \
   TESample.o \
   clikloop.o \
-  asmclikloop.o
+  asmclikloop.o \
+  scrolling.o \
+  #
 
 TESample.code.bin: $(OBJS)
 	$(CC) $^ -o $@ $(LDFLAGS) -L/build/twelf/bin -L/opt/gmp-m68k-INSTALL/lib -ltwelf -lgmp -lm
