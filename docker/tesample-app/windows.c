@@ -9,9 +9,10 @@
 #include "scrolling.h"
 #include "view-rects.h"
 
-/* Create a new document and window. */
+/* Create a new document and window. Returns NULL on failure, pointer to new
+ * document on success. */
 
-void DoNew() {
+WindowPtr mkDocumentWindow() {
   Boolean good;
   Ptr storage;
   WindowPtr window;
@@ -54,25 +55,32 @@ void DoNew() {
         course, the window is hidden so it wouldn't matter whether we called
         ShowControl or not. */
         AdjustScrollValues(window, false);
-        // FIXME(open): if this is an Open, set title before showing
-        ShowWindow(window);
+        return window;
       } else {
         DoCloseWindow(window); /* otherwise regret we ever created it... */
         AlertUser(eNoWindow);  /* and tell user */
+        return NULL;
       }
     } else
       DisposePtr(storage); /* get rid of the storage if it is never used */
+    return NULL;
   }
-} /*DoNew*/
+}
+
+// Create a new untitled document window and show it.
+void DoNew() {
+  WindowPtr window = mkDocumentWindow();
+  ShowWindow(window);
+}
 
 /* Close a window. This handles desk accessory and application windows. */
 
 /*	1.01 - At this point, if there was a document associated with a
-        window, you could do any document saving processing if it is 'dirty'.
-        DoCloseWindow would return true if the window actually closed, i.e.,
-        the user didn't cancel from a save dialog. This result is handy when
-        the user quits an application, but then cancels the save of a document
-        associated with a window. */
+        window, you could do any document saving processing if it is
+   'dirty'. DoCloseWindow would return true if the window actually closed,
+   i.e., the user didn't cancel from a save dialog. This result is handy
+   when the user quits an application, but then cancels the save of a
+   document associated with a window. */
 
 Boolean DoCloseWindow(WindowPtr window) {
   TEHandle te;

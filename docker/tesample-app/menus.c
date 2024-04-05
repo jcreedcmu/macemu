@@ -96,53 +96,55 @@ void DoSaveAs(WindowPtr window) {
   TEHandle te = ((DocumentPeek)window)->docTE;
   StandardFileReply reply;
   StandardPutFile("\pSave as:", "\puntitled.txt", &reply);
-  if (reply.sfGood) {
-    OSErr err;
-    short refNum;
-    err = FSpCreate(&reply.sfFile, 'ttxt', 'TEXT', smSystemScript);
-    err = FSpOpenDF(&reply.sfFile, fsRdWrPerm, &refNum);
-    Handle textHandle = (Handle)TEGetText(te);
-    long size = (*te)->teLength;
-    err = FSWrite(refNum, &size, *textHandle);
-    err = FSClose(refNum);
-    SetWTitle(window, reply.sfFile.name);
-  }  // else the user cancelled
+  if (!reply.sfGood) return;
+
+  OSErr err;
+  short refNum;
+  err = FSpCreate(&reply.sfFile, 'ttxt', 'TEXT', smSystemScript);
+  err = FSpOpenDF(&reply.sfFile, fsRdWrPerm, &refNum);
+  Handle textHandle = (Handle)TEGetText(te);
+  long size = (*te)->teLength;
+  err = FSWrite(refNum, &size, *textHandle);
+  err = FSClose(refNum);
+  SetWTitle(window, reply.sfFile.name);
 }
 
+// FIXME(open): better error handling
 void DoOpen() {
   StandardFileReply reply;
   SFTypeList types = {'TEXT'};
 
-  // FIXME(open): should create a new window
-  WindowPtr window = FrontWindow();
+  StandardGetFile(NULL, 1, types, &reply);
+  if (!reply.sfGood) return;
+
+  WindowPtr window = mkDocumentWindow();
   if (window == NULL) return;
   TEHandle te = ((DocumentPeek)window)->docTE;
+  SetWTitle(window, reply.sfFile.name);
 
-  StandardGetFile(NULL, 1, types, &reply);
-  if (reply.sfGood) {
-    int16_t refNum;
-    long textLength;
-    OSErr err = FSpOpenDF(&reply.sfFile, fsCurPerm, &refNum);
-    err = SetFPos(refNum, fsFromStart, 0);
-    err = GetEOF(refNum, &textLength);
-    if (textLength > kMaxTELength) {
-      textLength = kMaxTELength;
-    }
-    Handle buf = NewHandle(textLength);
-    err = FSRead(refNum, &textLength, *buf);
-    for (int i = 0; i < textLength; i++) {
-      if ((*buf)[i] == '\n') {
-        (*buf)[i] = '\r';
-      }
-    }
-    MoveHHi(buf);
-    HLock(buf);
-    TESetText(*buf, textLength, te);
-    HUnlock(buf);
-    DisposeHandle(buf);
-    err = FSClose(refNum);
-    InvalRect(&window->portRect);
+  int16_t refNum;
+  long textLength;
+  OSErr err = FSpOpenDF(&reply.sfFile, fsCurPerm, &refNum);
+  err = SetFPos(refNum, fsFromStart, 0);
+  err = GetEOF(refNum, &textLength);
+  if (textLength > kMaxTELength) {
+    textLength = kMaxTELength;
   }
+  Handle buf = NewHandle(textLength);
+  err = FSRead(refNum, &textLength, *buf);
+  for (int i = 0; i < textLength; i++) {
+    if ((*buf)[i] == '\n') {
+      (*buf)[i] = '\r';
+    }
+  }
+  MoveHHi(buf);
+  HLock(buf);
+  TESetText(*buf, textLength, te);
+  HUnlock(buf);
+  DisposeHandle(buf);
+  err = FSClose(refNum);
+  ShowWindow(window);
+  InvalRect(&window->portRect);
 }
 
 /*	This is called when an item is chosen from the menu bar (after calling
