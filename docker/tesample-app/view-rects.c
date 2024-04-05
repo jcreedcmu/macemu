@@ -1,6 +1,6 @@
 #include "view-rects.h"
 
-#include "TESample.h"
+#include "consts.h"
 
 /* Return a rectangle that is inset from the portRect by the size of
         the scrollbars and a little extra margin. */

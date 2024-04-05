@@ -58,8 +58,7 @@
 ------------------------------------------------------------------------------*/
 
 #include "Types.r"
-
-#include "TESample.h"
+#include "resource-consts.h"
 
 /* we use an MBAR resource to conveniently load all the menus */
 

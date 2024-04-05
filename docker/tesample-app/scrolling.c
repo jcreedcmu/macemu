@@ -2,8 +2,8 @@
 
 #include <Windows.h>
 
-#include "TESample.h"
 #include "api.h"
+#include "consts.h"
 #include "document.h"
 #include "view-rects.h"
 

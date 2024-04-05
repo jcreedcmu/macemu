@@ -1,8 +1,6 @@
 // We are trying to compile with multiversal interface
 #define UNIVERSAL_INTERFACE 0
 
-#include "TESample.h"
-
 #include <Devices.h>
 #include <Dialogs.h>
 #include <Events.h>
@@ -24,7 +22,9 @@
 #include "api.h"
 #include "asmclikloop.h"
 #include "clikloop.h"
+#include "consts.h"
 #include "document.h"
+#include "resource-consts.h"
 #include "scrolling.h"
 #include "view-rects.h"
 
