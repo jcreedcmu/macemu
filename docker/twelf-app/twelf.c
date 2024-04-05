@@ -117,7 +117,9 @@ void GetTERect(Rect *teRect, int which) {
   InsetRect(teRect, 2, 2);  // inset a little
                             /* *teRect = window->portRect; */
   /* InsetRect(teRect, 2, 2);	/\* adjust for margin *\/ */
-  /* teRect->bottom = teRect->bottom - 15;		/\* and for the scrollbars *\/
+  /* teRect->bottom = teRect->bottom - 15;		/\* and for the
+   * scrollbars
+   * *\/
    */
   /* teRect->right = teRect->right - 15; */
 }

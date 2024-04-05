@@ -289,7 +289,7 @@ void EventLoop() {
   EventRecord event;
   Point mouse;
 
-  cursorRgn = NewRgn(); /* weÕll pass WNE an empty region the 1st time thru */
+  cursorRgn = NewRgn(); /* we'll pass WNE an empty region the 1st time thru */
   do {
     /* use WNE if it is available */
     if (gHasWaitNextEvent) {
@@ -305,7 +305,7 @@ void EventLoop() {
       AdjustCursor(event.where, cursorRgn);
       DoEvent(&event);
     } else
-      DoIdle();   /* perform idle tasks when itÕs not our event */
+      DoIdle();   /* perform idle tasks when it's not our event */
                   /*	If you are using modeless dialogs that have editText items,
                           you will want to call IsDialogEvent to give the caret a chance
                           to blink, even if WNE/GNE returned FALSE. However, check FrontWindow
@@ -324,7 +324,7 @@ void DoEvent(EventRecord *event) {
 
   switch (event->what) {
     case nullEvent:
-      /* we idle for null/mouse moved events ands for events which arenÕt
+      /* we idle for null/mouse moved events ands for events which aren't
               ours (see EventLoop) */
       DoIdle();
       break;
@@ -332,7 +332,7 @@ void DoEvent(EventRecord *event) {
       part = FindWindow(event->where, &window);
       switch (part) {
         case inMenuBar:  /* process a mouse menu command (if any) */
-          AdjustMenus(); /* bring Õem up-to-date */
+          AdjustMenus(); /* bring 'em up-to-date */
           DoMenuCommand(MenuSelect(event->where));
           break;
         case inSysWindow: /* let the system handle the mouseDown */
@@ -350,7 +350,7 @@ void DoEvent(EventRecord *event) {
           break;
         case inGoAway:
           if (TrackGoAway(window, event->where))
-            DoCloseWindow(window); /* we donÕt care if the user cancelled */
+            DoCloseWindow(window); /* we don't care if the user cancelled */
           break;
         case inGrow:
           DoGrowWindow(window, event);
@@ -408,7 +408,7 @@ void DoEvent(EventRecord *event) {
 /*	Change the cursor's shape, depending on its position. This also
    calculates the region where the current cursor resides (for WaitNextEvent).
    When the mouse moves outside of this region, an event is generated. If there
-   is more to the event than just Òthe mouse movedÓ, we get called before the
+   is more to the event than just `the mouse moved', we get called before the
    event is processed to make sure the cursor is the right one. In any (ahem)
    event, this is called again before we fall back into WNE. */
 
@@ -434,7 +434,7 @@ void AdjustCursor(Point mouse, RgnHandle region) {
       LocalToGlobal(&TopLeft(iBeamRect));
       LocalToGlobal(&BotRight(iBeamRect));
       RectRgn(iBeamRgn, &iBeamRect);
-      /* we temporarily change the portÕs origin to ÒglobalfyÓ the visRgn */
+      /* we temporarily change the port's origin to 'globalify' the visRgn */
       SetOrigin(-window->portBits.bounds.left, -window->portBits.bounds.top);
       SectRgn(iBeamRgn, window->visRgn, iBeamRgn);
       SetOrigin(0, 0);
@@ -497,7 +497,7 @@ void DoGrowWindow(WindowPtr window, EventRecord *event) {
     GetLocalUpdateRgn(window, tempRgn); /* get localized update region */
     SizeWindow(window, LoWord(growResult), HiWord(growResult), true);
     _ResizeWindow(window);
-    /* calculate & validate the region that hasnÕt changed so it wonÕt get
+    /* calculate & validate the region that hasn't changed so it won't get
      * redrawn */
     SectRect(&tempRect, &(*doc->docTE)->viewRect, &tempRect);
     ValidRect(&tempRect); /* take it out of update */
@@ -559,8 +559,8 @@ void DoActivate(WindowPtr window, Boolean becomingActive) {
   if (IsAppWindow(window)) {
     doc = (DocumentPeek)window;
     if (becomingActive) {
-      /*	since we donÕt want TEActivate to draw a selection in an area
-         where weÕre going to erase and redraw, weÕll clip out the update region
+      /*	since we don't want TEActivate to draw a selection in an area
+         where we're going to erase and redraw, we'll clip out the update region
               before calling it. */
       tempRgn = NewRgn();
       clipRgn = NewRgn();
@@ -610,7 +610,7 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
     mouse = event->where; /* get the click position */
     GlobalToLocal(&mouse);
     doc = (DocumentPeek)window;
-    /* see if we are in the viewRect. if so, we wonÕt check the controls */
+    /* see if we are in the viewRect. if so, we won't check the controls */
     GetTERect(window, &teRect);
     if (PtInRect(mouse, &teRect)) {
       /* see if we need to extend the selection */
@@ -662,7 +662,7 @@ void DoKeyDown(EventRecord *event) {
   if (IsAppWindow(window)) {
     te = ((DocumentPeek)window)->docTE;
     key = event->message & charCodeMask;
-    /* we have a char. for our window; see if we are still below TextEditÕs
+    /* we have a char. for our window; see if we are still below TextEdit's
             limit for the number of characters (but deletes are always rad) */
     if (key == kDelChar ||
         (*te)->teLength - ((*te)->selEnd - (*te)->selStart) + 1 <
@@ -840,7 +840,7 @@ void AdjustMenus() {
     if ((*te)->selStart < (*te)->selEnd) cutCopyClear = true;
     /* Cut, Copy, and Clear is enabled for app. windows with selections */
     if (GetScrap(nil, 'TEXT', &offset) > 0)
-      paste = true; /* if thereÕs any text in the clipboard, paste is enabled */
+      paste = true; /* if there's any text in the clipboard, paste is enabled */
   }
   if (undo)
     EnableItem(menu, iUndo);
@@ -1025,14 +1025,14 @@ void DoNew() {
       doc->docTE = TENew(&destRect, &viewRect);
       good =
           doc->docTE != nil; /* if TENew succeeded, we have a good document */
-      if (good) {            /* 1.02 - good document? Ñ proceed */
+      if (good) {            /* 1.02 - good document? -- proceed */
         AdjustViewRect(doc->docTE);
         TEAutoView(true, doc->docTE);
         doc->docClick = (*doc->docTE)->clikLoop;
         (*doc->docTE)->clikLoop = (ProcPtr)AsmClikLoop;
       }
 
-      if (good) { /* good document? Ñ get scrollbars */
+      if (good) { /* good document? -- get scrollbars */
         doc->docVScroll = GetNewControl(rVScroll, window);
         good = (doc->docVScroll != nil);
       }
@@ -1041,9 +1041,9 @@ void DoNew() {
         good = (doc->docHScroll != nil);
       }
 
-      if (good) { /* good? Ñ adjust & draw the controls, draw the window */
-        /* false to AdjustScrollValues means musnÕt redraw; technically, of
-        course, the window is hidden so it wouldnÕt matter whether we called
+      if (good) { /* good? -- adjust & draw the controls, draw the window */
+        /* false to AdjustScrollValues means musn't redraw; technically, of
+        course, the window is hidden so it wouldn't matter whether we called
         ShowControl or not. */
         AdjustScrollValues(window, false);
         ShowWindow(window);
@@ -1061,7 +1061,7 @@ void DoNew() {
 /*	1.01 - At this point, if there was a document associated with a
         window, you could do any document saving processing if it is 'dirty'.
         DoCloseWindow would return true if the window actually closed, i.e.,
-        the user didnÕt cancel from a save dialog. This result is handy when
+        the user didn't cancel from a save dialog. This result is handy when
         the user quits an application, but then cancels the save of a document
         associated with a window. */
 
@@ -1179,7 +1179,7 @@ void AdjustHV(Boolean isVert, ControlHandle control, TEHandle docTE,
   te = *docTE; /* point to TERec for convenience */
   if (isVert) {
     lines = te->nLines;
-    /* since nLines isnÕt right if the last character is a return, check for
+    /* since nLines isn't right if the last character is a return, check for
      * that case */
     if (*(*te->hText + te->teLength - 1) == kCrChar) lines += 1;
     max = lines - ((te->viewRect.bottom - te->viewRect.top) / te->lineHeight);
@@ -1190,7 +1190,7 @@ void AdjustHV(Boolean isVert, ControlHandle control, TEHandle docTE,
   SetControlMaximum(control, max);
 
   /* Must deref. after SetControlMaximum since, technically, it could draw and
-     therefore move memory. This is why we donÕt just do it once at the
+     therefore move memory. This is why we don't just do it once at the
      beginning. */
   te = *docTE;
   if (isVert)
@@ -1252,7 +1252,7 @@ void AdjustScrollbars(WindowPtr window, Boolean needsResize) {
   DocumentPeek doc;
 
   doc = (DocumentPeek)window;
-  /* First, turn visibility of scrollbars off so we wonÕt get unwanted redrawing
+  /* First, turn visibility of scrollbars off so we won't get unwanted redrawing
    */
   (*doc->docVScroll)->contrlVis = kControlInvisible; /* turn them off */
   (*doc->docHScroll)->contrlVis = kControlInvisible;
