@@ -43,8 +43,8 @@ void AdjustMenus() {
     EnableItem(menu, iClose);
     EnableItem(menu, iSaveAs);
     DocumentPeek doc = (DocumentPeek)window;
-    if (doc->fsSpecSet) {
-      EnableItem(menu, iSave);  // also Revert? also check Dirty?
+    if (doc->fsSpecSet && doc->dirty) {
+      EnableItem(menu, iSave);  // also Revert?
     } else {
       DisableItem(menu, iSave);
     }
@@ -148,6 +148,7 @@ void DoSave(WindowPtr window) {
   DocumentPeek doc = (DocumentPeek)window;
   TEHandle te = doc->docTE;
   writeFile(doc->docTE, &doc->fsSpec);
+  doc->dirty = false;
 }
 
 void DoSaveAs(WindowPtr window) {
@@ -161,6 +162,7 @@ void DoSaveAs(WindowPtr window) {
   FSpCreate(spec, 'ttxt', 'TEXT', smSystemScript);
   writeFile(doc->docTE, spec);
   associateFile(window, spec);
+  doc->dirty = false;
 }
 
 void DoOpen() {
@@ -236,7 +238,8 @@ void DoMenuCommand(long menuResult) {
       }
       break;
     case mEdit: { /* call SystemEdit for DA editing & MultiFinder */
-      TEHandle te = ((DocumentPeek)FrontWindow())->docTE;
+      DocumentPeek doc = (DocumentPeek)FrontWindow();
+      TEHandle te = doc->docTE;
       if (!SystemEdit(menuItem - 1)) {
         switch (menuItem) {
           case iCut:
@@ -246,6 +249,7 @@ void DoMenuCommand(long menuResult) {
                 AlertUser(eNoSpaceCut);
               else {
                 TECut(te);
+                doc->dirty = true;
                 if (TEToScrap() != noErr) {
                   AlertUser(eNoCut);
                   ZeroScrap();
@@ -277,14 +281,17 @@ void DoMenuCommand(long menuResult) {
                 SetHandleSize(aHandle, oldSize);
                 if (saveErr != noErr)
                   AlertUser(eNoSpacePaste);
-                else
+                else {
                   TEPaste(te);
+                  doc->dirty = true;
+                }
               }
             } else
               AlertUser(eNoPaste);
             break;
           case iClear:
             TEDelete(te);
+            doc->dirty = true;
             break;
           case iSelectAll: {
             TESetSelect(0, (*te)->teLength, te);

@@ -37,6 +37,7 @@ WindowPtr mkDocumentWindow() {
       destRect.right = destRect.left + kMaxDocWidth;
       doc->docTE = TENew(&destRect, &viewRect);
       doc->fsSpecSet = false;
+      doc->dirty = false;
       good =
           doc->docTE != nil; /* if TENew succeeded, we have a good document */
       if (good) {            /* 1.02 - good document? -- proceed */

@@ -10,4 +10,5 @@ typedef struct {
   TEClickLoopUPP docClick;
   Boolean fsSpecSet;
   FSSpec fsSpec;
+  Boolean dirty;
 } DocumentRecord, *DocumentPeek;

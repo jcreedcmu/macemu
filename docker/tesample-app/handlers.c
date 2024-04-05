@@ -212,13 +212,15 @@ void DoKeyDown(EventRecord *event) {
 
   window = FrontWindow();
   if (IsAppWindow(window)) {
-    te = ((DocumentPeek)window)->docTE;
+    DocumentPeek doc = ((DocumentPeek)window);
+    te = doc->docTE;
     key = event->message & charCodeMask;
     /* we have a char. for our window; see if we are still below TextEdit's
             limit for the number of characters (but deletes are always rad) */
     if (key == kDelChar ||
         (*te)->teLength - ((*te)->selEnd - (*te)->selStart) + 1 <
             kMaxTELength) {
+      doc->dirty = true;
       TEKey(key, te);
       AdjustScrollbars(window, false);
       AdjustTE(window);
