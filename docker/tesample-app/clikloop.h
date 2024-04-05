@@ -14,8 +14,8 @@ something like
 ```
 pascal void AsmClikLoop() {
   asm (
-	 "movem.l		%d1-%d2/%a1,-(%sp)"
-	 ...
+         "movem.l		%d1-%d2/%a1,-(%sp)"
+         ...
   );
 }
 ```
@@ -31,8 +31,8 @@ extern pascal void AsmClikLoop();
 
 asm(
   "ASMCLIKLOOP:"
-	 "movem.l		%d1-%d2/%a1,-(%sp)"
-	 ...
+         "movem.l		%d1-%d2/%a1,-(%sp)"
+         ...
   );
 ```
 is that at the end of the day I judged that it wasn't really buying much
