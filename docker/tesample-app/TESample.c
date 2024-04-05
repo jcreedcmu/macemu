@@ -47,11 +47,6 @@ void Initialize(void);
 void BigBadError(short error);
 Boolean TrapAvailable(short tNumber, TrapType tType);
 
-/* Define TopLeft and BotRight macros for convenience. Notice the implicit
-   dependency on the ordering of fields within a Rect */
-#define TopLeft(aRect) (*(Point *)&(aRect).top)
-#define BotRight(aRect) (*(Point *)&(aRect).bottom)
-
 /*	Set up the whole world, including global variables, Toolbox managers,
         menus, and a single blank document. */
 
@@ -222,55 +217,3 @@ int main() {
 
   EventLoop(); /* call the main event loop */
 }
-
-/*	Change the cursor's shape, depending on its position. This also
-   calculates the region where the current cursor resides (for WaitNextEvent).
-   When the mouse moves outside of this region, an event is generated. If there
-   is more to the event than just `the mouse moved', we get called before the
-   event is processed to make sure the cursor is the right one. In any (ahem)
-   event, this is called again before we fall back into WNE. */
-
-void AdjustCursor(Point mouse, RgnHandle region) {
-  WindowPtr window;
-  RgnHandle arrowRgn;
-  RgnHandle iBeamRgn;
-  Rect iBeamRect;
-
-  window = FrontWindow(); /* we only adjust the cursor when we are in front */
-  if ((!gInBackground) && (!IsDAWindow(window))) {
-    /* calculate regions for different cursor shapes */
-    arrowRgn = NewRgn();
-    iBeamRgn = NewRgn();
-
-    /* start arrowRgn wide open */
-    SetRectRgn(arrowRgn, kExtremeNeg, kExtremeNeg, kExtremePos, kExtremePos);
-
-    /* calculate iBeamRgn */
-    if (IsAppWindow(window)) {
-      iBeamRect = (*((DocumentPeek)window)->docTE)->viewRect;
-      SetPort(window); /* make a global version of the viewRect */
-      LocalToGlobal(&TopLeft(iBeamRect));
-      LocalToGlobal(&BotRight(iBeamRect));
-      RectRgn(iBeamRgn, &iBeamRect);
-      /* we temporarily change the port's origin to 'globalify' the visRgn */
-      SetOrigin(-window->portBits.bounds.left, -window->portBits.bounds.top);
-      SectRgn(iBeamRgn, window->visRgn, iBeamRgn);
-      SetOrigin(0, 0);
-    }
-
-    /* subtract other regions from arrowRgn */
-    DiffRgn(arrowRgn, iBeamRgn, arrowRgn);
-
-    /* change the cursor and the region parameter */
-    if (PtInRgn(mouse, iBeamRgn)) {
-      SetCursor(*GetCursor(iBeamCursor));
-      CopyRgn(iBeamRgn, region);
-    } else {
-      SetCursor(&qd.arrow);
-      CopyRgn(arrowRgn, region);
-    }
-
-    DisposeRgn(arrowRgn);
-    DisposeRgn(iBeamRgn);
-  }
-} /*AdjustCursor*/
