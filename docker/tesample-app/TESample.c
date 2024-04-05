@@ -26,6 +26,7 @@
 #include "clikloop.h"
 #include "document.h"
 #include "scrolling.h"
+#include "view-rects.h"
 
 #if UNIVERSAL_INTERFACE
 #include <ControlDefinitions.h>
@@ -62,8 +63,6 @@ Boolean DoCloseWindow(WindowPtr window);
 void Terminate(void);
 void Initialize(void);
 void BigBadError(short error);
-void GetTERect(WindowPtr window, Rect *teRect);
-void AdjustViewRect(TEHandle docTE);
 Boolean IsAppWindow(WindowPtr window);
 Boolean IsDAWindow(WindowPtr window);
 Boolean TrapAvailable(short tNumber, TrapType tType);
@@ -1104,29 +1103,6 @@ void Terminate() {
   } while (closed && (aWindow != nil));
   if (closed) ExitToShell(); /* exit if no cancellation */
 } /*Terminate*/
-
-/* Return a rectangle that is inset from the portRect by the size of
-        the scrollbars and a little extra margin. */
-
-void GetTERect(WindowPtr window, Rect *teRect) {
-  *teRect = window->portRect;
-  InsetRect(teRect, kTextMargin, kTextMargin); /* adjust for margin */
-  teRect->bottom = teRect->bottom - 15;        /* and for the scrollbars */
-  teRect->right = teRect->right - 15;
-} /*GetTERect*/
-
-/* Update the TERec's view rect so that it is the greatest multiple of
-        the lineHeight that still fits in the old viewRect. */
-
-void AdjustViewRect(TEHandle docTE) {
-  TEPtr te;
-
-  te = *docTE;
-  te->viewRect.bottom =
-      (((te->viewRect.bottom - te->viewRect.top) / te->lineHeight) *
-       te->lineHeight) +
-      te->viewRect.top;
-} /*AdjustViewRect*/
 
 /* Gets called from our assembly language routine, AsmClickLoop, which is in
         turn called by the TEClick toolbox routine. Saves the windows clip

@@ -18,6 +18,7 @@ OBJS = \
   clikloop.o \
   asmclikloop.o \
   scrolling.o \
+  view-rects.o \
   #
 
 TESample.code.bin: $(OBJS)
