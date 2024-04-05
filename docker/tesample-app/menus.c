@@ -141,6 +141,7 @@ void DoOpen() {
     HUnlock(buf);
     DisposeHandle(buf);
     err = FSClose(refNum);
+    InvalRect(&window->portRect);
   }
 }
 
