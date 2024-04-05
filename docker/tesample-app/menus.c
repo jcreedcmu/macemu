@@ -42,8 +42,15 @@ void AdjustMenus() {
   if (window != nil) {
     EnableItem(menu, iClose);
     EnableItem(menu, iSaveAs);
+    DocumentPeek doc = (DocumentPeek)window;
+    if (doc->fsSpecSet) {
+      EnableItem(menu, iSave);  // also Revert? also check Dirty?
+    } else {
+      DisableItem(menu, iSave);
+    }
   } else {
     DisableItem(menu, iClose);
+    DisableItem(menu, iSave);
     DisableItem(menu, iSaveAs);
   }
 
@@ -92,39 +99,23 @@ void AdjustMenus() {
 
 } /*AdjustMenus*/
 
-void DoSaveAs(WindowPtr window) {
-  TEHandle te = ((DocumentPeek)window)->docTE;
-  StandardFileReply reply;
-  StandardPutFile("\pSave as:", "\puntitled.txt", &reply);
-  if (!reply.sfGood) return;
-
+// FIXME(fs): better error handling in all file operations
+OSErr writeFile(TEHandle te, FSSpec *spec) {
   OSErr err;
   short refNum;
-  err = FSpCreate(&reply.sfFile, 'ttxt', 'TEXT', smSystemScript);
-  err = FSpOpenDF(&reply.sfFile, fsRdWrPerm, &refNum);
+  err = FSpOpenDF(spec, fsRdWrPerm, &refNum);
   Handle textHandle = (Handle)TEGetText(te);
   long size = (*te)->teLength;
   err = FSWrite(refNum, &size, *textHandle);
   err = FSClose(refNum);
-  SetWTitle(window, reply.sfFile.name);
+
+  return err;
 }
 
-// FIXME(open): better error handling
-void DoOpen() {
-  StandardFileReply reply;
-  SFTypeList types = {'TEXT'};
-
-  StandardGetFile(NULL, 1, types, &reply);
-  if (!reply.sfGood) return;
-
-  WindowPtr window = mkDocumentWindow();
-  if (window == NULL) return;
-  TEHandle te = ((DocumentPeek)window)->docTE;
-  SetWTitle(window, reply.sfFile.name);
-
+OSErr readFile(TEHandle te, FSSpec *spec) {
   int16_t refNum;
   long textLength;
-  OSErr err = FSpOpenDF(&reply.sfFile, fsCurPerm, &refNum);
+  OSErr err = FSpOpenDF(spec, fsCurPerm, &refNum);
   err = SetFPos(refNum, fsFromStart, 0);
   err = GetEOF(refNum, &textLength);
   if (textLength > kMaxTELength) {
@@ -143,6 +134,52 @@ void DoOpen() {
   HUnlock(buf);
   DisposeHandle(buf);
   err = FSClose(refNum);
+  return err;
+}
+
+void associateFile(WindowPtr window, FSSpec *spec) {
+  DocumentPeek doc = (DocumentPeek)window;
+  doc->fsSpec = *spec;
+  doc->fsSpecSet = true;
+  SetWTitle(window, spec->name);
+}
+
+void DoSave(WindowPtr window) {
+  DocumentPeek doc = (DocumentPeek)window;
+  TEHandle te = doc->docTE;
+  writeFile(doc->docTE, &doc->fsSpec);
+}
+
+void DoSaveAs(WindowPtr window) {
+  DocumentPeek doc = (DocumentPeek)window;
+  TEHandle te = doc->docTE;
+  StandardFileReply reply;
+  StandardPutFile("\pSave as:", "\puntitled", &reply);
+  if (!reply.sfGood) return;
+
+  FSSpec *spec = &reply.sfFile;
+  FSpCreate(spec, 'ttxt', 'TEXT', smSystemScript);
+  writeFile(doc->docTE, spec);
+  associateFile(window, spec);
+}
+
+void DoOpen() {
+  StandardFileReply reply;
+  SFTypeList types = {'TEXT'};
+
+  StandardGetFile(nil, 1, types, &reply);
+  if (!reply.sfGood) return;
+
+  WindowPtr window = mkDocumentWindow();
+  if (window == NULL) return;
+  DocumentPeek doc = (DocumentPeek)window;
+  TEHandle te = doc->docTE;
+
+  FSSpec *spec = &reply.sfFile;
+  readFile(te, spec);
+
+  associateFile(window, spec);
+
   ShowWindow(window);
   InvalRect(&window->portRect);
 }
@@ -187,6 +224,9 @@ void DoMenuCommand(long menuResult) {
         case iClose:
           DoCloseWindow(FrontWindow()); /* ignore the result */
           break;
+        case iSave: {
+          DoSave(FrontWindow());
+        } break;
         case iSaveAs: {
           DoSaveAs(FrontWindow());
         } break;

@@ -8,4 +8,6 @@ typedef struct {
   ControlHandle docVScroll;
   ControlHandle docHScroll;
   TEClickLoopUPP docClick;
+  Boolean fsSpecSet;
+  FSSpec fsSpec;
 } DocumentRecord, *DocumentPeek;
