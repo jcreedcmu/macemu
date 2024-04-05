@@ -225,7 +225,7 @@ resource 'DITL' (rUserAlert, purgeable) {
 	}
 };
 
-
+/* FIXME: deprecated */
 resource 'WIND' (rDocWindow, preload, purgeable) {
 	{64, 60, 314, 460},
 	zoomDocProc, invisible, goAway, 0x0, "untitled",

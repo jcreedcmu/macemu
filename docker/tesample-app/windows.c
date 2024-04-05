@@ -15,13 +15,17 @@
 WindowPtr mkDocumentWindow() {
   Boolean good;
   Ptr storage;
-  WindowPtr window;
-  Rect destRect, viewRect;
+  Rect destRect, viewRect, windowRect;
   DocumentPeek doc;
+
+  int offset = gNumDocuments * 16;
+  SetRect(&windowRect, 3, 40, 403, 340);
+  OffsetRect(&windowRect, offset, offset);
 
   storage = NewPtr(sizeof(DocumentRecord));
   if (storage != nil) {
-    window = GetNewWindow(rDocWindow, storage, (WindowPtr)-1);
+    WindowPtr window = NewWindow(storage, &windowRect, "\puntitled", true,
+                                 documentProc, (WindowPtr)-1, true, 0);
     if (window != nil) {
       gNumDocuments +=
           1; /* this will be decremented when we call DoCloseWindow */
@@ -50,11 +54,9 @@ WindowPtr mkDocumentWindow() {
         good = (doc->docHScroll != nil);
       }
 
-      if (good) { /* good? -- adjust & draw the controls, draw the window */
-        /* false to AdjustScrollValues means musn't redraw; technically, of
-        course, the window is hidden so it wouldn't matter whether we called
-        ShowControl or not. */
+      if (good) {
         AdjustScrollValues(window, false);
+        AdjustScrollbars(window, true);
         return window;
       } else {
         DoCloseWindow(window); /* otherwise regret we ever created it... */
