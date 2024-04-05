@@ -12,8 +12,12 @@
 
 #define mFile 129 /* File menu */
 #define iNew 1
+#define iOpen 2
 #define iClose 4
-#define iQuit 12
+#define iSave 5
+#define iSaveAs 6
+#define iRevert 7
+#define iQuit 9
 
 #define mEdit 130 /* Edit menu */
 #define iUndo 1
@@ -21,6 +25,7 @@
 #define iCopy 4
 #define iPaste 5
 #define iClear 6
+#define iSelectAll 8
 
 #define rMenuBar 128    /* application's menu bar */
 #define rAboutAlert 128 /* about alert */

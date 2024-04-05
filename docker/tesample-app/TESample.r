@@ -81,7 +81,7 @@ resource 'MENU' (mApple, preload) {
 
 resource 'MENU' (mFile, preload) {
 	mFile, textMenuProc,
-	0b0000000000000000000100000000000,	/* enable Quit only, program enables others */
+	0b0000000000000000000000000000000, /* enable nothing */
 	enabled, "File",
 	{
 		"New",
@@ -100,12 +100,6 @@ resource 'MENU' (mFile, preload) {
 			noicon, nokey, nomark, plain;
 		"-",
 			noicon, nokey, nomark, plain;
-		"Page Setup\311",
-			noicon, nokey, nomark, plain;
-		"Print\311",
-			noicon, nokey, nomark, plain;
-		"-",
-			noicon, nokey, nomark, plain;
 		"Quit",
 			noicon, "Q", nomark, plain
 	}
@@ -113,7 +107,7 @@ resource 'MENU' (mFile, preload) {
 
 resource 'MENU' (mEdit, preload) {
 	mEdit, textMenuProc,
-	0b0000000000000000000000000000000,	/* disable everything, program does the enabling */
+	0b0000000000000000000000000000000,	/* enable nothing */
 	enabled, "Edit",
 	 {
 		"Undo",
@@ -127,7 +121,11 @@ resource 'MENU' (mEdit, preload) {
 		"Paste",
 			noicon, "V", nomark, plain;
 		"Clear",
-			noicon, nokey, nomark, plain
+			noicon, nokey, nomark, plain;
+		"-",
+			noicon, nokey, nomark, plain;
+		"Select All",
+			noicon, "A", nomark, plain;
 	}
 };
 

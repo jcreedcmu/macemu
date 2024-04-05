@@ -39,15 +39,20 @@ void AdjustMenus() {
   else
     DisableItem(menu, iClose);
 
+  EnableItem(menu, iQuit);
+
   menu = GetMenuHandle(mEdit);
   undo = false;
   cutCopyClear = false;
   paste = false;
+  Boolean selectAll = false;
+
   if (IsDAWindow(window)) {
     undo = true; /* all editing is enabled for DA windows */
     cutCopyClear = true;
     paste = true;
   } else if (IsAppWindow(window)) {
+    selectAll = true;
     te = ((DocumentPeek)window)->docTE;
     if ((*te)->selStart < (*te)->selEnd) cutCopyClear = true;
     /* Cut, Copy, and Clear is enabled for app. windows with selections */
@@ -71,6 +76,12 @@ void AdjustMenus() {
     EnableItem(menu, iPaste);
   else
     DisableItem(menu, iPaste);
+
+  if (selectAll)
+    EnableItem(menu, iSelectAll);
+  else
+    DisableItem(menu, iSelectAll);
+
 } /*AdjustMenus*/
 
 /*	This is called when an item is chosen from the menu bar (after calling
@@ -167,6 +178,9 @@ void DoMenuCommand(long menuResult) {
           case iClear:
             TEDelete(te);
             break;
+          case iSelectAll: {
+            TESetSelect(0, (*te)->teLength, te);
+          } break;
         }
         AdjustScrollbars(window, false);
         AdjustTE(window);
