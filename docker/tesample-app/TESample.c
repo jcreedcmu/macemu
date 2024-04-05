@@ -34,6 +34,8 @@
 #include <DiskInit.h>
 #include <Packages.h>
 #include <Scrap.h>
+#else
+#include "scrap.h"
 #endif
 
 void AlertUser(short error);
@@ -765,43 +767,6 @@ void AdjustMenus() {
   else
     DisableItem(menu, iPaste);
 } /*AdjustMenus*/
-
-#if !UNIVERSAL_INTERFACE
-Ptr somePtr;
-Handle someHndl = &somePtr;
-
-// Adapted from
-// https://github.com/autc04/executor/blob/27c8ef28bc0ea29e7621466068c4e30aea664562/src/textedit/teScrap.cpp#L17-L30
-pascal OSErr TEFromScrap() {
-  long unused_offset;
-  long len;
-  Handle sh = LMGetTEScrpHandle();
-  len = GetScrap(sh, 'TEXT', &unused_offset);
-  if (len < 0) {
-    EmptyHandle(sh);
-    LMSetTEScrpLength(0);
-    return len;
-  } else {
-    LMSetTEScrpLength(len);
-    return noErr;
-  }
-}
-
-pascal OSErr TEToScrap() {
-  PScrapStuff scrapInfo = InfoScrap();
-  // XXX how detect whether scrap hasn't been initialized?
-  // Is checking for length = 0 enough?
-  // should return noScrapErr = -100 in that case
-  long scrapLength = LMGetTEScrpLength();
-  if (scrapLength == 0) {
-    return noScrapErr;
-  }
-  Handle h = LMGetTEScrpHandle();
-  return PutScrap(scrapLength, 'TEXT', *h);
-}
-
-pascal long TEGetScrapLength() { return LMGetTEScrpLength(); }
-#endif
 
 /*	This is called when an item is chosen from the menu bar (after calling
         MenuSelect or MenuKey). It does the right thing for each command. */

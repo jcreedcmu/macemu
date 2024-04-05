@@ -13,12 +13,14 @@ REZFLAGS=-I$(RINCLUDES)
 TESample.bin: TESample.code.bin
 	$(REZ) $(REZFLAGS) --copy $^ TESample.r -t "APPL" -c "TSMP" -o $@
 
+# remove scrap.o if we use universal interface
 OBJS = \
   TESample.o \
   clikloop.o \
   asmclikloop.o \
   scrolling.o \
   view-rects.o \
+  scrap.o \
   #
 
 TESample.code.bin: $(OBJS)
