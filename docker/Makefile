@@ -21,7 +21,7 @@ docker:
 	docker build . -t jcreed/retro68
 
 bash:
-	docker run --rm -v "./twelf-app:/root/app" -it jcreed/retro68
+	docker run --rm -v "./tesample-app:/root/app" -it jcreed/retro68
 
 # local server that I can access from http://10.0.2.2:8000 on the client to
 # download Twelf.bin and put it through stuffit

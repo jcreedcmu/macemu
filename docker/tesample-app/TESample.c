@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include "clikloop.h"
 
 /*------------------------------------------------------------------------------
 #
@@ -352,25 +353,6 @@ Boolean TrapAvailable(short tNumber, TrapType tType)
 	}
 	return NGetTrapAddress(tNumber, tType) != NGetTrapAddress(_Unimplemented, ToolTrap);
 } /*TrapAvailable*/
-
-extern pascal void AsmClikLoop();
-
-asm (
-	  "ASMCLIKLOOP:\n"
-	  "movem.l		%d1-%d2/%a1,-(%sp)\n"
-	  "clr.l			-(%sp)\n"
-	  "jsr			GETOLDCLIKLOOP\n"
-	  "movea.l		(%sp)+,%a0\n"
-	  "movem.l		(%sp)+,%d1-%d2/%a1\n"
-
-	  "jsr			(%a0)\n"
-
-	  "movem.l		%d1-%d2/%a1,-(%sp)\n"
-	  "jsr			PASCALCLIKLOOP\n"
-	  "movem.l		(%sp)+,%d1-%d2/%a1\n"
-	  "moveq			#1,%d0\n"
-	  "rts\n"
-	  );
 
 int main()
 {
