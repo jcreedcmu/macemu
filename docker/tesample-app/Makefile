@@ -21,6 +21,7 @@ OBJS = \
   events.o \
   global-state.o \
   handlers.o \
+  menus.o \
   scrap.o \
   scrolling.o \
   view-rects.o \

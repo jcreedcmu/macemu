@@ -136,3 +136,31 @@ void AlertUser(short error) {
   ParamText(message, "", "", "");
   itemHit = Alert(rUserAlert, nil);
 } /* AlertUser */
+
+/* Draw the contents of an application window. */
+
+void DrawWindow(WindowPtr window) {
+  SetPort(window);
+  EraseRect(&window->portRect);
+  DrawControls(window);
+  DrawGrowIcon(window);
+  TEUpdate(&window->portRect, ((DocumentPeek)window)->docTE);
+} /*DrawWindow*/
+
+/* Clean up the application and exit. We close all of the windows so that
+ they can update their documents, if any. */
+
+/*	1.01 - If we find out that a cancel has occurred, we won't exit to the
+        shell, but will return instead. */
+
+void Terminate() {
+  WindowPtr aWindow;
+  Boolean closed;
+
+  closed = true;
+  do {
+    aWindow = FrontWindow(); /* get the current front window */
+    if (aWindow != nil) closed = DoCloseWindow(aWindow); /* close this window */
+  } while (closed && (aWindow != nil));
+  if (closed) ExitToShell(); /* exit if no cancellation */
+} /*Terminate*/
