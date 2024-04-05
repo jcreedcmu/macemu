@@ -109,7 +109,40 @@ void DoSaveAs(WindowPtr window) {
   }  // else the user cancelled
 }
 
-void DoOpen() {}
+void DoOpen() {
+  StandardFileReply reply;
+  SFTypeList types = {'TEXT'};
+
+  // FIXME(open): should create a new window
+  WindowPtr window = FrontWindow();
+  if (window == NULL) return;
+  TEHandle te = ((DocumentPeek)window)->docTE;
+
+  StandardGetFile(NULL, 1, types, &reply);
+  if (reply.sfGood) {
+    int16_t refNum;
+    long textLength;
+    OSErr err = FSpOpenDF(&reply.sfFile, fsCurPerm, &refNum);
+    err = SetFPos(refNum, fsFromStart, 0);
+    err = GetEOF(refNum, &textLength);
+    if (textLength > kMaxTELength) {
+      textLength = kMaxTELength;
+    }
+    Handle buf = NewHandle(textLength);
+    err = FSRead(refNum, &textLength, *buf);
+    for (int i = 0; i < textLength; i++) {
+      if ((*buf)[i] == '\n') {
+        (*buf)[i] = '\r';
+      }
+    }
+    MoveHHi(buf);
+    HLock(buf);
+    TESetText(*buf, textLength, te);
+    HUnlock(buf);
+    DisposeHandle(buf);
+    err = FSClose(refNum);
+  }
+}
 
 /*	This is called when an item is chosen from the menu bar (after calling
         MenuSelect or MenuKey). It does the right thing for each command. */

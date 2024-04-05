@@ -54,6 +54,7 @@ void DoNew() {
         course, the window is hidden so it wouldn't matter whether we called
         ShowControl or not. */
         AdjustScrollValues(window, false);
+        // FIXME(open): if this is an Open, set title before showing
         ShowWindow(window);
       } else {
         DoCloseWindow(window); /* otherwise regret we ever created it... */
