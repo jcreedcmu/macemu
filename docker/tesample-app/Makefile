@@ -16,11 +16,14 @@ TESample.bin: TESample.code.bin
 # remove scrap.o if we use universal interface
 OBJS = \
   TESample.o \
-  clikloop.o \
   asmclikloop.o \
+  clikloop.o \
+  events.o \
+  global-state.o \
+  handlers.o \
+  scrap.o \
   scrolling.o \
   view-rects.o \
-  scrap.o \
   #
 
 TESample.code.bin: $(OBJS)
