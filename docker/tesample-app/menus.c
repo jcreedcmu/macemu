@@ -34,10 +34,14 @@ void AdjustMenus() {
     EnableItem(menu, iNew); /* New is enabled when we can open more documents */
   else
     DisableItem(menu, iNew);
-  if (window != nil) /* Close is enabled when there is a window to close */
+
+  if (window != nil) {
     EnableItem(menu, iClose);
-  else
+    EnableItem(menu, iSaveAs);
+  } else {
     DisableItem(menu, iClose);
+    DisableItem(menu, iSaveAs);
+  }
 
   EnableItem(menu, iQuit);
 
@@ -92,7 +96,6 @@ void DoMenuCommand(long menuResult) {
   short itemHit, daRefNum;
   Str255 daName;
   OSErr saveErr;
-  TEHandle te;
   WindowPtr window;
   Handle aHandle;
   long oldSize, newSize;
@@ -122,14 +125,30 @@ void DoMenuCommand(long menuResult) {
         case iClose:
           DoCloseWindow(FrontWindow()); /* ignore the result */
           break;
+        case iSaveAs: {
+          TEHandle te = ((DocumentPeek)FrontWindow())->docTE;
+          StandardFileReply reply;
+          StandardPutFile("\pSave as:", "\puntitled.txt", &reply);
+          if (reply.sfGood) {
+            OSErr err;
+            short refNum;
+            err = FSpCreate(&reply.sfFile, 'ttxt', 'TEXT', smSystemScript);
+            err = FSpOpenDF(&reply.sfFile, fsRdWrPerm, &refNum);
+            Handle textHandle = (Handle)TEGetText(te);
+            long size = (*te)->teLength;
+            err = FSWrite(refNum, &size, *textHandle);
+            err = FSClose(refNum);
+            SetWTitle(window, reply.sfFile.name);
+          }  // else the user cancelled
+        } break;
         case iQuit:
           Terminate();
           break;
       }
       break;
-    case mEdit: /* call SystemEdit for DA editing & MultiFinder */
+    case mEdit: { /* call SystemEdit for DA editing & MultiFinder */
+      TEHandle te = ((DocumentPeek)FrontWindow())->docTE;
       if (!SystemEdit(menuItem - 1)) {
-        te = ((DocumentPeek)FrontWindow())->docTE;
         switch (menuItem) {
           case iCut:
             if (ZeroScrap() == noErr) {
@@ -185,7 +204,7 @@ void DoMenuCommand(long menuResult) {
         AdjustScrollbars(window, false);
         AdjustTE(window);
       }
-      break;
+    } break;
   }
   HiliteMenu(0); /* unhighlight what MenuSelect (or MenuKey) hilited */
 } /*DoMenuCommand*/
