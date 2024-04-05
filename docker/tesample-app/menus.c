@@ -30,10 +30,14 @@ void AdjustMenus() {
   window = FrontWindow();
 
   menu = GetMenuHandle(mFile);
-  if (gNumDocuments < kMaxOpenDocuments)
-    EnableItem(menu, iNew); /* New is enabled when we can open more documents */
-  else
+  if (gNumDocuments < kMaxOpenDocuments) {
+    /* New, Open enabled when we can open more documents */
+    EnableItem(menu, iNew);
+    EnableItem(menu, iOpen);
+  } else {
     DisableItem(menu, iNew);
+    DisableItem(menu, iOpen);
+  }
 
   if (window != nil) {
     EnableItem(menu, iClose);
@@ -88,6 +92,25 @@ void AdjustMenus() {
 
 } /*AdjustMenus*/
 
+void DoSaveAs(WindowPtr window) {
+  TEHandle te = ((DocumentPeek)window)->docTE;
+  StandardFileReply reply;
+  StandardPutFile("\pSave as:", "\puntitled.txt", &reply);
+  if (reply.sfGood) {
+    OSErr err;
+    short refNum;
+    err = FSpCreate(&reply.sfFile, 'ttxt', 'TEXT', smSystemScript);
+    err = FSpOpenDF(&reply.sfFile, fsRdWrPerm, &refNum);
+    Handle textHandle = (Handle)TEGetText(te);
+    long size = (*te)->teLength;
+    err = FSWrite(refNum, &size, *textHandle);
+    err = FSClose(refNum);
+    SetWTitle(window, reply.sfFile.name);
+  }  // else the user cancelled
+}
+
+void DoOpen() {}
+
 /*	This is called when an item is chosen from the menu bar (after calling
         MenuSelect or MenuKey). It does the right thing for each command. */
 
@@ -122,24 +145,14 @@ void DoMenuCommand(long menuResult) {
         case iNew:
           DoNew();
           break;
+        case iOpen:
+          DoOpen();
+          break;
         case iClose:
           DoCloseWindow(FrontWindow()); /* ignore the result */
           break;
         case iSaveAs: {
-          TEHandle te = ((DocumentPeek)FrontWindow())->docTE;
-          StandardFileReply reply;
-          StandardPutFile("\pSave as:", "\puntitled.txt", &reply);
-          if (reply.sfGood) {
-            OSErr err;
-            short refNum;
-            err = FSpCreate(&reply.sfFile, 'ttxt', 'TEXT', smSystemScript);
-            err = FSpOpenDF(&reply.sfFile, fsRdWrPerm, &refNum);
-            Handle textHandle = (Handle)TEGetText(te);
-            long size = (*te)->teLength;
-            err = FSWrite(refNum, &size, *textHandle);
-            err = FSClose(refNum);
-            SetWTitle(window, reply.sfFile.name);
-          }  // else the user cancelled
+          DoSaveAs(FrontWindow());
         } break;
         case iQuit:
           Terminate();
