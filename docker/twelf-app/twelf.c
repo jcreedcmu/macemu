@@ -306,10 +306,10 @@ static void openElf(WindowPtr w, TEHandle te) {
     MoveHHi(buf);
     HLock(buf);
     TESetText(*buf, textLength, te);
-    TEUpdate(&w->portRect, te);
     HUnlock(buf);
     DisposeHandle(buf);
     err = FSClose(refNum);
+    TEUpdate(&w->portRect, te);
   }
 }
 
