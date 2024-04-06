@@ -11,58 +11,13 @@
 #include "scrolling.h"
 #include "windows.h"
 
-/*	Enable and disable menus based on the current state.
-        The user can only select enabled menu items. We set up all the menu
-   items before calling MenuSelect or MenuKey, since these are the only times
-   that a menu item can be selected. Note that MenuSelect is also the only time
-        the user will see menu items. This approach to deciding what enable/
-        disable state a menu item has the advantage of concentrating all
-        the decision-making in one routine, as opposed to being spread
-   throughout the application. Other application designs may take a different
-   approach that may or may not be as valid. */
+void AdjustEditMenu() {
+  WindowPtr window = FrontWindow();
+  MenuHandle menu = GetMenuHandle(mFile);
 
-void AdjustMenus() {
-  WindowPtr window;
-  MenuHandle menu;
-  long offset;
-  Boolean undo;
-  Boolean cutCopyClear;
-  Boolean paste;
-  TEHandle te;
-
-  window = FrontWindow();
-
-  menu = GetMenuHandle(mFile);
-  if (gNumDocuments < kMaxOpenDocuments) {
-    /* New, Open enabled when we can open more documents */
-    EnableItem(menu, iNew);
-    EnableItem(menu, iOpen);
-  } else {
-    DisableItem(menu, iNew);
-    DisableItem(menu, iOpen);
-  }
-
-  if (window != nil) {
-    EnableItem(menu, iClose);
-    EnableItem(menu, iSaveAs);
-    DocumentPeek doc = (DocumentPeek)window;
-    if (doc->fsSpecSet && doc->dirty) {
-      EnableItem(menu, iSave);  // also Revert?
-    } else {
-      DisableItem(menu, iSave);
-    }
-  } else {
-    DisableItem(menu, iClose);
-    DisableItem(menu, iSave);
-    DisableItem(menu, iSaveAs);
-  }
-
-  EnableItem(menu, iQuit);
-
-  menu = GetMenuHandle(mEdit);
-  undo = false;
-  cutCopyClear = false;
-  paste = false;
+  Boolean undo = false;
+  Boolean cutCopyClear = false;
+  Boolean paste = false;
   Boolean selectAll = false;
 
   if (IsDAWindow(window)) {
@@ -71,9 +26,10 @@ void AdjustMenus() {
     paste = true;
   } else if (IsAppWindow(window)) {
     selectAll = true;
-    te = ((DocumentPeek)window)->docTE;
+    TEHandle te = getDoc(window)->docTE;
     if ((*te)->selStart < (*te)->selEnd) cutCopyClear = true;
     /* Cut, Copy, and Clear is enabled for app. windows with selections */
+    long offset;
     if (GetScrap(nil, 'TEXT', &offset) > 0)
       paste = true; /* if there's any text in the clipboard, paste is enabled */
   }
@@ -99,8 +55,57 @@ void AdjustMenus() {
     EnableItem(menu, iSelectAll);
   else
     DisableItem(menu, iSelectAll);
+}
 
-} /*AdjustMenus*/
+void AdjustFileMenu() {
+  WindowPtr window = FrontWindow();
+  MenuHandle menu = GetMenuHandle(mFile);
+
+  if (gNumDocuments < kMaxOpenDocuments) {
+    /* New, Open enabled when we can open more documents */
+    EnableItem(menu, iNew);
+    EnableItem(menu, iOpen);
+  } else {
+    DisableItem(menu, iNew);
+    DisableItem(menu, iOpen);
+  }
+
+  if (window != nil) {
+    EnableItem(menu, iClose);
+    EnableItem(menu, iSaveAs);
+    DocumentPeek doc = getDoc(window);
+    if (doc->fsSpecSet && doc->dirty) {
+      EnableItem(menu, iSave);  // also Revert?
+    } else {
+      DisableItem(menu, iSave);
+    }
+  } else {
+    DisableItem(menu, iClose);
+    DisableItem(menu, iSave);
+    DisableItem(menu, iSaveAs);
+  }
+
+  EnableItem(menu, iQuit);
+}
+
+void AdjustSignatureMenu() {
+  WindowPtr window = FrontWindow();
+  MenuHandle menu = GetMenuHandle(mSignature);
+
+  if (window != nil) {
+    EnableItem(menu, iEval);
+    EnableItem(menu, iEvalUnsafe);
+  } else {
+    DisableItem(menu, iEval);
+    DisableItem(menu, iEvalUnsafe);
+  }
+}
+
+void AdjustMenus() {
+  AdjustFileMenu();
+  AdjustEditMenu();
+  AdjustSignatureMenu();
+}
 
 void DoOpen() {
   StandardFileReply reply;
