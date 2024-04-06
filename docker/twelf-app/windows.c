@@ -12,7 +12,14 @@
 /* Create a new document and window. Returns NULL on failure, pointer to new
  * document on success. */
 
-WindowPtr mkDocumentWindow() {
+WindowPtr getOutputWindow() {
+  if (!gOutputWindow) {
+    gOutputWindow = mkDocumentWindow(TwelfOutput);
+  }
+  return gOutputWindow;
+}
+
+WindowPtr mkDocumentWindow(DocType docType) {
   Boolean good;
   Ptr storage;
   Rect destRect, viewRect, windowRect;
@@ -24,8 +31,19 @@ WindowPtr mkDocumentWindow() {
 
   storage = NewPtr(sizeof(DocumentRecord));
   if (storage != nil) {
-    WindowPtr window = NewWindow(storage, &windowRect, "\puntitled", true,
-                                 documentProc, (WindowPtr)-1, true, 0);
+    WindowPtr window;
+
+    switch (docType) {
+      case TwelfDocument:
+        window = NewWindow(storage, &windowRect, "\puntitled", true,
+                           documentProc, (WindowPtr)-1, true, 0);
+        break;
+      case TwelfOutput:
+        window = NewWindow(storage, &windowRect, "\pTwelf Output", true,
+                           documentProc, (WindowPtr)-1, true, 0);
+        break;
+    }
+
     if (window != nil) {
       gNumDocuments +=
           1; /* this will be decremented when we call DoCloseWindow */
@@ -38,6 +56,7 @@ WindowPtr mkDocumentWindow() {
       doc->docTE = TENew(&destRect, &viewRect);
       doc->fsSpecSet = false;
       doc->dirty = false;
+      doc->docType = docType;
       good =
           doc->docTE != nil; /* if TENew succeeded, we have a good document */
       if (good) {            /* 1.02 - good document? -- proceed */
@@ -73,7 +92,7 @@ WindowPtr mkDocumentWindow() {
 
 // Create a new untitled document window and show it.
 void DoNew() {
-  WindowPtr window = mkDocumentWindow();
+  WindowPtr window = mkDocumentWindow(TwelfDocument);
   ShowWindow(window);
 }
 
@@ -87,12 +106,11 @@ void DoNew() {
    document associated with a window. */
 
 Boolean DoCloseWindow(WindowPtr window) {
-  TEHandle te;
-
   if (IsDAWindow(window))
     CloseDeskAcc(((WindowPeek)window)->windowKind);
   else if (IsAppWindow(window)) {
-    te = ((DocumentPeek)window)->docTE;
+    DocumentPeek doc = getDoc(window);
+    TEHandle te = doc->docTE;
     if (te != nil)
       TEDispose(te); /* dispose the TEHandle if we got far enough to make one */
     /*	1.01 - We used to call DisposeWindow, but that was technically
@@ -100,6 +118,11 @@ Boolean DoCloseWindow(WindowPtr window) {
             the heap. We should instead call CloseWindow to have the structures
             taken care of and then dispose of the storage ourselves. */
     CloseWindow(window);
+
+    if (doc->docType == TwelfOutput) {
+      gOutputWindow = NULL;
+    }
+
     DisposePtr((Ptr)window);
     gNumDocuments -= 1;
   }

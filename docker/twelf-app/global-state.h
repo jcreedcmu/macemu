@@ -7,6 +7,9 @@
 /* Are we still running? Set to false to cleanly ExitToShell */
 extern Boolean gRunning;
 
+/* Output window, if any */
+extern WindowPtr gOutputWindow;
+
 /* GMac is used to hold the result of a SysEnvirons call. This makes
    it convenient for any routine to check the environment. It is
    global information, anyway. */

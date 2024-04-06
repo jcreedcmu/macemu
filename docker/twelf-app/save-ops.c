@@ -61,7 +61,7 @@ Boolean DoSaveAs(DocumentPeek doc) {
   }
 
   FSSpec *spec = &reply.sfFile;
-  FSpCreate(spec, 'ttxt', 'TEXT', smSystemScript);
+  FSpCreate(spec, 'TWLF', 'TEXT', smSystemScript);
   writeFile(doc->docTE, spec);
   associateFile(doc, spec);
   doc->dirty = false;

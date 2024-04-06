@@ -16,9 +16,40 @@
 #include "scrolling.h"
 #include "windows.h"
 
-void AdjustEditMenu() {
+void AdjustFileMenu() {
   WindowPtr window = FrontWindow();
   MenuHandle menu = GetMenuHandle(mFile);
+
+  if (gNumDocuments < kMaxOpenDocuments) {
+    /* New, Open enabled when we can open more documents */
+    EnableItem(menu, iNew);
+    EnableItem(menu, iOpen);
+  } else {
+    DisableItem(menu, iNew);
+    DisableItem(menu, iOpen);
+  }
+
+  if (window != nil) {
+    EnableItem(menu, iClose);
+    EnableItem(menu, iSaveAs);
+    DocumentPeek doc = getDoc(window);
+    if (doc->fsSpecSet && doc->dirty) {
+      EnableItem(menu, iSave);  // also Revert?
+    } else {
+      DisableItem(menu, iSave);
+    }
+  } else {
+    DisableItem(menu, iClose);
+    DisableItem(menu, iSave);
+    DisableItem(menu, iSaveAs);
+  }
+
+  EnableItem(menu, iQuit);
+}
+
+void AdjustEditMenu() {
+  WindowPtr window = FrontWindow();
+  MenuHandle menu = GetMenuHandle(mEdit);
 
   Boolean undo = false;
   Boolean cutCopyClear = false;
@@ -62,44 +93,13 @@ void AdjustEditMenu() {
     DisableItem(menu, iSelectAll);
 }
 
-void AdjustFileMenu() {
-  WindowPtr window = FrontWindow();
-  MenuHandle menu = GetMenuHandle(mFile);
-
-  if (gNumDocuments < kMaxOpenDocuments) {
-    /* New, Open enabled when we can open more documents */
-    EnableItem(menu, iNew);
-    EnableItem(menu, iOpen);
-  } else {
-    DisableItem(menu, iNew);
-    DisableItem(menu, iOpen);
-  }
-
-  if (window != nil) {
-    EnableItem(menu, iClose);
-    EnableItem(menu, iSaveAs);
-    DocumentPeek doc = getDoc(window);
-    if (doc->fsSpecSet && doc->dirty) {
-      EnableItem(menu, iSave);  // also Revert?
-    } else {
-      DisableItem(menu, iSave);
-    }
-  } else {
-    DisableItem(menu, iClose);
-    DisableItem(menu, iSave);
-    DisableItem(menu, iSaveAs);
-  }
-
-  EnableItem(menu, iQuit);
-}
-
 void AdjustSignatureMenu() {
   WindowPtr window = FrontWindow();
   MenuHandle menu = GetMenuHandle(mSignature);
 
   if (window != nil) {
     EnableItem(menu, iEval);
-    EnableItem(menu, iEvalUnsafe);
+    // EnableItem(menu, iEvalUnsafe);
   } else {
     DisableItem(menu, iEval);
     DisableItem(menu, iEvalUnsafe);
@@ -119,7 +119,7 @@ void DoOpen() {
   StandardGetFile(nil, 1, types, &reply);
   if (!reply.sfGood) return;
 
-  WindowPtr window = mkDocumentWindow();
+  WindowPtr window = mkDocumentWindow(TwelfDocument);
   if (window == NULL) return;
   DocumentPeek doc = (DocumentPeek)window;
   TEHandle te = doc->docTE;
@@ -280,7 +280,9 @@ void DoMenuCommand(long menuResult) {
           WindowPtr window = FrontWindow();
           DocumentPeek doc = getDoc(window);
 
-          // XXX initialize output stream
+          DocumentPeek outDoc = getDoc(getOutputWindow());
+          TESetText("", 0, outDoc->docTE);
+          setOutputDest(outDoc->docTE);
 
           unsigned char **textHandle = TEGetText(doc->docTE);
           TERec *tePtr = *(doc->docTE);
@@ -298,7 +300,11 @@ void DoMenuCommand(long menuResult) {
           printf("Twelf response: %d\r", resp);
 
           // XXX raise an alert if abort?
-          // XXX finalize output stream
+          setOutputDest(NULL);
+          char *abortStr = "%% ABORT %%";
+          char *okStr = "%% OK %%";
+          TEInsert(resp ? abortStr : okStr,
+                   resp ? strlen(abortStr) : strlen(okStr), outDoc->docTE);
 
         } break;
         case iEvalUnsafe: {

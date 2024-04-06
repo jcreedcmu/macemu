@@ -2,7 +2,10 @@
 
 #include <Windows.h>
 
-WindowPtr mkDocumentWindow();
+#include "document.h"
+
+WindowPtr getOutputWindow();
+WindowPtr mkDocumentWindow(DocType docType);
 void DoNew();
 Boolean IsAppWindow(WindowPtr window);
 Boolean IsDAWindow(WindowPtr window);
