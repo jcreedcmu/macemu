@@ -19,6 +19,7 @@ TESample.bin: TESample.code.bin
 # remove multiversal-stubs.o if we use universal interface
 OBJS = \
 	 TESample.o \
+    framework.o \
 	 asmclikloop.o \
 	 clikloop.o \
 	 dialogs.o \
