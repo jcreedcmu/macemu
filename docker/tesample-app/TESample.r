@@ -349,3 +349,24 @@ resource 'ICN#' (128) {
 		$"7F BE FB EE 7F BE FB E4 7F BE FB EE 73 BE FB 8E"
 	}
 };
+
+resource 'DLOG' (rCloseConfirm) {
+  {94, 80, 211, 434},
+  dBoxProc,
+  visible,
+  noGoAway,
+  0,
+  rCloseConfirm,
+  "",
+  centerMainScreen,
+};
+
+resource 'DITL' (rCloseConfirm) {
+	{
+		{ 87, 284, 107, 344 }, Button { enabled, "Save" };
+		{ 87, 211, 107, 271 }, Button { enabled, "Cancel" };
+		{ 87, 70, 107, 155 }, Button { enabled, "Don't Save" };
+		{ 10, 20, 42, 52 }, Icon { disabled, 2 };
+		{ 10, 72, 76, 344 },	StaticText { enabled, "Save changes to the document \"^0\" before closing?" };
+	}
+};

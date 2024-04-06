@@ -2,6 +2,7 @@
 
 #include "api.h"
 #include "consts.h"
+#include "dialogs.h"
 #include "document.h"
 #include "global-state.h"
 #include "multiversal-stubs.h"
@@ -226,9 +227,13 @@ void DoMenuCommand(long menuResult) {
         case iOpen:
           DoOpen();
           break;
-        case iClose:
-          DoCloseWindow(FrontWindow()); /* ignore the result */
-          break;
+        case iClose: {
+          WindowPtr window = FrontWindow();
+          short result = closeConfirmForDoc((DocumentPeek)window);
+          if (result != rCloseConfirm_CancelButtonIndex) {
+            DoCloseWindow(window);
+          }
+        } break;
         case iSave: {
           DoSave(FrontWindow());
         } break;

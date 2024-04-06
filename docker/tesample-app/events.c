@@ -1,9 +1,10 @@
 #include "events.h"
 
 #include <Events.h>
-#include <Windows.h>
+#include <Types.h>
 
 #include "consts.h"
+#include "dialogs.h"
 #include "global-state.h"
 #include "handlers.h"
 #include "windows.h"
@@ -46,10 +47,14 @@ void DoEvent(EventRecord *event) {
         case inDrag: /* pass screenBits.bounds to get all gDevices */
           DragWindow(window, event->where, &qd.screenBits.bounds);
           break;
-        case inGoAway:
-          if (TrackGoAway(window, event->where))
-            DoCloseWindow(window); /* we don't care if the user cancelled */
-          break;
+        case inGoAway: {
+          if (TrackGoAway(window, event->where)) {
+            short result = closeConfirmForDoc((DocumentPeek)window);
+            if (result != rCloseConfirm_CancelButtonIndex) {
+              DoCloseWindow(window);
+            }
+          }
+        } break;
         case inGrow:
           DoGrowWindow(window, event);
           break;

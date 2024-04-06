@@ -85,3 +85,5 @@
 
 #define kPrefSize 122
 #define kMinSize 38
+
+#define rCloseConfirm 128

@@ -21,6 +21,7 @@ OBJS = \
 	 TESample.o \
 	 asmclikloop.o \
 	 clikloop.o \
+	 dialogs.o \
 	 events.o \
 	 global-state.o \
 	 handlers.o \

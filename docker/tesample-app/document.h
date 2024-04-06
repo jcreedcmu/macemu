@@ -1,3 +1,7 @@
+#pragma once
+
+#include "api.h"
+
 /* A DocumentRecord contains the WindowRecord for one of our document windows,
    as well as the TEHandle for the text we are editing. Other document fields
    can be added to this record as needed. For a similar example, see how the
