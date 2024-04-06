@@ -111,6 +111,7 @@ OSErr writeFile(TEHandle te, FSSpec *spec) {
   err = FSWrite(refNum, &size, *textHandle);
   err = SetEOF(refNum, size);
   err = FSClose(refNum);
+  FlushVol(nil, spec->vRefNum);
   return err;
 }
 
