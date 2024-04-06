@@ -7,6 +7,7 @@
 #include "global-state.h"
 #include "multiversal-stubs.h"
 #include "resource-consts.h"
+#include "save-ops.h"
 #include "scrolling.h"
 #include "windows.h"
 
@@ -101,74 +102,6 @@ void AdjustMenus() {
 
 } /*AdjustMenus*/
 
-// FIXME(fs): better error handling in all file operations
-OSErr writeFile(TEHandle te, FSSpec *spec) {
-  OSErr err;
-  short refNum;
-  err = FSpOpenDF(spec, fsRdWrPerm, &refNum);
-  Handle textHandle = (Handle)TEGetText(te);
-  long size = (*te)->teLength;
-  err = SetFPos(refNum, fsFromStart, 0);
-  err = FSWrite(refNum, &size, *textHandle);
-  err = SetEOF(refNum, size);
-  err = FSClose(refNum);
-  FlushVol(nil, spec->vRefNum);
-  return err;
-}
-
-OSErr readFile(TEHandle te, FSSpec *spec) {
-  int16_t refNum;
-  long textLength;
-  OSErr err = FSpOpenDF(spec, fsCurPerm, &refNum);
-  err = SetFPos(refNum, fsFromStart, 0);
-  err = GetEOF(refNum, &textLength);
-  if (textLength > kMaxTELength) {
-    textLength = kMaxTELength;
-  }
-  Handle buf = NewHandle(textLength);
-  err = FSRead(refNum, &textLength, *buf);
-  for (int i = 0; i < textLength; i++) {
-    if ((*buf)[i] == '\n') {
-      (*buf)[i] = '\r';
-    }
-  }
-  MoveHHi(buf);
-  HLock(buf);
-  TESetText(*buf, textLength, te);
-  HUnlock(buf);
-  DisposeHandle(buf);
-  err = FSClose(refNum);
-  return err;
-}
-
-void associateFile(WindowPtr window, FSSpec *spec) {
-  DocumentPeek doc = (DocumentPeek)window;
-  doc->fsSpec = *spec;
-  doc->fsSpecSet = true;
-  SetWTitle(window, spec->name);
-}
-
-void DoSave(WindowPtr window) {
-  DocumentPeek doc = (DocumentPeek)window;
-  TEHandle te = doc->docTE;
-  writeFile(doc->docTE, &doc->fsSpec);
-  doc->dirty = false;
-}
-
-void DoSaveAs(WindowPtr window) {
-  DocumentPeek doc = (DocumentPeek)window;
-  TEHandle te = doc->docTE;
-  StandardFileReply reply;
-  StandardPutFile("\pSave as:", "\puntitled", &reply);
-  if (!reply.sfGood) return;
-
-  FSSpec *spec = &reply.sfFile;
-  FSpCreate(spec, 'ttxt', 'TEXT', smSystemScript);
-  writeFile(doc->docTE, spec);
-  associateFile(window, spec);
-  doc->dirty = false;
-}
-
 void DoOpen() {
   StandardFileReply reply;
   SFTypeList types = {'TEXT'};
@@ -184,7 +117,7 @@ void DoOpen() {
   FSSpec *spec = &reply.sfFile;
   readFile(te, spec);
 
-  associateFile(window, spec);
+  associateFile(getDoc(window), spec);
 
   ShowWindow(window);
   InvalRect(&window->portRect);
@@ -229,16 +162,15 @@ void DoMenuCommand(long menuResult) {
           break;
         case iClose: {
           WindowPtr window = FrontWindow();
-          short result = closeConfirmForDoc((DocumentPeek)window);
-          if (result != rCloseConfirm_CancelButtonIndex) {
+          if (closeConfirmForDoc(getDoc(window))) {
             DoCloseWindow(window);
           }
         } break;
         case iSave: {
-          DoSave(FrontWindow());
+          DoSave(getDoc(FrontWindow()));
         } break;
         case iSaveAs: {
-          DoSaveAs(FrontWindow());
+          DoSaveAs(getDoc(FrontWindow()));
         } break;
         case iQuit:
           Terminate();

@@ -49,8 +49,7 @@ void DoEvent(EventRecord *event) {
           break;
         case inGoAway: {
           if (TrackGoAway(window, event->where)) {
-            short result = closeConfirmForDoc((DocumentPeek)window);
-            if (result != rCloseConfirm_CancelButtonIndex) {
+            if (closeConfirmForDoc(getDoc(window))) {
               DoCloseWindow(window);
             }
           }

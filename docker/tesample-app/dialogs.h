@@ -10,4 +10,5 @@
 
 short closeConfirm(FSSpec *spec);
 
-short closeConfirmForDoc(DocumentPeek doc);
+// Returns true if we should close, false if cancel
+Boolean closeConfirmForDoc(DocumentPeek doc);

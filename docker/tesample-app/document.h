@@ -16,3 +16,5 @@ typedef struct {
   FSSpec fsSpec;
   Boolean dirty;
 } DocumentRecord, *DocumentPeek;
+
+#define getDoc(window) ((DocumentPeek)(window))

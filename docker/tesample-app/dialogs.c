@@ -1,5 +1,7 @@
 #include "dialogs.h"
 
+#include "save-ops.h"
+
 short closeConfirm(FSSpec *spec) {
   DialogPtr dlg = GetNewDialog(128, nil, (WindowPtr)-1);
   DialogItemType type;
@@ -31,10 +33,25 @@ short closeConfirm(FSSpec *spec) {
   return item;
 }
 
-short closeConfirmForDoc(DocumentPeek doc) {
-  if (doc->dirty) {
-    return closeConfirm(doc->fsSpecSet ? &doc->fsSpec : NULL);
-  } else {
-    return rCloseConfirm_DontSaveButtonIndex;
+Boolean closeConfirmForDoc(DocumentPeek doc) {
+  if (!doc->dirty) {
+    return true;
+  }
+
+  switch (closeConfirm(doc->fsSpecSet ? &doc->fsSpec : NULL)) {
+    case rCloseConfirm_SaveButtonIndex: {
+      // try to save. if we have an associated file, simply save over.
+      if (doc->fsSpecSet) {
+        DoSave(doc);
+        return true;
+      } else {
+        // otherwise, do a save-as. If save goes through, can close.
+        return DoSaveAs(doc);
+      }
+    } break;
+    case rCloseConfirm_CancelButtonIndex:
+      return false;
+    case rCloseConfirm_DontSaveButtonIndex:
+      return true;
   }
 }

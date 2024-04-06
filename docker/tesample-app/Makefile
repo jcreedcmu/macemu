@@ -27,6 +27,7 @@ OBJS = \
 	 handlers.o \
 	 menus.o \
 	 multiversal-stubs.o \
+	 save-ops.o \
 	 scrolling.o \
 	 view-rects.o \
 	 windows.o \
