@@ -135,10 +135,10 @@ void EventLoop() {
       AdjustCursor(event.where, cursorRgn);
       DoEvent(&event);
     } else
-      DoIdle();   /* perform idle tasks when it's not our event */
-                  /*	If you are using modeless dialogs that have editText items,
-                          you will want to call IsDialogEvent to give the caret a chance
-                          to blink, even if WNE/GNE returned FALSE. However, check FrontWindow
-                          for a non-NIL value before calling IsDialogEvent. */
-  } while (true); /* loop forever; we quit via ExitToShell */
+      DoIdle(); /* perform idle tasks when it's not our event */
+                /*	If you are using modeless dialogs that have editText items,
+                        you will want to call IsDialogEvent to give the caret a chance
+                        to blink, even if WNE/GNE returned FALSE. However, check FrontWindow
+                        for a non-NIL value before calling IsDialogEvent. */
+  } while (gRunning); /* loop forever; we quit via ExitToShell */
 } /*EventLoop*/

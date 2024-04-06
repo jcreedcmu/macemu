@@ -60,6 +60,7 @@ Boolean TrapAvailable(short tNumber, TrapType tType);
    provided by Signals, can be used. */
 
 pascal OSErr MyHandleQuit(AppleEvent msg, AppleEvent reply, long refCon) {
+  gRunning = false;
   return noErr;
 }
 
@@ -70,6 +71,7 @@ void Initialize() {
   short count;
 
   gInBackground = false;
+  gRunning = true;
 
   InitGraf(&qd.thePort);
   InitFonts();
@@ -79,9 +81,12 @@ void Initialize() {
   InitDialogs(nil);
   InitCursor();
 
+  // Install Apple Event handler
   short err = AEInstallEventHandler(kCoreEventClass, kAEQuitApplication,
                                     (AEEventHandlerUPP)MyHandleQuit, 0, false);
-  printf("AEInstall err: %d\r", err);
+  if (err != 0) {
+    printf("AEInstall err: %d\r", err);
+  }
 
   /*	Call MPPOpen and ATPLoad at this point to initialize AppleTalk,
           if you are using it. */
@@ -216,12 +221,16 @@ int main() {
   /* 1.01 - call to ForceEnvirons removed */
 
   /*	If you have stack requirements that differ from the default,
-          then you could use SetApplLimit to increase StackSpace at
-          this point, before calling MaxApplZone. */
+      then you could use SetApplLimit to increase StackSpace at
+      this point, before calling MaxApplZone. */
+
   MaxApplZone(); /* expand the heap so code segments load at the top */
 
   Initialize();               /* initialize the program */
   UnloadSeg((Ptr)Initialize); /* note that Initialize must not be in Main! */
 
   EventLoop(); /* call the main event loop */
+
+  /* Consider doing other cleanup here */
+  ExitToShell();
 }
