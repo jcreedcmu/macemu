@@ -1,3 +1,4 @@
+
 # path to RETRO68
 RETRO68=/opt/Retro68-INSTALL
 
@@ -13,12 +14,35 @@ REZFLAGS=-I$(RINCLUDES)
 Twelf.bin: Twelf.code.bin
 	$(REZ) $(REZFLAGS) --copy $^ twelf.r -t "APPL" -c "TWLF" -o $@
 
-Twelf.code.bin: twelf.o clikloop.o
+-include Makefile.deps
+
+# remove multiversal-stubs.o if we use universal interface
+OBJS = \
+	 twelf.o \
+    framework.o \
+	 asmclikloop.o \
+	 clikloop.o \
+	 dialogs.o \
+	 events.o \
+	 global-state.o \
+	 handlers.o \
+	 menus.o \
+	 multiversal-stubs.o \
+	 save-ops.o \
+	 scrolling.o \
+	 view-rects.o \
+	 windows.o \
+	 #
+
+Makefile.deps:
+	gcc $(CFLAGS) -MM *.c > $@
+
+Twelf.code.bin: $(OBJS) $(HEADERS)
 	$(CC) $^ -o $@ $(LDFLAGS) -L/build/twelf/bin -L/opt/gmp-m68k-INSTALL/lib -ltwelf -lgmp -lm
 
-clikloop.o: clikloop.s
-	$(CC) -ffunction-sections -c clikloop.s -o $@
+asmclikloop.o: asmclikloop.s
+	$(CC) -ffunction-sections -c asmclikloop.s -o $@
 
 .PHONY: clean
 clean:
-	rm -f Twelf.bin Twelf.APPL Twelf.dsk Twelf.code.bin Twelf.code.bin.gdb twelf.o clikloop.o
+	rm -f Twelf.bin Twelf.APPL Twelf.dsk Twelf.code.bin Twelf.code.bin.gdb $(OBJS)
