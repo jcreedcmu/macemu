@@ -280,7 +280,8 @@ void DoMenuCommand(long menuResult) {
           WindowPtr window = FrontWindow();
           DocumentPeek doc = getDoc(window);
 
-          DocumentPeek outDoc = getDoc(getOutputWindow());
+          WindowPtr outWin = getOutputWindow();
+          DocumentPeek outDoc = getDoc(outWin);
           TESetText("", 0, outDoc->docTE);
           setOutputDest(outDoc->docTE);
 
@@ -305,7 +306,11 @@ void DoMenuCommand(long menuResult) {
           char *okStr = "%% OK %%";
           TEInsert(resp ? abortStr : okStr,
                    resp ? strlen(abortStr) : strlen(okStr), outDoc->docTE);
-
+          // I couldn't seem to get by with anything less than this, which
+          // includes a whole EraseWindow. I tried just TEUpdate, I tried just
+          // InvalRect, but when the output string grew shorter, it left
+          // graphical cruft behind.
+          DrawWindow(outWin);
         } break;
         case iEvalUnsafe: {
         } break;
