@@ -1,6 +1,6 @@
 TESample.o: TESample.c api.h asmclikloop.h clikloop.h consts.h document.h \
  events.h global-state.h handlers.h resource-consts.h scrolling.h \
- view-rects.h windows.h scrap.h
+ view-rects.h windows.h multiversal-stubs.h
 clikloop.o: clikloop.c clikloop.h api.h document.h
 events.o: events.c events.h consts.h global-state.h handlers.h windows.h
 global-state.o: global-state.c global-state.h
@@ -8,7 +8,7 @@ handlers.o: handlers.c handlers.h api.h consts.h document.h \
  global-state.h rect-macros.h scrolling.h view-rects.h windows.h
 menus.o: menus.c menus.h api.h consts.h document.h global-state.h \
  resource-consts.h scrolling.h windows.h
-scrap.o: scrap.c scrap.h
+multiversal-stubs.o: multiversal-stubs.c multiversal-stubs.h
 scrolling.o: scrolling.c scrolling.h api.h consts.h document.h \
  view-rects.h
 view-rects.o: view-rects.c view-rects.h consts.h

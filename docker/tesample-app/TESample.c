@@ -39,7 +39,7 @@
 #include <Packages.h>
 #include <Scrap.h>
 #else
-#include "scrap.h"
+#include "multiversal-stubs.h"
 #endif
 
 void Terminate(void);

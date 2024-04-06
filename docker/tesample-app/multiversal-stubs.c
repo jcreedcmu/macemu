@@ -1,4 +1,9 @@
-#include "scrap.h"
+#include "multiversal-stubs.h"
+
+// The purpose of this file is to expediently fill in functions that
+// were missing in
+// https://github.com/autc04/multiversal
+// but they can be deleted if they wind up being upstreamed there.
 
 // Adapted from
 // https://github.com/autc04/executor/blob/27c8ef28bc0ea29e7621466068c4e30aea664562/src/textedit/teScrap.cpp#L17-L30

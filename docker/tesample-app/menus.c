@@ -4,6 +4,7 @@
 #include "consts.h"
 #include "document.h"
 #include "global-state.h"
+#include "multiversal-stubs.h"
 #include "resource-consts.h"
 #include "scrolling.h"
 #include "windows.h"
@@ -106,9 +107,10 @@ OSErr writeFile(TEHandle te, FSSpec *spec) {
   err = FSpOpenDF(spec, fsRdWrPerm, &refNum);
   Handle textHandle = (Handle)TEGetText(te);
   long size = (*te)->teLength;
+  err = SetFPos(refNum, fsFromStart, 0);
   err = FSWrite(refNum, &size, *textHandle);
+  err = SetEOF(refNum, size);
   err = FSClose(refNum);
-
   return err;
 }
 

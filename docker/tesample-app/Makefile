@@ -16,7 +16,7 @@ TESample.bin: TESample.code.bin
 
 -include Makefile.deps
 
-# remove scrap.o if we use universal interface
+# remove multiversal-stubs.o if we use universal interface
 OBJS = \
 	 TESample.o \
 	 asmclikloop.o \
@@ -25,7 +25,7 @@ OBJS = \
 	 global-state.o \
 	 handlers.o \
 	 menus.o \
-	 scrap.o \
+	 multiversal-stubs.o \
 	 scrolling.o \
 	 view-rects.o \
 	 windows.o \
