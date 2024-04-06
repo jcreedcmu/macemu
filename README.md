@@ -10,11 +10,14 @@ target is a Quadra 800 running System 7.5.3.
 Status:
  - :white_check_mark: Twelf runs and can typecheck simple signatures that are typed in by hand
  - :white_check_mark: Application and document icons exist
- - :no_entry: File IO (open, save) is not implemented yet
- - :no_entry: Scrolling of the text box is not implemented very well yet
- - :no_entry: Selection of output text is not implemented
- - :no_entry: Copy/Paste is not implemented
-
+ - :white_check_mark: File IO (Open, Save) is implemented
+ - :white_check_mark: Scrolling of the input document works
+ - :white_check_mark: Selection of output text works
+ - :white_check_mark: Copy/Paste is implemented
+ - :no_entry_sign: Revert doesn't work yet
+ - :no_entry_sign: Unsafe Eval doesn't work yet
+ - :clown_face: Output window is janky in various ways (see #10 for details)
+ 
 Setup Notes
 -----------
 
@@ -55,7 +58,7 @@ On linux cross-compile host:
 
 ```shell
 cd docker
-make Twelf.app
+make Twelf.bin
 ```
 
 ### Install
@@ -71,14 +74,3 @@ Start MacOS guest with `./qemu-macos`. Inside MacOS guest:
 - Go to `http://10.0.2.2:8000/` (this is the host-local web server)
 - Download `Twelf.bin`
 - Expand it in Stuffit Expander to create app named `Twelf`.
-
-Building and Running TESample
------------------------------
-
-I'm also trying to adapt https://github.com/CamHenlin/TESample to work
-with purely multiversal interfaces. To build,
-
-```shell
-cd docker
-make TESample.app
-```
