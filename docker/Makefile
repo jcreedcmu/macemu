@@ -1,4 +1,4 @@
-Twelf.bin: Dockerfile twelf-app/*.c twelf-app/*.r twelf-app/Makefile twelf-app/icon.r
+Twelf.bin: Dockerfile twelf-app/*.c twelf-app/*.h twelf-app/*.r twelf-app/Makefile twelf-app/icon.r
 	docker build . -t "jcreed/retro68:latest"
 	docker run --rm -v "./twelf-app:/root/app" "jcreed/retro68:latest" /root/build.sh
 	cp twelf-app/Twelf.bin Twelf.bin

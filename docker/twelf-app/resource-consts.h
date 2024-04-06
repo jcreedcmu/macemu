@@ -38,8 +38,8 @@
 #define rHScroll 129      /* horizontal scrollbar control */
 #define kErrStrings 128   /* error string list */
 
-#define kPrefSize 122
-#define kMinSize 38
+#define kPrefSize 16 * 1024
+#define kMinSize 8 * 1024
 
 #define rAboutText 128
 #define rAboutBoxWindow 128

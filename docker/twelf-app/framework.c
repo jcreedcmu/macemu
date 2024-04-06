@@ -93,11 +93,6 @@ void Initialize() {
 }
 
 int FrameworkEntry() {
-  // Debugging Log
-  stdout = stderr = fopen("out", "w");
-  setbuf(stdout, NULL);
-  setbuf(stderr, NULL);
-
   MaxApplZone();
 
   Initialize();

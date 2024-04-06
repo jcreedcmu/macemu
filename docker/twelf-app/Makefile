@@ -37,7 +37,7 @@ OBJS = \
 Makefile.deps:
 	gcc $(CFLAGS) -MM *.c > $@
 
-Twelf.code.bin: $(OBJS) $(HEADERS)
+Twelf.code.bin: $(OBJS)
 	$(CC) $^ -o $@ $(LDFLAGS) -L/build/twelf/bin -L/opt/gmp-m68k-INSTALL/lib -ltwelf -lgmp -lm
 
 asmclikloop.o: asmclikloop.s
