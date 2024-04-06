@@ -1,69 +1,10 @@
-/*------------------------------------------------------------------------------
-#
-#	Apple Macintosh Developer Technical Support
-#
-#	MultiFinder-Aware TextEdit Sample Application
-#
-#	TESample
-#
-#	TESample.r	-	Rez Source
-#
-#	Copyright © 1989 Apple Computer, Inc.
-#	All rights reserved.
-#
-#	Versions:
-#				1.00				08/88
-#				1.01				11/88
-#				1.02				04/89
-#				1.03				06/89
-#				1.04				06/92
-#
-#	Components:
-#				TESample.p			June 1, 1989
-#				TESample.c			June 1, 1989
-#				TESampleInit.c		June 4, 1992
-#				TESampleGlue.a		June 1, 1989
-#				TESample.r			June 1, 1989
-#				TESample.h			June 1, 1989
-#				PTESample.make		June 1, 1989
-#				CTESample.make		June 1, 1989
-#				TCTESample.π		June 4, 1992
-#				TCTESample.π.rsrc	June 4, 1992
-#				TCTESampleGlue.c	June 4, 1992
-#
-#	TESample is an example application that demonstrates how
-#	to initialize the commonly used toolbox managers, operate
-#	successfully under MultiFinder, handle desk accessories and
-#	create, grow, and zoom windows. The fundamental TextEdit
-#	toolbox calls and TextEdit autoscroll are demonstrated. It
-#	also shows how to create and maintain scrollbar controls.
-#
-#	It does not by any means demonstrate all the techniques you
-#	need for a large application. In particular, Sample does not
-#	cover exception handling, multiple windows/documents,
-#	sophisticated memory management, printing, or undo. All of
-#	these are vital parts of a normal full-sized application.
-#
-#	This application is an example of the form of a Macintosh
-#	application; it is NOT a template. It is NOT intended to be
-#	used as a foundation for the next world-class, best-selling,
-#	600K application. A stick figure drawing of the human body may
-#	be a good example of the form for a painting, but that does not
-#	mean it should be used as the basis for the next Mona Lisa.
-#
-#	We recommend that you review this program or Sample before
-#	beginning a new application. Sample is a simple app. which doesn’t
-#	use TextEdit or the Control Manager.
-#
-------------------------------------------------------------------------------*/
-
 #include "Types.r"
 #include "resource-consts.h"
 
 /* we use an MBAR resource to conveniently load all the menus */
 
 resource 'MBAR' (rMenuBar, preload) {
-	{ mApple, mFile, mEdit };		/* three menus */
+	{ mApple, mFile, mEdit, mSignature };
 };
 
 
@@ -125,6 +66,18 @@ resource 'MENU' (mEdit, preload) {
 			noicon, nokey, nomark, plain;
 		"Select All",
 			noicon, "A", nomark, plain;
+	}
+};
+
+resource 'MENU' (mSignature, preload) {
+	mSignature, textMenuProc,
+	0b0000000000000000000000000000000,	/* enable nothing */
+	enabled, "Signature",
+	 {
+		"Evaluate",
+			noicon, "E", nomark, plain;
+		"Evaluate Unsafe",
+			noicon, "U", nomark, plain;
 	}
 };
 

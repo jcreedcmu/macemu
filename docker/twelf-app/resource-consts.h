@@ -26,6 +26,10 @@
 #define iClear 6
 #define iSelectAll 8
 
+#define mSignature 131 /* Signature menu */
+#define iEval 1
+#define iEvalUnsafe 2
+
 #define rMenuBar 128      /* application's menu bar */
 #define rCloseConfirm 128 /* close-confirm dialog box */
 #define rUserAlert 129    /* user error alert */
