@@ -16,7 +16,7 @@ Status:
  - :white_check_mark: Copy/Paste is implemented
  - :no_entry_sign: Revert doesn't work yet
  - :no_entry_sign: Unsafe Eval doesn't work yet
- - :clown_face: Output window is janky in various ways (see #10 for details)
+ - :clown_face: Output window is janky in various ways (see [this issue](https://github.com/jcreedcmu/twelf-mac/issues/10) for details)
  
 Setup Notes
 -----------
