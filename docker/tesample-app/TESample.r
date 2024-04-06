@@ -284,7 +284,7 @@ resource 'SIZE' (-1) {
 	dontGetFrontClicks,			/* change this is if you want "do first click" behavior like the Finder */
 	ignoreChildDiedEvents,		/* essentially, I'm not a debugger (sub-launching) */
 	not32BitCompatible,			/* this app should not be run in 32-bit address space */
-	reserved,
+   isHighLevelEventAware,
 	reserved,
 	reserved,
 	reserved,

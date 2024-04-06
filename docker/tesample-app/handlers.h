@@ -16,3 +16,4 @@ void DoActivate(WindowPtr window, Boolean becomingActive);
 void DoContentClick(WindowPtr window, EventRecord *event);
 void DoKeyDown(EventRecord *event);
 void DoIdle(void);
+void DoHighLevelEvent(EventRecord *event);

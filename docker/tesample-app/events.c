@@ -91,6 +91,9 @@ void DoEvent(EventRecord *event) {
       }
 
       break;
+    case kHighLevelEvent:
+      DoHighLevelEvent(event);
+      break;
     case kOSEvent:
       /*	1.02 - must BitAND with 0x0FF to get only low byte */
       switch ((event->message >> 24) & 0x0FF) { /* high byte of message */

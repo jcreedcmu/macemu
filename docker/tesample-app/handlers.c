@@ -316,3 +316,8 @@ void AdjustCursor(Point mouse, RgnHandle region) {
     DisposeRgn(iBeamRgn);
   }
 } /*AdjustCursor*/
+
+void DoHighLevelEvent(EventRecord *event) {
+  ////
+  AEProcessAppleEvent(event);
+}

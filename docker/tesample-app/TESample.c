@@ -59,6 +59,10 @@ Boolean TrapAvailable(short tNumber, TrapType tType);
    sophisticated error recovery is needed, an exception mechanism, such as is
    provided by Signals, can be used. */
 
+pascal OSErr MyHandleQuit(AppleEvent msg, AppleEvent reply, long refCon) {
+  return noErr;
+}
+
 void Initialize() {
   Handle menuBar;
   long total, contig;
@@ -74,6 +78,10 @@ void Initialize() {
   TEInit();
   InitDialogs(nil);
   InitCursor();
+
+  short err = AEInstallEventHandler(kCoreEventClass, kAEQuitApplication,
+                                    (AEEventHandlerUPP)MyHandleQuit, 0, false);
+  printf("AEInstall err: %d\r", err);
 
   /*	Call MPPOpen and ATPLoad at this point to initialize AppleTalk,
           if you are using it. */
