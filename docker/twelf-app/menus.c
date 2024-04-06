@@ -1,6 +1,11 @@
 #include "menus.h"
 
+#include <libtwelf.h>
+#include <stdio.h>
+#include <string.h>
+
 #include "api.h"
+#include "console.h"
 #include "consts.h"
 #include "dialogs.h"
 #include "document.h"
@@ -267,6 +272,37 @@ void DoMenuCommand(long menuResult) {
         }
         AdjustScrollbars(window, false);
         AdjustTE(window);
+      }
+    } break;
+    case mSignature: {
+      switch (menuItem) {
+        case iEval: {
+          WindowPtr window = FrontWindow();
+          DocumentPeek doc = getDoc(window);
+
+          // XXX initialize output stream
+
+          unsigned char **textHandle = TEGetText(doc->docTE);
+          TERec *tePtr = *(doc->docTE);
+
+          printf("got the text: \"%.*s\"\r", tePtr->teLength, *textHandle);
+
+          int len = tePtr->teLength;
+          printf("about to allocate %d bytes...\r", len);
+          char *buffer = (char *)allocate(len);
+          printf("allocated\r");
+          strncpy(buffer, *textHandle, len);
+          printf("copied %d bytes to buffer\r", len);
+
+          int resp = execute();
+          printf("Twelf response: %d\r", resp);
+
+          // XXX raise an alert if abort?
+          // XXX finalize output stream
+
+        } break;
+        case iEvalUnsafe: {
+        } break;
       }
     } break;
   }

@@ -19,7 +19,6 @@ Twelf.bin: Twelf.code.bin
 # remove multiversal-stubs.o if we use universal interface
 OBJS = \
 	 twelf.o \
-    framework.o \
 	 asmclikloop.o \
 	 clikloop.o \
 	 dialogs.o \
@@ -32,6 +31,8 @@ OBJS = \
 	 scrolling.o \
 	 view-rects.o \
 	 windows.o \
+    console.o \
+    framework.o \
 	 #
 
 Makefile.deps:
