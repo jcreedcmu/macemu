@@ -1,5 +1,7 @@
 #include "windows.h"
 
+#include <stdio.h>
+
 #include "api.h"
 #include "asmclikloop.h"
 #include "consts.h"
@@ -55,6 +57,12 @@ WindowPtr mkDocumentWindow(DocType docType) {
       destRect.right = destRect.left + kMaxDocWidth;
       doc->docTE = TENew(&destRect, &viewRect);
       (**(doc->docTE)).txFont = kFontIDMonaco;
+      // XXX These seem to be suitable metrics, but I feel like
+      // I should be querying the toolbox somehow to discover that 12
+      // is the appropriate line height to go with txSize = fontAscent = 9.
+      (**(doc->docTE)).txSize = 9;
+      (**(doc->docTE)).fontAscent = 9;
+      (**(doc->docTE)).lineHeight = 12;
       doc->fsSpecSet = false;
       doc->dirty = false;
       doc->docType = docType;
