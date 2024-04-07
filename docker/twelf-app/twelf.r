@@ -224,7 +224,7 @@ resource 'DITL' (rCloseConfirm) {
 
 // About box
 resource 'WIND' (rAboutBoxWindow) {
-    {0, 0, 220, 400}, altDBoxProc;
+    {0, 0, 220, 400 + 260}, altDBoxProc;
     invisible;
     noGoAway;
     0, "";

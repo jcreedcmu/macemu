@@ -12,7 +12,15 @@ twelf-app/icon.r: ../scripts/*.js ../assets/*.png
 	convert  ../assets/twelf-doc-small.png -compress none /tmp/twelf-doc-small.ppm
 	node ../scripts/make-icon-resources.js >twelf-app/icon.r
 
-twelf-app/pict.r: ../scripts/*.js ../assets/*.png
+../assets/twelf-logo-layer-1.json: ../assets/twelf-logo-layer-1.png
+	convert  ../assets/twelf-logo-layer-1.png -compress none /tmp/twelf-logo-layer-1.pbm
+	potrace /tmp/twelf-logo-layer-1.pbm -o ../assets/twelf-logo-layer-1.json -b geojson -a 0
+
+../assets/twelf-logo-layer-2.json: ../assets/twelf-logo-layer-2.png
+	convert  ../assets/twelf-logo-layer-2.png -compress none /tmp/twelf-logo-layer-2.pbm
+	potrace /tmp/twelf-logo-layer-2.pbm -o ../assets/twelf-logo-layer-2.json -b geojson -a 0
+
+twelf-app/pict.r: ../scripts/*.js ../assets/twelf-logo-layer-1.json ../assets/twelf-logo-layer-2.json
 	node ../scripts/make-logo-pict.js >twelf-app/pict.r
 
 TESample.bin: Dockerfile tesample-app/*.c tesample-app/*.r tesample-app/Makefile

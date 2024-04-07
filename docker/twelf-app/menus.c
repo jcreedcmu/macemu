@@ -148,17 +148,17 @@ void ShowAboutBox(void) {
   Handle h = GetResource('TEXT', rAboutText);
   HLock(h);
   Rect r = window->portRect;
+  r.left += 260;
   InsetRect(&r, 10, 10);
   TETextBox(*h, GetHandleSize(h), &r, teJustLeft);
   ReleaseResource(h);
 
-#if DISPLAY_ABOUT_IMAGE
   PicHandle myPic = GetPicture(rAboutPict);
 
   Rect destRect;
-  SetRect(&destRect, 0, 0, 0xA8, 0x6C);
+  // original size 515x431
+  SetRect(&destRect, 2, 2, 260, 218);
   DrawPicture(myPic, &destRect);
-#endif
 
   while (!Button())
     ;
