@@ -20,6 +20,10 @@ function wordBytes(word) {
   return [0xff & (word >> 8), 0xff & word];
 }
 
+function longBytes(word) {
+  return [0xff & (word >> 24), 0xff & (word >> 16), 0xff & (word >> 8), 0xff & word];
+}
+
 const header = [
   0x00, 0x11, 0x02, 0xff, 0x0c, 0x00, 0xff, 0xfe, // required specific header bytes
   0x00, 0x00, // reserved
@@ -33,26 +37,26 @@ function words(string) {
   return string.split(/\s+/).filter(x => x.length).flatMap(x => wordBytes(parseInt(x, 16)));
 }
 
+function fgColor(r, g, b) {
+  return [...wordBytes(0x001a), r, r, g, g, b, b];
+}
+
 const image = [
   ...words(`
   001E
   0001
   000A
-  0002 0002 006E 00AA
-  001A 0000 FFFF 0000
-  0034
-  0002 0002 006E 00AA
-  001A 0000 0000 FFFF
-  005C
-  0008
-  0008
-  001A 7777 7777 7777
-  0071
+  0002 0002 006E 00AA`),
+  ...fgColor(0x66, 0x99, 0x66),
+  ...words(`0034 0002 0002 006E 00AA`),
+  ...fgColor(0xff, 0x00, 0x00),
+  ...words(`005C 0008 0008`),
+  ...fgColor(0x00, 0xff, 0x00),
+  ...words(`0071
   001A
   0002 0002 006E 00AA
   006E 0002 0002 0054 006E 00AA 006E 0002
-  00FF
-`)
+  00FF`),
 ]
 
 const imageWithHeader = [

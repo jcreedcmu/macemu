@@ -134,7 +134,10 @@ void DoOpen() {
 }
 
 void ShowAboutBox(void) {
-  WindowPtr window = GetNewWindow(rAboutBoxWindow, NULL, (WindowPtr)-1);
+  WindowPtr window;
+  // should test for color availability
+  window = GetNewCWindow(rAboutBoxWindow, NULL, (WindowPtr)-1);
+
   ((WindowPeek)window)->refCon = rAboutBoxWindow;
   MoveWindow(
       window, qd.screenBits.bounds.right / 2 - window->portRect.right / 2,
