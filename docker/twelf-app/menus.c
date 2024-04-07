@@ -297,6 +297,13 @@ void DoMenuCommand(long menuResult) {
           strncpy(buffer, *textHandle, len);
           printf("copied %d bytes to buffer\r", len);
 
+          for (int i = 0; i < len; i++) {
+            if (buffer[i] == '\r') {
+              buffer[i] = '\n';
+            }
+          }
+          printf("swizzled %d bytes from CR to NL...\r", len);
+
           int resp = execute();
           printf("Twelf response: %d\r", resp);
 
