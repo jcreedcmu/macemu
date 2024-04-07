@@ -1,6 +1,8 @@
 Twelf on Classic Mac
 ====================
 
+![Screenshot of Twelf on Classic Mac](screenshot.png)
+
 The purpose of this repository is to build a version of the
 [Twelf](https://en.wikipedia.org/wiki/Twelf) logical framework that
 can be run in the "Classic Mac" environment of approximately [System
@@ -17,7 +19,7 @@ Status:
  - :no_entry_sign: Revert doesn't work yet
  - :no_entry_sign: Unsafe Eval doesn't work yet
  - :clown_face: Output window is janky in various ways (see [this issue](https://github.com/jcreedcmu/twelf-mac/issues/10) for details)
- 
+
 Setup Notes
 -----------
 
