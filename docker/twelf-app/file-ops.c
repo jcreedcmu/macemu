@@ -1,6 +1,7 @@
-#include "save-ops.h"
+#include "file-ops.h"
 
 #include "consts.h"
+#include "windows.h"
 
 // FIXME(fs): better error handling in all file operations
 OSErr writeFile(TEHandle te, FSSpec *spec) {
@@ -66,4 +67,18 @@ Boolean DoSaveAs(DocumentPeek doc) {
   associateFile(doc, spec);
   doc->dirty = false;
   return true;
+}
+
+void openFileSpec(FSSpec *spec) {
+  WindowPtr window = mkDocumentWindow(TwelfDocument);
+  if (window == NULL) return;
+  DocumentPeek doc = (DocumentPeek)window;
+  TEHandle te = doc->docTE;
+
+  readFile(te, spec);
+
+  associateFile(getDoc(window), spec);
+
+  ShowWindow(window);
+  InvalRect(&window->portRect);
 }

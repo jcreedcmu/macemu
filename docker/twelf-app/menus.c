@@ -9,10 +9,10 @@
 #include "consts.h"
 #include "dialogs.h"
 #include "document.h"
+#include "file-ops.h"
 #include "global-state.h"
 #include "multiversal-stubs.h"
 #include "resource-consts.h"
-#include "save-ops.h"
 #include "scrolling.h"
 #include "windows.h"
 
@@ -119,18 +119,7 @@ void DoOpen() {
   StandardGetFile(nil, 1, types, &reply);
   if (!reply.sfGood) return;
 
-  WindowPtr window = mkDocumentWindow(TwelfDocument);
-  if (window == NULL) return;
-  DocumentPeek doc = (DocumentPeek)window;
-  TEHandle te = doc->docTE;
-
-  FSSpec *spec = &reply.sfFile;
-  readFile(te, spec);
-
-  associateFile(getDoc(window), spec);
-
-  ShowWindow(window);
-  InvalRect(&window->portRect);
+  openFileSpec(&reply.sfFile);
 }
 
 void ShowAboutBox(void) {

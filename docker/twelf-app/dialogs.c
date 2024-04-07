@@ -1,6 +1,6 @@
 #include "dialogs.h"
 
-#include "save-ops.h"
+#include "file-ops.h"
 
 short closeConfirm(FSSpec *spec) {
   DialogPtr dlg = GetNewDialog(128, nil, (WindowPtr)-1);

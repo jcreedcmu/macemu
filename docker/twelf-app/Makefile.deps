@@ -1,20 +1,23 @@
+apple-event-handlers.o: apple-event-handlers.c apple-event-handlers.h \
+ file-ops.h document.h api.h global-state.h
 clikloop.o: clikloop.c clikloop.h api.h document.h
-dialogs.o: dialogs.c dialogs.h document.h api.h save-ops.h
+console.o: console.c console.h
+dialogs.o: dialogs.c dialogs.h document.h api.h file-ops.h
 events.o: events.c events.h consts.h dialogs.h document.h api.h \
  global-state.h handlers.h windows.h
-framework.o: framework.c framework.h api.h consts.h events.h \
- global-state.h resource-consts.h windows.h
+file-ops.o: file-ops.c file-ops.h document.h api.h consts.h
+framework.o: framework.c framework.h api.h apple-event-handlers.h \
+ consts.h events.h global-state.h resource-consts.h windows.h document.h
 global-state.o: global-state.c global-state.h
 handlers.o: handlers.c handlers.h api.h consts.h document.h \
  global-state.h rect-macros.h scrolling.h view-rects.h windows.h
-menus.o: menus.c menus.h api.h consts.h dialogs.h document.h \
- global-state.h multiversal-stubs.h resource-consts.h save-ops.h \
+menus.o: menus.c menus.h api.h console.h consts.h dialogs.h document.h \
+ file-ops.h global-state.h multiversal-stubs.h resource-consts.h \
  scrolling.h windows.h
 multiversal-stubs.o: multiversal-stubs.c multiversal-stubs.h
-save-ops.o: save-ops.c save-ops.h document.h api.h consts.h
 scrolling.o: scrolling.c scrolling.h api.h consts.h document.h \
  view-rects.h
 twelf.o: twelf.c framework.h
 view-rects.o: view-rects.c view-rects.h consts.h
-windows.o: windows.c windows.h api.h asmclikloop.h consts.h document.h \
+windows.o: windows.c windows.h document.h api.h asmclikloop.h consts.h \
  global-state.h resource-consts.h scrolling.h view-rects.h
