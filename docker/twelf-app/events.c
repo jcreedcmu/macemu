@@ -2,6 +2,7 @@
 
 #include <Events.h>
 #include <Types.h>
+#include <stdio.h>
 
 #include "consts.h"
 #include "dialogs.h"
@@ -15,11 +16,19 @@ void DoMenuCommand(long menuResult);
 /* Do the right thing for an event. Determine what kind of event it is, and call
  the appropriate routines. */
 
+int debug = 25;
+
 void DoEvent(EventRecord *event) {
   short part, err;
   WindowPtr window;
   char key;
   Point aPoint;
+
+  if (debug > 0) {
+    printf("event type %d is apple event? %d\r", event->what,
+           event->what == kHighLevelEvent);
+    debug--;
+  }
 
   switch (event->what) {
     case nullEvent:

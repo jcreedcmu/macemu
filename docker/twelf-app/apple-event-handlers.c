@@ -5,10 +5,12 @@
 
 #include "file-ops.h"
 #include "global-state.h"
+#include "windows.h"
 
-pascal OSErr handleAEOpen(AppleEvent *msg, AppleEvent *reply, long refCon) {
+pascal OSErr handleAEOpenDocuments(AppleEvent *msg, AppleEvent *reply,
+                                   long refCon) {
   AEDescList docList;
-  printf("handleAEOpen invoked!\r");
+  printf("handleAEOpenDocs invoked!\r");
   OSErr err;
   err = AEGetParamDesc(msg, keyDirectObject, typeAEList, &docList);
   if (err != 0) {
@@ -33,7 +35,16 @@ pascal OSErr handleAEOpen(AppleEvent *msg, AppleEvent *reply, long refCon) {
     openFileSpec(&spec);
   }
 
-  AEDisposeDesc(docList);
+  AEDisposeDesc(&docList);
+  return noErr;
+}
+
+pascal OSErr handleAEOpenApplication(AppleEvent *msg, AppleEvent *reply,
+                                     long refCon) {
+  AEDescList docList;
+  printf("handleAEOpenApp invoked!\r");
+  DoNew();
+
   return noErr;
 }
 
@@ -51,9 +62,17 @@ void installAEHandlers() {
     printf("AEInstall Quit err: %d\r", err);
   }
 
-  err = AEInstallEventHandler(kCoreEventClass, kAEOpenDocuments,
-                              (AEEventHandlerUPP)handleAEOpen, 0, false);
+  err =
+      AEInstallEventHandler(kCoreEventClass, kAEOpenDocuments,
+                            (AEEventHandlerUPP)handleAEOpenDocuments, 0, false);
   if (err != 0) {
-    printf("AEInstall Open err: %d\r", err);
+    printf("AEInstall Open Doc err: %d\r", err);
+  }
+
+  err = AEInstallEventHandler(kCoreEventClass, kAEOpenApplication,
+                              (AEEventHandlerUPP)handleAEOpenApplication, 0,
+                              false);
+  if (err != 0) {
+    printf("AEInstall Open App err: %d\r", err);
   }
 }

@@ -79,8 +79,6 @@ void Initialize() {
   DrawMenuBar();
 
   gNumDocuments = 0;
-
-  DoNew(); /* create a single empty document */
 }
 
 int FrameworkEntry() {
