@@ -54,6 +54,7 @@ WindowPtr mkDocumentWindow(DocType docType) {
       destRect = viewRect;
       destRect.right = destRect.left + kMaxDocWidth;
       doc->docTE = TENew(&destRect, &viewRect);
+      (**(doc->docTE)).txFont = kFontIDMonaco;
       doc->fsSpecSet = false;
       doc->dirty = false;
       doc->docType = docType;
