@@ -5,17 +5,13 @@
 #include <stdio.h>
 
 #include "api.h"
+#include "apple-event-handlers.h"
 #include "consts.h"
 #include "events.h"
 #include "framework.h"
 #include "global-state.h"
 #include "resource-consts.h"
 #include "windows.h"
-
-pascal OSErr MyHandleQuit(AppleEvent msg, AppleEvent reply, long refCon) {
-  gRunning = false;
-  return noErr;
-}
 
 Boolean TrapAvailable(short tNumber, TrapType tType) {
   if ((tType == (unsigned char)ToolTrap) &&
@@ -51,12 +47,7 @@ void Initialize() {
   InitDialogs(nil);
   InitCursor();
 
-  // Install Apple Event handler
-  short err = AEInstallEventHandler(kCoreEventClass, kAEQuitApplication,
-                                    (AEEventHandlerUPP)MyHandleQuit, 0, false);
-  if (err != 0) {
-    printf("AEInstall err: %d\r", err);
-  }
+  installAEHandlers();
 
   for (count = 1; count <= 3; count++) EventAvail(everyEvent, &event);
 
