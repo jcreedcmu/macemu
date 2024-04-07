@@ -43,3 +43,4 @@
 
 #define rAboutText 128
 #define rAboutBoxWindow 128
+#define rAboutPict 128

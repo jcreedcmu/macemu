@@ -5,6 +5,7 @@ pram-macos.img
 Quadra800.rom
 Saved.hda
 docker/*/icon.r
+docker/*/pict.r
 docker/*/build
 *.bin
 *.img.bak

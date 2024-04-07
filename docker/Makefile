@@ -1,4 +1,5 @@
-Twelf.bin: Dockerfile twelf-app/*.c twelf-app/*.h twelf-app/*.r twelf-app/Makefile twelf-app/icon.r
+Twelf.bin: Dockerfile twelf-app/*.c twelf-app/*.h twelf-app/*.r twelf-app/Makefile \
+           twelf-app/icon.r twelf-app/pict.r
 	docker build . -t "jcreed/retro68:latest"
 	docker run --rm -v "./twelf-app:/root/app" "jcreed/retro68:latest" /root/build.sh
 	cp twelf-app/Twelf.bin Twelf.bin
@@ -10,6 +11,9 @@ twelf-app/icon.r: ../scripts/*.js ../assets/*.png
 	convert  ../assets/twelf-doc.png -compress none /tmp/twelf-doc.ppm
 	convert  ../assets/twelf-doc-small.png -compress none /tmp/twelf-doc-small.ppm
 	node ../scripts/make-icon-resources.js >twelf-app/icon.r
+
+twelf-app/pict.r: ../scripts/*.js ../assets/*.png
+	node ../scripts/make-logo-pict.js >twelf-app/pict.r
 
 TESample.bin: Dockerfile tesample-app/*.c tesample-app/*.r tesample-app/Makefile
 	docker build . -t "jcreed/retro68:latest"

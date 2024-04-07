@@ -148,6 +148,15 @@ void ShowAboutBox(void) {
   InsetRect(&r, 10, 10);
   TETextBox(*h, GetHandleSize(h), &r, teJustLeft);
   ReleaseResource(h);
+
+#if DISPLAY_ABOUT_IMAGE
+  PicHandle myPic = GetPicture(rAboutPict);
+
+  Rect destRect;
+  SetRect(&destRect, 0, 0, 0xA8, 0x6C);
+  DrawPicture(myPic, &destRect);
+#endif
+
   while (!Button())
     ;
   while (Button())

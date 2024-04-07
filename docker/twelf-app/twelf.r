@@ -232,3 +232,4 @@ resource 'WIND' (rAboutBoxWindow) {
 };
 
 #include "icon.r"
+#include "pict.r"
