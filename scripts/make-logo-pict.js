@@ -16,6 +16,16 @@ function rectBytes(rect) {
   ];
 }
 
+function rectRegionBytes(rect) {
+  return [
+	 ...wordBytes(10),
+	 ...wordBytes(rect.top),
+	 ...wordBytes(rect.left),
+	 ...wordBytes(rect.bottom),
+	 ...wordBytes(rect.right),
+  ];
+}
+
 function wordBytes(word) {
   return [0xff & (word >> 8), 0xff & word];
 }
@@ -41,12 +51,17 @@ function fgColor(r, g, b) {
   return [...wordBytes(0x001a), r, r, g, g, b, b];
 }
 
+function clipRect(rect) {
+  return [...wordBytes(0x0001), ...rectRegionBytes(rect)];
+}
+
+function defHilite() {
+  return wordBytes(0x001e);
+}
+
 const image = [
-  ...words(`
-  001E
-  0001
-  000A
-  0002 0002 006E 00AA`),
+  ...defHilite(),
+  ...clipRect({top: 2, left: 2, bottom: 0x6e, right: 0xaa}),
   ...fgColor(0x66, 0x99, 0x66),
   ...words(`0034 0002 0002 006E 00AA`),
   ...fgColor(0xff, 0x00, 0x00),
