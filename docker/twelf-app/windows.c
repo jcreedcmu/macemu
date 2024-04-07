@@ -55,14 +55,23 @@ WindowPtr mkDocumentWindow(DocType docType) {
       GetTERect(window, &viewRect);
       destRect = viewRect;
       destRect.right = destRect.left + kMaxDocWidth;
-      doc->docTE = TENew(&destRect, &viewRect);
-      (**(doc->docTE)).txFont = kFontIDMonaco;
-      // XXX These seem to be suitable metrics, but I feel like
-      // I should be querying the toolbox somehow to discover that 12
-      // is the appropriate line height to go with txSize = fontAscent = 9.
-      (**(doc->docTE)).txSize = 9;
-      (**(doc->docTE)).fontAscent = 9;
-      (**(doc->docTE)).lineHeight = 12;
+
+      // Get font metrics
+      int fontFamily = kFontIDMonaco;
+      int fontSize = 9;
+      TextFont(fontFamily);
+      TextSize(fontSize);
+      FontInfo finfo;
+      GetFontInfo(&finfo);
+
+      TEHandle te = TENew(&destRect, &viewRect);
+      doc->docTE = te;
+
+      (*te)->txFont = kFontIDMonaco;
+      (*te)->txSize = fontSize;
+      (*te)->fontAscent = finfo.ascent;
+      (*te)->lineHeight = finfo.ascent + finfo.descent + 1;
+
       doc->fsSpecSet = false;
       doc->dirty = false;
       doc->docType = docType;
