@@ -75,6 +75,8 @@ WindowPtr mkDocumentWindow(DocType docType) {
       doc->fsSpecSet = false;
       doc->dirty = false;
       doc->docType = docType;
+      doc->winType = TwelfWinDocument;
+
       good =
           doc->docTE != nil; /* if TENew succeeded, we have a good document */
       if (good) {            /* 1.02 - good document? -- proceed */

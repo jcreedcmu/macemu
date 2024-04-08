@@ -129,6 +129,12 @@ void DoAboutIdle() {
 }
 
 void ShowAboutBox() {
+  WindowPtr window = mkDocumentWindow(TwelfDocument);
+  ShowWindow(window);
+  ((TwelfWinPtr)window)->winType = TwelfWinAbout;
+}
+
+void NoShowAboutBox() {
   WindowPtr window;
   // should test for color availability
 
