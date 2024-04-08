@@ -11,17 +11,14 @@
         values. This is really useful when the window has been resized such that
    the scrollbars became inactive but the TERec was already scrolled. */
 
-void AdjustTE(WindowPtr window) {
-  TEPtr te;
-
-  te = *((DocumentPeek)window)->docTE;
+void AdjustTE(DocumentPtr doc) {
+  TEPtr te = *doc->docTE;
   TEScroll((te->viewRect.left - te->destRect.left) -
-               GetControlValue(((DocumentPeek)window)->docHScroll),
+               GetControlValue(doc->docHScroll),
            (te->viewRect.top - te->destRect.top) -
-               (GetControlValue(((DocumentPeek)window)->docVScroll) *
-                te->lineHeight),
-           ((DocumentPeek)window)->docTE);
-} /*AdjustTE*/
+               (GetControlValue(doc->docVScroll) * te->lineHeight),
+           doc->docTE);
+}
 
 /* Calculate the new control maximum value and current value, whether it is the
    horizontal or vertical scrollbar. The vertical max is calculated by comparing
@@ -74,24 +71,22 @@ void AdjustHV(Boolean isVert, ControlHandle control, TEHandle docTE,
 /* Simply call the common adjust routine for the vertical and horizontal
  * scrollbars. */
 
-void AdjustScrollValues(WindowPtr window, Boolean canRedraw) {
+void AdjustScrollValues(DocumentPtr doc, Boolean canRedraw) {
   DocumentPeek doc;
 
-  doc = (DocumentPeek)window;
   AdjustHV(true, doc->docVScroll, doc->docTE, canRedraw);
   AdjustHV(false, doc->docHScroll, doc->docTE, canRedraw);
-} /*AdjustScrollValues*/
+}
 
 /*	Re-calculate the position and size of the viewRect and the scrollbars.
         kScrollTweek compensates for off-by-one requirements of the scrollbars
         to have borders coincide with the growbox. */
 
-void AdjustScrollSizes(WindowPtr window) {
+void AdjustScrollSizes(DocumentPtr doc) {
   Rect teRect;
-  DocumentPeek doc;
+  WindowPtr window = &doc->window;
 
-  doc = (DocumentPeek)window;
-  GetTERect(window, &teRect); /* start with TERect */
+  GetTERect(, &teRect); /* start with TERect */
   (*doc->docTE)->viewRect = teRect;
   AdjustViewRect(doc->docTE); /* snap to nearest line */
   MoveControl(doc->docVScroll, window->portRect.right - kScrollbarAdjust, -1);
@@ -103,7 +98,7 @@ void AdjustScrollSizes(WindowPtr window) {
               (window->portRect.right - window->portRect.left) -
                   (kScrollbarAdjust - kScrollTweek),
               kScrollbarWidth);
-} /*AdjustScrollSizes*/
+}
 
 /* Turn off the controls by jamming a zero into their contrlVis fields
    (HideControl erases them and we don't want that). If the controls are to be
@@ -111,10 +106,9 @@ void AdjustScrollSizes(WindowPtr window) {
    adjust the maximum and current values. Finally re-enable the controls by
    jamming a $FF in their contrlVis fields. */
 
-void AdjustScrollbars(WindowPtr window, Boolean needsResize) {
-  DocumentPeek doc;
+void AdjustScrollbars(DocumentPtr doc, Boolean needsResize) {
+  WindowPtr window = &doc->window;
 
-  doc = (DocumentPeek)window;
   /* First, turn visibility of scrollbars off so we won't get unwanted redrawing
    */
   (*doc->docVScroll)->contrlVis = kControlInvisible; /* turn them off */
@@ -149,6 +143,7 @@ void CommonAction(ControlHandle control, short *amount) {
 /* Determines how much to change the value of the vertical scrollbar by and how
         much to scroll the TE record. */
 
+/* WARNING: Assumes the control came from a document window! */
 pascal void VActionProc(ControlHandle control, short part) {
   short amount;
   WindowPtr window;
@@ -173,11 +168,12 @@ pascal void VActionProc(ControlHandle control, short part) {
     if (amount != 0)
       TEScroll(0, amount * te->lineHeight, ((DocumentPeek)window)->docTE);
   }
-} /* VActionProc */
+}
 
 /* Determines how much to change the value of the horizontal scrollbar by and
 how much to scroll the TE record. */
 
+/* WARNING: Assumes the control came from a document window! */
 pascal void HActionProc(ControlHandle control, short part) {
   short amount;
   WindowPtr window;
@@ -201,4 +197,4 @@ pascal void HActionProc(ControlHandle control, short part) {
     CommonAction(control, &amount);
     if (amount != 0) TEScroll(amount, 0, ((DocumentPeek)window)->docTE);
   }
-} /* VActionProc */
+}

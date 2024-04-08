@@ -70,6 +70,8 @@ Boolean DoSaveAs(DocumentPeek doc) {
 }
 
 void openFileSpec(FSSpec *spec) {
+  // FIXME(type-safety): we should really be getting back a documentPtr from
+  // mkDocumentWindow, so we don't have to cast back to document.
   WindowPtr window = mkDocumentWindow(TwelfDocument);
   if (window == NULL) return;
   DocumentPeek doc = (DocumentPeek)window;

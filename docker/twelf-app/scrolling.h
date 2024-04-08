@@ -2,12 +2,14 @@
 
 #include <Windows.h>
 
-void AdjustTE(WindowPtr window);
+#include "document.h"
+
+void AdjustTE(DocumentPtr doc);
 void AdjustHV(Boolean isVert, ControlHandle control, TEHandle docTE,
               Boolean canRedraw);
-void AdjustScrollValues(WindowPtr window, Boolean canRedraw);
-void AdjustScrollSizes(WindowPtr window);
-void AdjustScrollbars(WindowPtr window, Boolean needsResize);
+void AdjustScrollValues(DocumentPtr doc, Boolean canRedraw);
+void AdjustScrollSizes(DocumentPtr doc);
+void AdjustScrollbars(DocumentPtr doc, Boolean needsResize);
 
 // Scrolling callbacks
 pascal void VActionProc(ControlHandle control, short part);
