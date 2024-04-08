@@ -12,3 +12,6 @@ short closeConfirm(FSSpec *spec);
 
 // Returns true if we should close, false if cancel
 Boolean closeConfirmForDoc(DocumentPeek doc);
+
+// Returns true if we should close, false if cancel
+Boolean closeConfirmForWin(WindowPtr window);

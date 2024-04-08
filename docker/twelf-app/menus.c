@@ -343,7 +343,7 @@ void DoMenuCommand(long menuResult) {
           break;
         case iClose: {
           WindowPtr window = FrontWindow();
-          if (closeConfirmForDoc(getDoc(window))) {
+          if (closeConfirmForWin(window)) {
             DoCloseWindow(window);
           }
         } break;

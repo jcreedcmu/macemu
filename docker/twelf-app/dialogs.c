@@ -55,3 +55,15 @@ Boolean closeConfirmForDoc(DocumentPeek doc) {
       return true;
   }
 }
+
+Boolean closeConfirmForWin(WindowPtr window) {
+  TwelfWinPtr twin = (TwelfWinPtr)window;
+  switch (twin->winType) {
+    case TwelfWinDocument: {
+      return closeConfirmForDoc(getDoc(window));
+    } break;
+    case TwelfWinAbout: {
+      return true;
+    } break;
+  }
+}

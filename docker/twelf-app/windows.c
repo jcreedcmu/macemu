@@ -21,6 +21,7 @@ WindowPtr getOutputWindow() {
   return gOutputWindow;
 }
 
+// FIXME(safety): should return DocumentPtr
 WindowPtr mkDocumentWindow(DocType docType) {
   Boolean good;
   Ptr storage;
@@ -47,8 +48,8 @@ WindowPtr mkDocumentWindow(DocType docType) {
     }
 
     if (window != nil) {
-      gNumDocuments +=
-          1; /* this will be decremented when we call DoCloseWindow */
+      /* this will be decremented when we call DoCloseWindow */
+      gNumDocuments += 1;
       good = false;
       SetPort(window);
       doc = (DocumentPeek)window;
@@ -118,36 +119,35 @@ void DoNew() {
 
 /* Close a window. This handles desk accessory and application windows. */
 
-/*	1.01 - At this point, if there was a document associated with a
-        window, you could do any document saving processing if it is
-   'dirty'. DoCloseWindow would return true if the window actually closed,
-   i.e., the user didn't cancel from a save dialog. This result is handy
-   when the user quits an application, but then cancels the save of a
-   document associated with a window. */
-
 Boolean DoCloseWindow(WindowPtr window) {
   if (IsDAWindow(window))
     CloseDeskAcc(((WindowPeek)window)->windowKind);
   else if (IsAppWindow(window)) {
-    DocumentPeek doc = getDoc(window);
-    TEHandle te = doc->docTE;
-    if (te != nil)
-      TEDispose(te); /* dispose the TEHandle if we got far enough to make one */
-    /*	1.01 - We used to call DisposeWindow, but that was technically
-            incorrect, even though we allocated storage for the window on
-            the heap. We should instead call CloseWindow to have the structures
-            taken care of and then dispose of the storage ourselves. */
-    CloseWindow(window);
+    TwelfWinPtr twin = (TwelfWinPtr)window;
+    switch (twin->winType) {
+      case TwelfWinDocument: {
+        DocumentPeek doc = getDoc(window);
+        TEHandle te = doc->docTE;
+        if (te != nil) {
+          TEDispose(te);
+        }
+        CloseWindow(window);
 
-    if (doc->docType == TwelfOutput) {
-      gOutputWindow = NULL;
+        if (doc->docType == TwelfOutput) {
+          gOutputWindow = NULL;
+        }
+
+        DisposePtr((Ptr)window);
+        gNumDocuments -= 1;
+      } break;
+      case TwelfWinAbout: {
+        // FIXME(memleak): probably should dispose of more things here
+        CloseWindow(window);
+      } break;
     }
-
-    DisposePtr((Ptr)window);
-    gNumDocuments -= 1;
+    return true;
   }
-  return true;
-} /*DoCloseWindow*/
+}
 
 /* Gets called from our assembly language routine, AsmClickLoop, which is in
         turn called by the TEClick toolbox routine. Saves the windows clip
@@ -207,10 +207,11 @@ void DrawWindow(WindowPtr window) {
       PaintRect(&r);
     } break;
     case TwelfWinDocument: {
+      DocumentPtr doc = getDoc(window);
       EraseRect(&window->portRect);
       DrawControls(window);
       DrawGrowIcon(window);
-      TEUpdate(&window->portRect, ((DocumentPeek)window)->docTE);
+      TEUpdate(&window->portRect, doc->docTE);
     } break;
   }
 } /*DrawWindow*/
