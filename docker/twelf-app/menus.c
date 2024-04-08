@@ -198,11 +198,26 @@ void AboutEventLoop() {
 
 void ShowAboutBox() {
   WindowPtr window;
-  Rect windowRect;
+  // should test for color availability
 
-  SetRect(&windowRect, 3, 40, 403, 340);
-  window = NewWindow(NULL, &windowRect, "\puntitled", true, documentProc,
-                     (WindowPtr)-1, true, kAboutBoxRef);
+  // About box
+  Rect aboutWindowRect;
+
+  // original pic size 515x431
+  int PIC_WIDTH = 258;
+  int PIC_HEIGHT = 216;
+  int WINDOW_HEIGHT = 310;
+  int WINDOW_WIDTH = 400 + PIC_WIDTH;
+
+  SetRect(&aboutWindowRect, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
+  window = NewCWindow(NULL, &aboutWindowRect, "\pAbout Twelf", false,
+                      documentProc, (WindowPtr)-1, true, kAboutBoxRef);
+
+  MoveWindow(
+      window, qd.screenBits.bounds.right / 2 - window->portRect.right / 2,
+      qd.screenBits.bounds.bottom / 2 - window->portRect.bottom / 2, false);
+  ShowWindow(window);
+  SetPort(window);
 }
 
 void NoShowAboutBox() {
