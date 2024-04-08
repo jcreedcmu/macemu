@@ -65,17 +65,33 @@ void DoGrowWindow(WindowPtr window, EventRecord *event) {
         _ResizeWindow invalidates the whole portRect. */
 
 void DoZoomWindow(WindowPtr window, short part) {
-  EraseRect(&window->portRect);
-  ZoomWindow(window, part, window == FrontWindow());
-  _ResizeWindow(window);
+  TwelfWinPtr twin = (TwelfWinPtr)window;
+  switch (twin->winType) {
+    case TwelfWinDocument: {
+      EraseRect(&window->portRect);
+      ZoomWindow(window, part, window == FrontWindow());
+      _ResizeWindow(window);
+    } break;
+    case TwelfWinAbout: {
+      /* Unimplemented */
+    } break;
+  }
 } /*  DoZoomWindow */
 
 /* Called when the window has been resized to fix up the controls and content.
  */
 void _ResizeWindow(WindowPtr window) {
-  AdjustScrollbars(window, true);
-  AdjustTE(window);
-  InvalRect(&window->portRect);
+  TwelfWinPtr twin = (TwelfWinPtr)window;
+  switch (twin->winType) {
+    case TwelfWinDocument: {
+      AdjustScrollbars(window, true);
+      AdjustTE(window);
+      InvalRect(&window->portRect);
+    } break;
+    case TwelfWinAbout: {
+      /* Unimplemented */
+    } break;
+  }
 } /* _ResizeWindow */
 
 /* Returns the update region in local coordinates */
@@ -111,45 +127,55 @@ void DoActivate(WindowPtr window, Boolean becomingActive) {
   DocumentPeek doc;
 
   if (IsAppWindow(window)) {
-    doc = (DocumentPeek)window;
-    if (becomingActive) {
-      /*	since we don't want TEActivate to draw a selection in an area
-         where we're going to erase and redraw, we'll clip out the update region
-              before calling it. */
-      tempRgn = NewRgn();
-      clipRgn = NewRgn();
-      GetLocalUpdateRgn(window, tempRgn); /* get localized update region */
-      GetClip(clipRgn);
-      DiffRgn(clipRgn, tempRgn, tempRgn); /* subtract updateRgn from clipRgn */
-      SetClip(tempRgn);
-      TEActivate(doc->docTE);
-      SetClip(clipRgn); /* restore the full-blown clipRgn */
-      DisposeRgn(tempRgn);
-      DisposeRgn(clipRgn);
+    TwelfWinPtr twin = (TwelfWinPtr)window;
+    switch (twin->winType) {
+      case TwelfWinDocument: {
+        doc = (DocumentPeek)window;
+        if (becomingActive) {
+          /*	since we don't want TEActivate to draw a selection in an area
+             where we're going to erase and redraw, we'll clip out the update
+             region before calling it. */
+          tempRgn = NewRgn();
+          clipRgn = NewRgn();
+          GetLocalUpdateRgn(window, tempRgn); /* get localized update region */
+          GetClip(clipRgn);
+          DiffRgn(clipRgn, tempRgn,
+                  tempRgn); /* subtract updateRgn from clipRgn */
+          SetClip(tempRgn);
+          TEActivate(doc->docTE);
+          SetClip(clipRgn); /* restore the full-blown clipRgn */
+          DisposeRgn(tempRgn);
+          DisposeRgn(clipRgn);
 
-      /* the controls must be redrawn on activation: */
-      (*doc->docVScroll)->contrlVis = kControlVisible;
-      (*doc->docHScroll)->contrlVis = kControlVisible;
-      InvalRect(&(*doc->docVScroll)->contrlRect);
-      InvalRect(&(*doc->docHScroll)->contrlRect);
-      /* the growbox needs to be redrawn on activation: */
-      growRect = window->portRect;
-      /* adjust for the scrollbars */
-      growRect.top = growRect.bottom - kScrollbarAdjust;
-      growRect.left = growRect.right - kScrollbarAdjust;
-      InvalRect(&growRect);
-    } else {
-      TEDeactivate(doc->docTE);
-      /* the controls must be hidden on deactivation: */
-      HideControl(doc->docVScroll);
-      HideControl(doc->docHScroll);
-      /* the growbox should be changed immediately on deactivation: */
-      DrawGrowIcon(window);
+          /* the controls must be redrawn on activation: */
+          (*doc->docVScroll)->contrlVis = kControlVisible;
+          (*doc->docHScroll)->contrlVis = kControlVisible;
+          InvalRect(&(*doc->docVScroll)->contrlRect);
+          InvalRect(&(*doc->docHScroll)->contrlRect);
+          /* the growbox needs to be redrawn on activation: */
+          growRect = window->portRect;
+          /* adjust for the scrollbars */
+          growRect.top = growRect.bottom - kScrollbarAdjust;
+          growRect.left = growRect.right - kScrollbarAdjust;
+          InvalRect(&growRect);
+        } else {
+          TEDeactivate(doc->docTE);
+          /* the controls must be hidden on deactivation: */
+          HideControl(doc->docVScroll);
+          HideControl(doc->docHScroll);
+          /* the growbox should be changed immediately on deactivation: */
+          DrawGrowIcon(window);
+        }
+      } break;
+      case TwelfWinAbout: {
+        /* Nothing special to do */
+      } break;
     }
   }
-} /*DoActivate*/
+}
 
-/*	This is called when a mouseDown occurs in the content of a window. */
+/*	This is called when a mouseDown occurs in the content of a
+ * window. */
 
 void DoContentClick(WindowPtr window, EventRecord *event) {
   Point mouse;
@@ -167,7 +193,8 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
         mouse = event->where; /* get the click position */
         GlobalToLocal(&mouse);
         doc = (DocumentPeek)window;
-        /* see if we are in the viewRect. if so, we won't check the controls */
+        /* see if we are in the viewRect. if so, we won't check the
+         * controls */
         GetTERect(window, &teRect);
         if (PtInRect(mouse, &teRect)) {
           /* see if we need to extend the selection */
@@ -184,7 +211,8 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
               part = TrackControl(control, mouse, nil);
               if (part != 0) {
                 value -= GetControlValue(control);
-                /* value now has CHANGE in value; if value changed, scroll */
+                /* value now has CHANGE in value; if value changed, scroll
+                 */
                 if (value != 0)
                   if (control == doc->docVScroll)
                     TEScroll(0, value * (*doc->docTE)->lineHeight, doc->docTE);
@@ -221,25 +249,34 @@ void DoKeyDown(EventRecord *event) {
 
   window = FrontWindow();
   if (IsAppWindow(window)) {
-    DocumentPeek doc = ((DocumentPeek)window);
-    te = doc->docTE;
-    key = event->message & charCodeMask;
-    /* we have a char. for our window; see if we are still below TextEdit's
-            limit for the number of characters (but deletes are always rad) */
-    if (key == kDelChar ||
-        (*te)->teLength - ((*te)->selEnd - (*te)->selStart) + 1 <
-            kMaxTELength) {
-      doc->dirty = true;
-      TEKey(key, te);
-      AdjustScrollbars(window, false);
-      AdjustTE(window);
-    } else
-      AlertUser(eExceedChar);
+    TwelfWinPtr twin = (TwelfWinPtr)window;
+    switch (twin->winType) {
+      case TwelfWinDocument: {
+        DocumentPeek doc = ((DocumentPeek)window);
+        te = doc->docTE;
+        key = event->message & charCodeMask;
+        /* we have a char. for our window; see if we are still below
+           TextEdit's limit for the number of characters (but deletes are
+           always rad) */
+        if (key == kDelChar ||
+            (*te)->teLength - ((*te)->selEnd - (*te)->selStart) + 1 <
+                kMaxTELength) {
+          doc->dirty = true;
+          TEKey(key, te);
+          AdjustScrollbars(window, false);
+          AdjustTE(window);
+        } else
+          AlertUser(eExceedChar);
+      } break;
+      case TwelfWinAbout: {
+        /* Nothing special to do */
+      } break;
+    }
   }
-} /*DoKeyDown*/
+}
 
-/*	Calculate a sleep value for WaitNextEvent. This takes into account the
-   things that DoIdle does with idle time. */
+/*	Calculate a sleep value for WaitNextEvent. This takes into
+   account the things that DoIdle does with idle time. */
 
 unsigned long GetSleep() {
   WindowPtr window;
@@ -251,8 +288,8 @@ unsigned long GetSleep() {
       switch (twin->winType) {
         case TwelfWinDocument: { /* and it's a proper document ... */
           TEHandle te =
-              ((DocumentPeek)(window))
-                  ->docTE; /* and the selection is an insertion point... */
+              ((DocumentPeek)(window))->docTE; /* and the selection is an
+                                                  insertion point... */
           if ((*te)->selStart == (*te)->selEnd) {
             return 250;  // GetCaretTime();
           }
@@ -267,7 +304,8 @@ unsigned long GetSleep() {
 }
 
 /* This is called whenever we get a null event et al.
- It takes care of necessary periodic actions. For this program, it calls TEIdle.
+ It takes care of necessary periodic actions. For this program, it calls
+ TEIdle.
  */
 
 void DoIdle() {
@@ -287,11 +325,12 @@ void DoIdle() {
 }
 
 /*	Change the cursor's shape, depending on its position. This also
-   calculates the region where the current cursor resides (for WaitNextEvent).
-   When the mouse moves outside of this region, an event is generated. If there
-   is more to the event than just `the mouse moved', we get called before the
-   event is processed to make sure the cursor is the right one. In any (ahem)
-   event, this is called again before we fall back into WNE. */
+   calculates the region where the current cursor resides (for
+   WaitNextEvent). When the mouse moves outside of this region, an event
+   is generated. If there is more to the event than just `the mouse
+   moved', we get called before the event is processed to make sure the
+   cursor is the right one. In any (ahem) event, this is called again
+   before we fall back into WNE. */
 
 void AdjustCursor(Point mouse, RgnHandle region) {
   WindowPtr window;
@@ -318,7 +357,8 @@ void AdjustCursor(Point mouse, RgnHandle region) {
           LocalToGlobal(&TopLeft(iBeamRect));
           LocalToGlobal(&BotRight(iBeamRect));
           RectRgn(iBeamRgn, &iBeamRect);
-          /* we temporarily change the port's origin to 'globalify' the visRgn
+          /* we temporarily change the port's origin to 'globalify' the
+           * visRgn
            */
           SetOrigin(-window->portBits.bounds.left,
                     -window->portBits.bounds.top);

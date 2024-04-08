@@ -13,7 +13,7 @@ typedef struct {
 
 // If winType == TwelfWinDocument, then assume all these fields exist:
 typedef struct {
-  WindowRecord docWindow;
+  WindowRecord window;
   TwelfWinType winType;
   DocType docType;
   TEHandle docTE;
@@ -23,6 +23,6 @@ typedef struct {
   Boolean fsSpecSet;
   FSSpec fsSpec;
   Boolean dirty;
-} DocumentRecord, *DocumentPeek;
+} DocumentRecord, *DocumentPeek, *DocumentPtr;
 
 #define getDoc(window) ((DocumentPeek)(window))
