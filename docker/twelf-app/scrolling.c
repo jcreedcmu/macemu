@@ -72,8 +72,6 @@ void AdjustHV(Boolean isVert, ControlHandle control, TEHandle docTE,
  * scrollbars. */
 
 void AdjustScrollValues(DocumentPtr doc, Boolean canRedraw) {
-  DocumentPeek doc;
-
   AdjustHV(true, doc->docVScroll, doc->docTE, canRedraw);
   AdjustHV(false, doc->docHScroll, doc->docTE, canRedraw);
 }
@@ -84,9 +82,9 @@ void AdjustScrollValues(DocumentPtr doc, Boolean canRedraw) {
 
 void AdjustScrollSizes(DocumentPtr doc) {
   Rect teRect;
-  WindowPtr window = &doc->window;
+  WindowPtr window = (WindowPtr)(&doc->window);
 
-  GetTERect(, &teRect); /* start with TERect */
+  GetTERect(window, &teRect); /* start with TERect */
   (*doc->docTE)->viewRect = teRect;
   AdjustViewRect(doc->docTE); /* snap to nearest line */
   MoveControl(doc->docVScroll, window->portRect.right - kScrollbarAdjust, -1);
@@ -107,15 +105,13 @@ void AdjustScrollSizes(DocumentPtr doc) {
    jamming a $FF in their contrlVis fields. */
 
 void AdjustScrollbars(DocumentPtr doc, Boolean needsResize) {
-  WindowPtr window = &doc->window;
-
   /* First, turn visibility of scrollbars off so we won't get unwanted redrawing
    */
   (*doc->docVScroll)->contrlVis = kControlInvisible; /* turn them off */
   (*doc->docHScroll)->contrlVis = kControlInvisible;
   if (needsResize) /* move & size as needed */
-    AdjustScrollSizes(window);
-  AdjustScrollValues(window, needsResize); /* fool with max and current value */
+    AdjustScrollSizes(doc);
+  AdjustScrollValues(doc, needsResize); /* fool with max and current value */
   /* Now, restore visibility in case we never had to ShowControl during
    * adjustment */
   (*doc->docVScroll)->contrlVis = kControlVisible; /* turn them on */

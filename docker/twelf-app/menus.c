@@ -364,8 +364,8 @@ void DoMenuCommand(long menuResult) {
             TESetSelect(0, (*te)->teLength, te);
           } break;
         }
-        AdjustScrollbars(window, false);
-        AdjustTE(window);
+        AdjustScrollbars(getDoc(window), false);  // FIXME(TE)
+        AdjustTE(getDoc(window));                 // FIXME(TE)
       }
     } break;
     case mSignature: {

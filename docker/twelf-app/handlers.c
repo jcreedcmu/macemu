@@ -84,8 +84,9 @@ void _ResizeWindow(WindowPtr window) {
   TwelfWinPtr twin = (TwelfWinPtr)window;
   switch (twin->winType) {
     case TwelfWinDocument: {
-      AdjustScrollbars(window, true);
-      AdjustTE(window);
+      DocumentPtr doc = getDoc(window);
+      AdjustScrollbars(doc, true);
+      AdjustTE(doc);
       InvalRect(&window->portRect);
     } break;
     case TwelfWinAbout: {
@@ -252,7 +253,7 @@ void DoKeyDown(EventRecord *event) {
     TwelfWinPtr twin = (TwelfWinPtr)window;
     switch (twin->winType) {
       case TwelfWinDocument: {
-        DocumentPeek doc = ((DocumentPeek)window);
+        DocumentPeek doc = getDoc(window);
         te = doc->docTE;
         key = event->message & charCodeMask;
         /* we have a char. for our window; see if we are still below
@@ -263,8 +264,8 @@ void DoKeyDown(EventRecord *event) {
                 kMaxTELength) {
           doc->dirty = true;
           TEKey(key, te);
-          AdjustScrollbars(window, false);
-          AdjustTE(window);
+          AdjustScrollbars(doc, false);
+          AdjustTE(doc);
         } else
           AlertUser(eExceedChar);
       } break;

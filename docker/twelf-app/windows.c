@@ -96,8 +96,8 @@ WindowPtr mkDocumentWindow(DocType docType) {
       }
 
       if (good) {
-        AdjustScrollValues(window, false);
-        AdjustScrollbars(window, true);
+        AdjustScrollValues(doc, false);
+        AdjustScrollbars(doc, true);
         return window;
       } else {
         DoCloseWindow(window); /* otherwise regret we ever created it... */
