@@ -158,48 +158,55 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
   Rect teRect;
 
   if (IsAppWindow(window)) {
-    SetPort(window);
-    mouse = event->where; /* get the click position */
-    GlobalToLocal(&mouse);
-    doc = (DocumentPeek)window;
-    /* see if we are in the viewRect. if so, we won't check the controls */
-    GetTERect(window, &teRect);
-    if (PtInRect(mouse, &teRect)) {
-      /* see if we need to extend the selection */
-      shiftDown =
-          (event->modifiers & shiftKey) != 0; /* extend if Shift is down */
-      TEClick(mouse, shiftDown, doc->docTE);
-    } else {
-      part = FindControl(mouse, window, &control);
-      switch (part) {
-        case 0: /* do nothing for viewRect case */
-          break;
-        case kControlIndicatorPart:
-          value = GetControlValue(control);
-          part = TrackControl(control, mouse, nil);
-          if (part != 0) {
-            value -= GetControlValue(control);
-            /* value now has CHANGE in value; if value changed, scroll */
-            if (value != 0)
-              if (control == doc->docVScroll)
-                TEScroll(0, value * (*doc->docTE)->lineHeight, doc->docTE);
-              else
-                TEScroll(value, 0, doc->docTE);
-          }
-          break;
-        default: /* they clicked in an arrow, so track & scroll */
-        {
-          if (control == doc->docVScroll) {
-            value = TrackControl(control, mouse, VActionProc);
-          } else if (control == doc->docHScroll) {
-            value = TrackControl(control, mouse, HActionProc);
-          }
+    TwelfWinPtr twin = (TwelfWinPtr)window;
+    switch (twin->winType) {
+      case TwelfWinDocument: {
+        SetPort(window);
+        mouse = event->where; /* get the click position */
+        GlobalToLocal(&mouse);
+        doc = (DocumentPeek)window;
+        /* see if we are in the viewRect. if so, we won't check the controls */
+        GetTERect(window, &teRect);
+        if (PtInRect(mouse, &teRect)) {
+          /* see if we need to extend the selection */
+          shiftDown =
+              (event->modifiers & shiftKey) != 0; /* extend if Shift is down */
+          TEClick(mouse, shiftDown, doc->docTE);
+        } else {
+          part = FindControl(mouse, window, &control);
+          switch (part) {
+            case 0: /* do nothing for viewRect case */
+              break;
+            case kControlIndicatorPart:
+              value = GetControlValue(control);
+              part = TrackControl(control, mouse, nil);
+              if (part != 0) {
+                value -= GetControlValue(control);
+                /* value now has CHANGE in value; if value changed, scroll */
+                if (value != 0)
+                  if (control == doc->docVScroll)
+                    TEScroll(0, value * (*doc->docTE)->lineHeight, doc->docTE);
+                  else
+                    TEScroll(value, 0, doc->docTE);
+              }
+              break;
+            default: /* they clicked in an arrow, so track & scroll */
+            {
+              if (control == doc->docVScroll) {
+                value = TrackControl(control, mouse, VActionProc);
+              } else if (control == doc->docHScroll) {
+                value = TrackControl(control, mouse, HActionProc);
+              }
 
-        } break;
-      }
+            } break;
+          }
+        }
+      } break;
+      case TwelfWinAbout: {
+      } break;
     }
   }
-} /*DoContentClick*/
+}
 
 /* This is called for any keyDown or autoKey events, except when the
  Command key is held down. It looks at the frontmost window to decide what
@@ -260,10 +267,19 @@ unsigned long GetSleep() {
 
 void DoIdle() {
   WindowPtr window;
-
   window = FrontWindow();
-  if (IsAppWindow(window)) TEIdle(((DocumentPeek)window)->docTE);
-} /*DoIdle*/
+  if (IsAppWindow(window)) {
+    TwelfWinPtr twin = (TwelfWinPtr)window;
+    switch (twin->winType) {
+      case TwelfWinAbout: {
+        // Conceivably some kind of idle animation could go here
+      } break;
+      case TwelfWinDocument: {
+        TEIdle(((DocumentPeek)window)->docTE);
+      } break;
+    }
+  }
+}
 
 /*	Change the cursor's shape, depending on its position. This also
    calculates the region where the current cursor resides (for WaitNextEvent).
@@ -289,15 +305,25 @@ void AdjustCursor(Point mouse, RgnHandle region) {
 
     /* calculate iBeamRgn */
     if (IsAppWindow(window)) {
-      iBeamRect = (*((DocumentPeek)window)->docTE)->viewRect;
-      SetPort(window); /* make a global version of the viewRect */
-      LocalToGlobal(&TopLeft(iBeamRect));
-      LocalToGlobal(&BotRight(iBeamRect));
-      RectRgn(iBeamRgn, &iBeamRect);
-      /* we temporarily change the port's origin to 'globalify' the visRgn */
-      SetOrigin(-window->portBits.bounds.left, -window->portBits.bounds.top);
-      SectRgn(iBeamRgn, window->visRgn, iBeamRgn);
-      SetOrigin(0, 0);
+      TwelfWinPtr twin = (TwelfWinPtr)window;
+      switch (twin->winType) {
+        case TwelfWinDocument: {
+          iBeamRect = (*((DocumentPeek)window)->docTE)->viewRect;
+          SetPort(window); /* make a global version of the viewRect */
+          LocalToGlobal(&TopLeft(iBeamRect));
+          LocalToGlobal(&BotRight(iBeamRect));
+          RectRgn(iBeamRgn, &iBeamRect);
+          /* we temporarily change the port's origin to 'globalify' the visRgn
+           */
+          SetOrigin(-window->portBits.bounds.left,
+                    -window->portBits.bounds.top);
+          SectRgn(iBeamRgn, window->visRgn, iBeamRgn);
+          SetOrigin(0, 0);
+        } break;
+        case TwelfWinAbout: {
+          // no iBeamRgn for about box
+        } break;
+      }
     }
 
     /* subtract other regions from arrowRgn */
