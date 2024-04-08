@@ -79,13 +79,15 @@ void AdjustEditMenu() {
   MenuHandle menu = GetMenuHandle(mEdit);
 
   Boolean undo = false;
-  Boolean cutCopyClear = false;
+  Boolean copy = false;
+  Boolean cutClear = false;
   Boolean paste = false;
   Boolean selectAll = false;
 
   if (IsDAWindow(window)) {
     undo = true; /* all editing is enabled for DA windows */
-    cutCopyClear = true;
+    copy = true;
+    cutClear = true;
     paste = true;
   } else if (IsAppWindow(window)) {
     TwelfWinPtr twin = (TwelfWinPtr)window;
@@ -94,13 +96,17 @@ void AdjustEditMenu() {
         DocumentPtr doc = getDoc(window);
         selectAll = true;
         TEHandle te = doc->docTE;
-        if ((*te)->selStart < (*te)->selEnd) cutCopyClear = true;
-        /* Cut, Copy, and Clear is enabled for app. windows with selections */
-        long offset;
-        if (GetScrap(nil, 'TEXT', &offset) > 0)
-          paste =
-              true; /* if there's any text in the clipboard, paste is enabled */
-
+        Boolean isSelection = (*te)->selStart < (*te)->selEnd;
+        if (isSelection) copy = true;
+        if (doc->docType == TwelfDocument) {
+          long offset;
+          if (GetScrap(nil, 'TEXT', &offset) > 0) {
+            paste = true;
+          }
+          if (isSelection) {
+            cutClear = true;
+          }
+        }
       } break;
       case TwelfWinAbout: {
       } break;
@@ -110,13 +116,15 @@ void AdjustEditMenu() {
     EnableItem(menu, iUndo);
   else
     DisableItem(menu, iUndo);
-  if (cutCopyClear) {
-    EnableItem(menu, iCut);
+  if (copy)
     EnableItem(menu, iCopy);
+  else
+    DisableItem(menu, iCopy);
+  if (cutClear) {
+    EnableItem(menu, iCut);
     EnableItem(menu, iClear);
   } else {
     DisableItem(menu, iCut);
-    DisableItem(menu, iCopy);
     DisableItem(menu, iClear);
   }
   if (paste)

@@ -244,18 +244,18 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
  to do with the key typed. */
 
 void DoKeyDown(EventRecord *event) {
-  WindowPtr window;
-  char key;
-  TEHandle te;
-
-  window = FrontWindow();
+  WindowPtr window = FrontWindow();
   if (IsAppWindow(window)) {
     TwelfWinPtr twin = (TwelfWinPtr)window;
     switch (twin->winType) {
       case TwelfWinDocument: {
         DocumentPeek doc = getDoc(window);
-        te = doc->docTE;
-        key = event->message & charCodeMask;
+        if (doc->docType == TwelfOutput) {
+          // Output document is readonly
+          return;
+        }
+        TEHandle te = doc->docTE;
+        char key = event->message & charCodeMask;
         /* we have a char. for our window; see if we are still below
            TextEdit's limit for the number of characters (but deletes are
            always rad) */
