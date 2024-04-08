@@ -1,5 +1,7 @@
 #include "handlers.h"
 
+#include <limits.h>
+
 #include "api.h"
 #include "consts.h"
 #include "document.h"
@@ -240,26 +242,29 @@ void DoKeyDown(EventRecord *event) {
    things that DoIdle does with idle time. */
 
 unsigned long GetSleep() {
-#if UNIVERSAL_INTERFACE
-  long sleep;
   WindowPtr window;
-  TEHandle te;
 
-  sleep = LONG_MAX; /* default value for sleep */
   if (!gInBackground) {
     window = FrontWindow(); /* and the front window is ours... */
     if (IsAppWindow(window)) {
-      te = ((DocumentPeek)(window))
-               ->docTE; /* and the selection is an insertion point... */
-      if ((*te)->selStart == (*te)->selEnd)
-        sleep = GetCaretTime(); /* blink time for the insertion point */
+      TwelfWinPtr twin = (TwelfWinPtr)window;
+      switch (twin->winType) {
+        case TwelfWinDocument: { /* and it's a proper document ... */
+          TEHandle te =
+              ((DocumentPeek)(window))
+                  ->docTE; /* and the selection is an insertion point... */
+          if ((*te)->selStart == (*te)->selEnd) {
+            return 250;  // GetCaretTime();
+          }
+        } break;
+        case TwelfWinAbout: {
+          return LONG_MAX;  // Is this correct?
+        } break;
+      }
     }
   }
-  return sleep;
-#else
-  return 0;
-#endif
-} /*GetSleep*/
+  return LONG_MAX;
+}
 
 /* This is called whenever we get a null event et al.
  It takes care of necessary periodic actions. For this program, it calls TEIdle.
