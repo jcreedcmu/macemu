@@ -23,4 +23,4 @@ void AdjustViewRect(TEHandle docTE) {
       (((te->viewRect.bottom - te->viewRect.top) / te->lineHeight) *
        te->lineHeight) +
       te->viewRect.top;
-} /*AdjustViewRect*/
+}

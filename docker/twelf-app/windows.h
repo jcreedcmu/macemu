@@ -6,6 +6,7 @@
 
 WindowPtr getOutputWindow();
 WindowPtr mkDocumentWindow(DocType docType);
+AboutPtr mkAboutWindow();
 void DoNew();
 Boolean IsAppWindow(WindowPtr window);
 Boolean IsDAWindow(WindowPtr window);

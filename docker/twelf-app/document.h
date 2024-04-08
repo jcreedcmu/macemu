@@ -2,14 +2,19 @@
 
 #include "api.h"
 
+typedef enum { TwelfWinDocument, TwelfWinAbout } TwelfWinType;
 typedef enum { TwelfDocument, TwelfOutput } DocType;
 
-/* A DocumentRecord contains the WindowRecord for one of our document windows,
-   as well as the TEHandle for the text we are editing. Other document fields
-   can be added to this record as needed. For a similar example, see how the
-   Window Manager and Dialog Manager add fields after the GrafPort. */
+// All windows in this application should be of this type:
 typedef struct {
   WindowRecord docWindow;
+  TwelfWinType winType;
+} TwelfWinRecord, *TwelfWinPtr;
+
+// If winType == TwelfWinDocument, then assume all these fields exist:
+typedef struct {
+  WindowRecord window;
+  TwelfWinType winType;
   DocType docType;
   TEHandle docTE;
   ControlHandle docVScroll;
@@ -18,6 +23,16 @@ typedef struct {
   Boolean fsSpecSet;
   FSSpec fsSpec;
   Boolean dirty;
-} DocumentRecord, *DocumentPeek;
+} DocumentRecord, *DocumentPeek, *DocumentPtr;
 
-#define getDoc(window) ((DocumentPeek)(window))
+// If winType == TwelfWinAbout, then assume all these fields exist:
+typedef struct {
+  WindowRecord window;
+  TwelfWinType winType;
+  TEHandle te;
+  PicHandle pic;
+  Rect picRect;
+} AboutRecord, *AboutPtr;
+
+#define getDoc(window) ((DocumentPeek)(window))   // FIXME(safety): check tag
+#define getAboutDoc(window) ((AboutPtr)(window))  // FIXME(safety): check tag
