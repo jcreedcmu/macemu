@@ -242,7 +242,7 @@ unsigned long GetSleep() {
   sleep = LONG_MAX; /* default value for sleep */
   if (!gInBackground) {
     window = FrontWindow(); /* and the front window is ours... */
-    if (IsAppWindow(window)) {
+    if (IsAppWindow(window) || ((WindowPeek)window)->refCon == kAboutBoxRef) {
       /* te = ((DocumentPeek)(window)) */
       /*          ->docTE; /\* and the selection is an insertion point... *\/ */
       /* if ((*te)->selStart == (*te)->selEnd) */
