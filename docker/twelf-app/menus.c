@@ -377,6 +377,10 @@ void DoMenuCommand(long menuResult) {
           char *okStr = "%% OK %%";
           TEInsert(resp ? abortStr : okStr,
                    resp ? strlen(abortStr) : strlen(okStr), outDoc->docTE);
+          // Scroll to insertion point
+          TESelView(outDoc->docTE);
+          // Update scrollbars as necessary
+          AdjustScrollValues(outDoc, false);
           // I couldn't seem to get by with anything less than this, which
           // includes a whole EraseWindow. I tried just TEUpdate, I tried just
           // InvalRect, but when the output string grew shorter, it left
