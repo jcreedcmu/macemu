@@ -197,6 +197,16 @@ void AboutEventLoop() {
 }
 
 void ShowAboutBox() {
+  Ptr storage = NewPtr(sizeof(DocumentRecord));
+  WindowPtr window;
+  Rect windowRect;
+
+  SetRect(&windowRect, 3, 40, 403, 340);
+  window = NewWindow(storage, &windowRect, "\puntitled", true, documentProc,
+                     (WindowPtr)-1, true, kAboutBoxRef);
+}
+
+void NoShowAboutBox() {
   WindowPtr window;
   // should test for color availability
 
@@ -242,11 +252,13 @@ void ShowAboutBox() {
   OffsetRect(&picRect, 0, (WINDOW_HEIGHT - PIC_HEIGHT) / 2);
   DrawPicture(myPic, &picRect);
 
-  AboutEventLoop();
+  if (0) {
+    AboutEventLoop();
 
-  printf("disposing about window\r");
-  TEDispose(te);
-  DisposeWindow(window);
+    printf("disposing about window\r");
+    TEDispose(te);
+    DisposeWindow(window);
+  }
 
   // FIXME(memleak): Do we still need to dispose of the picture handle, the text
   // handle, the style handle?

@@ -143,6 +143,9 @@ Boolean DoCloseWindow(WindowPtr window) {
 
     DisposePtr((Ptr)window);
     gNumDocuments -= 1;
+  } else if (((WindowPeek)window)->refCon == kAboutBoxRef) {
+    CloseWindow(window);
+    DisposePtr((Ptr)window);
   }
   return true;
 } /*DoCloseWindow*/
