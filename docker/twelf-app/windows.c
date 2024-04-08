@@ -197,10 +197,22 @@ void AlertUser(short error) {
 
 void DrawWindow(WindowPtr window) {
   SetPort(window);
-  EraseRect(&window->portRect);
-  DrawControls(window);
-  DrawGrowIcon(window);
-  TEUpdate(&window->portRect, ((DocumentPeek)window)->docTE);
+  TwelfWinPtr twin = (TwelfWinPtr)window;
+  switch (twin->winType) {
+    case TwelfWinAbout: {
+      Rect r;
+      EraseRect(&window->portRect);
+      SetRect(&r, 20, 20, 80, 80);
+      ForeColor(redColor);
+      PaintRect(&r);
+    } break;
+    case TwelfWinDocument: {
+      EraseRect(&window->portRect);
+      DrawControls(window);
+      DrawGrowIcon(window);
+      TEUpdate(&window->portRect, ((DocumentPeek)window)->docTE);
+    } break;
+  }
 } /*DrawWindow*/
 
 /* Clean up the application and exit. We close all of the windows so that
