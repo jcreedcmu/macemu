@@ -238,15 +238,16 @@ void AlertUser(short error) {
 
 /* Draw the contents of an application window. */
 
-void DrawWindow(WindowPtr window) {
+void DrawWindow_(WindowPtr window, short depth) {
   SetPort(window);
   TwelfWinPtr twin = (TwelfWinPtr)window;
   switch (twin->winType) {
     case TwelfWinAbout: {
       AboutPtr adoc = getAboutDoc(window);
       EraseRect(&window->portRect);
-
-      DrawPicture(adoc->pic, &adoc->picRect);
+      if (depth > 1) {
+        DrawPicture(adoc->pic, &adoc->picRect);
+      }
       TEUpdate(&window->portRect, adoc->te);
     } break;
     case TwelfWinDocument: {
@@ -257,6 +258,15 @@ void DrawWindow(WindowPtr window) {
       TEUpdate(&window->portRect, doc->docTE);
     } break;
   }
+}
+
+pascal void DrawWindowWrap(short depth, short flags, GDHandle device,
+                           long userData) {
+  DrawWindow_((WindowPtr)userData, depth);
+}
+
+void DrawWindow(WindowPtr window) {
+  DeviceLoop(window->visRgn, DrawWindowWrap, (long)(window), 0);
 }
 
 void Terminate() {

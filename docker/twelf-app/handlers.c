@@ -112,12 +112,13 @@ void GetLocalUpdateRgn(WindowPtr window, RgnHandle localRgn) {
 
 void DoUpdate(WindowPtr window) {
   if (IsAppWindow(window)) {
-    BeginUpdate(window);           /* this sets up the visRgn */
-    if (!EmptyRgn(window->visRgn)) /* draw if updating needs to be done */
+    BeginUpdate(window);             /* this sets up the visRgn */
+    if (!EmptyRgn(window->visRgn)) { /* draw if updating needs to be done */
       DrawWindow(window);
+    }
     EndUpdate(window);
   }
-} /*DoUpdate*/
+}
 
 /*	This is called when a window is activated or deactivated.
         It calls TextEdit to deal with the selection. */

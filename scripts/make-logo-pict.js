@@ -52,6 +52,14 @@ function fgColor(r, g, b) {
   return [...wordBytes(0x001a), r, r, g, g, b, b];
 }
 
+function bgColor(r, g, b) {
+  return [...wordBytes(0x001b), r, r, g, g, b, b];
+}
+
+function fgPat(...patBytes) { // expects 8 bytes
+  return [...fgColor(0,0,0), ...bgColor(0xff, 0xff, 0xff), ...wordBytes(0x000a), ...patBytes];
+}
+
 function clipRect(rect) {
   return [...wordBytes(0x0001), ...rectRegionBytes(rect)];
 }
@@ -98,68 +106,89 @@ function getPolys(layer, ix) {
   }));
 }
 
-const polyData = [];
+function getPolyData(config) {
+  const polyData = [];
 
-// legs
+  // legs
 
-for (const feature of layer1.features.slice(6,8)) {
-  polyData.push(...fgColor(0, 0, 0));
+  polyData.push(...fgPat(0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff));
+  for (const feature of layer1.features.slice(6,8)) {
+	 polyData.push(...fgColor(0, 0, 0));
 	 polyData.push(...fillPoly(convertPts(feature.geometry.coordinates[0])));
-  polyData.push(...fgColor(0xff, 0xff, 0xff));
-  for (const cutout of feature.geometry.coordinates.slice(1)) {
-	 polyData.push(...fillPoly(convertPts(cutout)));
+	 polyData.push(...fgColor(0xff, 0xff, 0xff));
+	 for (const cutout of feature.geometry.coordinates.slice(1)) {
+		polyData.push(...fillPoly(convertPts(cutout)));
+	 }
   }
+
+  // hat and shorts
+
+  polyData.push(...config.darkGreen);
+  polyData.push(...fillPoly(convertPts(layer2.features[0].geometry.coordinates[0])));
+  polyData.push(...fillPoly(convertPts(layer2.features[1].geometry.coordinates[0])));
+  polyData.push(...config.lightGreen);
+  polyData.push(...fillPoly(convertPts(layer2.features[0].geometry.coordinates[1])));
+  polyData.push(...fillPoly(convertPts(layer2.features[1].geometry.coordinates[1])));
+  polyData.push(...fgColor(0xff, 0xff, 0xff));
+  polyData.push(...fillPoly(convertPts(layer2.features[0].geometry.coordinates[2])));
+
+  // sign and letters
+
+  polyData.push(...fgPat(0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff));
+  for (const feature of layer1.features.slice(0,6)) {
+	 polyData.push(...fgColor(0, 0, 0));
+	 polyData.push(...fillPoly(convertPts(feature.geometry.coordinates[0])));
+	 polyData.push(...fgColor(0xff, 0xff, 0xff));
+	 for (const cutout of feature.geometry.coordinates.slice(1)) {
+		polyData.push(...fillPoly(convertPts(cutout)));
+	 }
+  }
+  return polyData;
 }
 
-// hat and shorts
+function imageBytes(config) {
+  const image = [
+	 ...defHilite(),
+	 ...clipRect(boundRect),
 
-polyData.push(...fgColor(0x0a, 0x30, 0x09));
-polyData.push(...fillPoly(convertPts(layer2.features[0].geometry.coordinates[0])));
-polyData.push(...fillPoly(convertPts(layer2.features[1].geometry.coordinates[0])));
-polyData.push(...fgColor(0x66, 0x99, 0x66));
-polyData.push(...fillPoly(convertPts(layer2.features[0].geometry.coordinates[1])));
-polyData.push(...fillPoly(convertPts(layer2.features[1].geometry.coordinates[1])));
-polyData.push(...fgColor(0xff, 0xff, 0xff));
-polyData.push(...fillPoly(convertPts(layer2.features[0].geometry.coordinates[2])));
+	 ...getPolyData(config),
 
-// sign and letters
+	 ...endPict(),
+  ]
 
-for (const feature of layer1.features.slice(0,6)) {
-  polyData.push(...fgColor(0, 0, 0));
-	 polyData.push(...fillPoly(convertPts(feature.geometry.coordinates[0])));
-  polyData.push(...fgColor(0xff, 0xff, 0xff));
-  for (const cutout of feature.geometry.coordinates.slice(1)) {
-	 polyData.push(...fillPoly(convertPts(cutout)));
-  }
+  const imageWithHeader = [
+	 ...header,
+	 ...image,
+  ];
+
+  const imageRezBytes = [
+	 ...wordBytes(
+		2 + /* length of this length field */
+		8 + /* length of bounding Rect */
+		imageWithHeader.length),
+	 ...rectBytes(boundRect),
+	 ...imageWithHeader
+  ];
+
+  return imageRezBytes;
 }
 
-const image = [
-  ...defHilite(),
-  ...clipRect(boundRect),
+const configColor = {
+  lightGreen: fgColor(0x66, 0x99, 0x66),
+  darkGreen: fgColor(0x0a, 0x30, 0x09),
+};
 
-  // ...fgColor(0xee, 0xee, 0xee),
-  // ...fillRect(boundRect),
-
-  ...polyData,
-
-  ...endPict(),
-]
-
-const imageWithHeader = [
-  ...header,
-  ...image,
-];
-
-const imageRezBytes = [
-  ...wordBytes(
-	 2 + /* length of this length field */
-	 8 + /* length of bounding Rect */
-	 imageWithHeader.length),
-  ...rectBytes(boundRect),
-  ...imageWithHeader
-];
+const configBw = {
+  lightGreen: fgPat(0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa, 0x55, 0xaa),
+  darkGreen: fgPat(0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff),
+};
 
 console.log(`
 data 'PICT' (rAboutPict, purgeable) {
-  ${rezOfBytes(imageRezBytes).replace(/ \$/g, '\n $')}
-};`);
+  ${rezOfBytes(imageBytes(configColor)).replace(/ \$/g, '\n $')}
+};
+
+data 'PICT' (rAboutPict+1, purgeable) {
+  ${rezOfBytes(imageBytes(configBw)).replace(/ \$/g, '\n $')}
+};
+`);
