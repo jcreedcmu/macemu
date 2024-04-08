@@ -197,12 +197,11 @@ void AboutEventLoop() {
 }
 
 void ShowAboutBox() {
-  Ptr storage = NewPtr(sizeof(DocumentRecord));
   WindowPtr window;
   Rect windowRect;
 
   SetRect(&windowRect, 3, 40, 403, 340);
-  window = NewWindow(storage, &windowRect, "\puntitled", true, documentProc,
+  window = NewWindow(NULL, &windowRect, "\puntitled", true, documentProc,
                      (WindowPtr)-1, true, kAboutBoxRef);
 }
 
