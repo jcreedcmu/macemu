@@ -128,6 +128,76 @@ void DoAboutIdle() {
   // Nothing for now, maybe do some kind of animation?
 }
 
+void DoAboutEvent(EventRecord *event, Boolean *running) {
+  short part, err;
+  WindowPtr window;
+  char key;
+  Point aPoint;
+  // printf("DoAboutEvent %d\r", event->what);
+  switch (event->what) {
+    case nullEvent:
+      DoAboutIdle();
+      break;
+    case mouseDown:  // fallthrough intentional
+    case keyDown:    // fallthrough intentional
+    case autoKey:
+      *running = false;
+      break;
+    case activateEvt:
+      break;
+    case updateEvt:
+      break;
+    case diskEvt:
+
+      if (HiWord(event->message) != noErr) {
+        SetPt(&aPoint, kDILeft, kDITop);
+        err = DIBadMount(aPoint, event->message);
+      }
+
+      break;
+    case kHighLevelEvent:
+      DoEvent(event);
+      running = false;
+      break;
+    case kOSEvent:
+      /*	1.02 - must BitAND with 0x0FF to get only low byte */
+      switch ((event->message >> 24) & 0x0FF) { /* high byte of message */
+        case kMouseMovedMessage:
+          DoAboutIdle(); /* mouse-moved is also an idle event */
+          break;
+        case kSuspendResumeMessage:
+          running = false;
+          gInBackground = (event->message & kResumeMask) == 0;
+          DoActivate(FrontWindow(), !gInBackground);
+          break;
+      }
+      break;
+  }
+}
+
+void AboutEventLoop() {
+  RgnHandle cursorRgn;
+  Boolean gotEvent;
+  EventRecord event;
+  Boolean running = true;
+
+  cursorRgn = NewRgn();
+  do {
+    if (gHasWaitNextEvent) {
+      //      printf("about to wait next event\r");
+      gotEvent = WaitNextEvent(everyEvent, &event, GetSleep(), cursorRgn);
+      // printf("gotEvent %d\r", gotEvent);
+    } else {
+      SystemTask();
+      gotEvent = GetNextEvent(everyEvent, &event);
+    }
+    if (gotEvent) {
+      DoAboutEvent(&event, &running);
+    } else
+      DoAboutIdle();
+  } while (running);
+}
+
 void ShowAboutBox() {
   WindowPtr window;
   // should test for color availability
@@ -174,63 +244,7 @@ void ShowAboutBox() {
   OffsetRect(&picRect, 0, (WINDOW_HEIGHT - PIC_HEIGHT) / 2);
   DrawPicture(myPic, &picRect);
 
-  // Do we have an event?
-  Boolean gotEvent;
-
-  // Do we want to fall back to the usual event
-  // handler for this event?
-  Boolean doLastEvent = false;
-
-  // Ought we still process events in the about box context?
-  Boolean running = true;
-
-  EventRecord event;
-  while (running) {
-    SystemTask();
-    gotEvent = GetNextEvent(everyEvent, &event);
-    if (gotEvent) {
-      // printf("about got event %d\r", event.what);
-      switch (event.what) {
-        case nullEvent:
-          DoAboutIdle();
-          break;
-        case mouseDown:  // fallthrough intentional
-        case keyDown:
-          printf("stopped %d\r", event.what);
-          running = false;
-          break;
-        case activateEvt:
-          // assuming this is the about window itself, not sure if that's a safe
-          // assumption
-          break;
-        case updateEvt:
-          // assuming this is the about window itself, not sure if that's a safe
-          // assumption
-          break;
-        case diskEvt:
-          break;
-        case kOSEvent:
-          switch ((event.message >> 24) & 0x0FF) {
-            case kMouseMovedMessage:
-              DoAboutIdle();
-              break;
-            default:
-              printf("stopped OSEvent %d\r", event.what);
-              doLastEvent = true;
-              running = false;
-              break;
-          }
-          break;
-        default:
-          printf("stopped default %d\r", event.what);
-          doLastEvent = true;
-          running = false;
-          break;
-      }
-    } else {
-      DoAboutIdle();
-    }
-  }
+  AboutEventLoop();
 
   printf("disposing about window\r");
   TEDispose(te);
@@ -238,10 +252,6 @@ void ShowAboutBox() {
 
   // FIXME(memleak): Do we still need to dispose of the picture handle, the text
   // handle, the style handle?
-
-  if (doLastEvent) {
-    DoEvent(&event);
-  }
 }
 
 /*	This is called when an item is chosen from the menu bar (after calling

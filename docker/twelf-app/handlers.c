@@ -1,5 +1,7 @@
 #include "handlers.h"
 
+#include <limits.h>
+
 #include "api.h"
 #include "consts.h"
 #include "document.h"
@@ -233,7 +235,6 @@ void DoKeyDown(EventRecord *event) {
    things that DoIdle does with idle time. */
 
 unsigned long GetSleep() {
-#if UNIVERSAL_INTERFACE
   long sleep;
   WindowPtr window;
   TEHandle te;
@@ -242,16 +243,13 @@ unsigned long GetSleep() {
   if (!gInBackground) {
     window = FrontWindow(); /* and the front window is ours... */
     if (IsAppWindow(window)) {
-      te = ((DocumentPeek)(window))
-               ->docTE; /* and the selection is an insertion point... */
-      if ((*te)->selStart == (*te)->selEnd)
-        sleep = GetCaretTime(); /* blink time for the insertion point */
+      /* te = ((DocumentPeek)(window)) */
+      /*          ->docTE; /\* and the selection is an insertion point... *\/ */
+      /* if ((*te)->selStart == (*te)->selEnd) */
+      sleep = 250; /* blink time for the insertion point */
     }
   }
   return sleep;
-#else
-  return 0;
-#endif
 } /*GetSleep*/
 
 /* This is called whenever we get a null event et al.
