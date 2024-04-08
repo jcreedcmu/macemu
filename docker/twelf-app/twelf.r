@@ -192,11 +192,17 @@ data 'TEXT' (rAboutText) {
     "About Twelf\r\r"
     "Twelf is a research project concerned with the design, implementation, "
     "and application of logical frameworks funded by the National Science "
-    "Foundation under grants CCR-9619584 and CCR-9988281 Meta-Logical Frameworks, "
-    "CCR-0306313 Efficient Logical Frameworks (Principal Investigator: Frank Pfenning) "
-    "and by DARPA under the contract number F196268-95-C-0050 The Fox Project: Advanced "
-    " Languages for Systems Software (Principal Investigators: Robert Harper, Peter "
-	 "Lee, and Frank Pfenning)."
+    "Foundation under grants \r"
+	 "\245 CCR-9619584, CCR-9988281 Meta-Logical Frameworks\r"
+    "\245 CCR-0306313 Efficient Logical Frameworks (PI: Frank Pfenning)\r"
+    "\245 DARPA contract F196268-95-C-0050 The Fox Project: Advanced "
+    "Languages for Systems Software (PIs: Robert Harper, Peter "
+	 "Lee, and Frank Pfenning).\r\r"
+	 "Classic Mac interface by Adam Goode & Jason Reed\r"
+	 "MPW sample code \251 1989, 1994-1995 Apple Computer, Inc. "
+	 "with modifications by Cam Henlin\r"
+	 "Retro68 sample code \251 2017 Wolfgang Thaller\r\r"
+	 "See LICENSE for more details."
 };
 
 // Close confirm dialog. XXX should it be an ALRT instead?
@@ -220,15 +226,6 @@ resource 'DITL' (rCloseConfirm) {
 		{ 10, 20, 42, 52 }, Icon { disabled, 2 };
 		{ 10, 72, 76, 344 },	StaticText { enabled, "Save changes to the document \"^0\" before closing?" };
 	}
-};
-
-// About box
-resource 'WIND' (rAboutBoxWindow) {
-    {0, 0, 220, 400 + 260}, altDBoxProc;
-    invisible;
-    noGoAway;
-    0, "";
-    noAutoCenter;
 };
 
 #include "icon.r"

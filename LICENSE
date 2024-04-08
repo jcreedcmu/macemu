@@ -1,6 +1,6 @@
 The main body of code in this respository is:
 
-© 2024 Jason Reed
+© 2024 Adam Goode, Jason Reed
 
 Redistribution and use in source and binary forms, with or without
 modification, are permitted provided that the following conditions are
@@ -31,3 +31,9 @@ Any remaining sample code from TESample.c and associated files from
 the MPW C example directory is:
 
      Copyright © 1989, 1994-95 Apple Computer, Inc.
+
+with modifications by Cam Henlin.
+(https://github.com/CamHenlin/TESample/)
+
+Retro68 sample code ©2017 Wolfgang Thaller
+(https://github.com/autc04/Retro68/)
