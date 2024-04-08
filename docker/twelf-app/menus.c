@@ -136,7 +136,7 @@ void DoAboutEvent(EventRecord *event, Boolean *running) {
   // printf("DoAboutEvent %d\r", event->what);
   switch (event->what) {
     case nullEvent:
-      DoAboutIdle();
+      DoIdle();
       break;
     case mouseDown:  // fallthrough intentional
     case keyDown:    // fallthrough intentional
@@ -163,7 +163,7 @@ void DoAboutEvent(EventRecord *event, Boolean *running) {
       /*	1.02 - must BitAND with 0x0FF to get only low byte */
       switch ((event->message >> 24) & 0x0FF) { /* high byte of message */
         case kMouseMovedMessage:
-          DoAboutIdle(); /* mouse-moved is also an idle event */
+          DoIdle(); /* mouse-moved is also an idle event */
           break;
         case kSuspendResumeMessage:
           running = false;
@@ -184,9 +184,7 @@ void AboutEventLoop() {
   cursorRgn = NewRgn();
   do {
     if (gHasWaitNextEvent) {
-      //      printf("about to wait next event\r");
-      gotEvent = WaitNextEvent(everyEvent, &event, GetSleep(), cursorRgn);
-      // printf("gotEvent %d\r", gotEvent);
+      gotEvent = WaitNextEvent(everyEvent, &event, 250, cursorRgn);
     } else {
       SystemTask();
       gotEvent = GetNextEvent(everyEvent, &event);
@@ -194,7 +192,7 @@ void AboutEventLoop() {
     if (gotEvent) {
       DoAboutEvent(&event, &running);
     } else
-      DoAboutIdle();
+      DoIdle();
   } while (running);
 }
 
@@ -213,7 +211,7 @@ void ShowAboutBox() {
 
   SetRect(&aboutWindowRect, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
   window = NewCWindow(NULL, &aboutWindowRect, "\pAbout Twelf", false,
-                      altDBoxProc, (WindowPtr)-1, false, 0);
+                      altDBoxProc, (WindowPtr)-1, false, kAboutBoxRef);
 
   MoveWindow(
       window, qd.screenBits.bounds.right / 2 - window->portRect.right / 2,

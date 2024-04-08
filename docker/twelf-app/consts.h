@@ -114,3 +114,7 @@
 #define eNoWindow 9
 #define eExceedChar 10
 #define eNoPaste 11
+
+/* Put this in the ->refCon of the about box to keep it from behaving like a
+ * real window */
+#define kAboutBoxRef 1234

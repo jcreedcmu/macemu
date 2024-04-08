@@ -158,6 +158,9 @@ Boolean IsAppWindow(WindowPtr window) {
   if (window == nil)
     return false;
   else { /* application windows have windowKinds = userKind (8) */
+    if (((WindowPeek)window)->refCon == kAboutBoxRef) {
+      return false;
+    }
     windowKind = ((WindowPeek)window)->windowKind;
     return (windowKind == userKind);
   }
