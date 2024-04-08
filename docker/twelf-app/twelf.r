@@ -205,6 +205,46 @@ data 'TEXT' (rAboutText) {
 	 "See LICENSE for more details."
 };
 
+type 'styl'
+{
+ integer = $$CountOf(runs);
+ array runs {
+    longint; // beginning of run
+    unsigned integer; // line height
+    unsigned integer; // ascent
+    integer chicago = 0,
+				applFont = 1,
+				newYork = 2,
+				geneva = 3,
+				monaco = 4,
+				venice = 5,
+				london = 6,
+				athens = 7,
+				sanFran = 8,
+				toronto = 9,
+				cairo = 11,
+				losAngeles = 12,
+				times = 20,
+				helvetica = 21,
+				courier = 22,
+				symbol = 23;
+     hex byte bold = 0x01, italic = 0x02, underline = 0x04, outline = 0x08,
+              shadow = 0x10, condensed = 0x20, expanded = 0x40;
+     fill byte;
+     unsigned integer; // fontSize
+     unsigned integer; // red
+     unsigned integer; // green
+     unsigned integer; // blue
+ };
+};
+
+resource 'styl' (rAboutText) {
+  {
+    0x0000, 0x20, 0x18, monaco, 0, 0x18, 0, 0, 0;
+    0x000B, 0x10, 0x0C, geneva, 0, 0x0C, 0, 0, 0;
+  }
+};
+
 // Close confirm dialog. XXX should it be an ALRT instead?
 
 resource 'DLOG' (rCloseConfirm) {

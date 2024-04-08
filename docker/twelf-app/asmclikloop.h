@@ -11,6 +11,10 @@ selection-drag-scrolling, so that we can update the scrollbar position.
 The reason why it is in assembly is that the required calling
 convention requires exact register control.
 
+(See the section entitled "Macintosh SetClikLoop procedure and TERec
+clikLoop field" in the tech note
+https://developer.apple.com/library/archive/technotes/te/te_525.html#//apple_ref/doc/uid/DTS10002840)
+
 The reason why it is in an external assembly file and not
 something like
 ```

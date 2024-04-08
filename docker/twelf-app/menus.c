@@ -134,7 +134,14 @@ void ShowAboutBox() {
 
   // About box
   Rect aboutWindowRect;
-  SetRect(&aboutWindowRect, 0, 0, 400 + 258, 310);
+
+  // original pic size 515x431
+  int PIC_WIDTH = 258;
+  int PIC_HEIGHT = 216;
+  int WINDOW_HEIGHT = 310;
+  int WINDOW_WIDTH = 400 + PIC_WIDTH;
+
+  SetRect(&aboutWindowRect, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
   window = NewCWindow(NULL, &aboutWindowRect, "\pAbout Twelf", false,
                       altDBoxProc, (WindowPtr)-1, false, 0);
 
@@ -144,22 +151,27 @@ void ShowAboutBox() {
   ShowWindow(window);
   SetPort(window);
 
-  Handle h = GetResource('TEXT', rAboutText);
-  HLock(h);
+  Handle txtHndl = GetResource('TEXT', rAboutText);
+  Handle stylHndl = GetResource('styl', rAboutText);
+
+  HLock(txtHndl);
+  HLock(stylHndl);
   Rect r = window->portRect;
   r.left += 260;
   InsetRect(&r, 10, 10);
-  TETextBox(*h, GetHandleSize(h), &r, teJustLeft);
-  ReleaseResource(h);
+  TEHandle te = TEStyleNew(&r, &r);
+  TEStyleInsert(*txtHndl, GetHandleSize(txtHndl), (StScrpHandle)stylHndl, te);
+  ReleaseResource(stylHndl);
+  ReleaseResource(txtHndl);
 
   PicHandle myPic = GetPicture(rAboutPict);
 
   Rect picRect;
-  // original size 515x431
-  SetRect(&picRect, 0, 0, 258, 216);
+  SetRect(&picRect, 0, 0, PIC_WIDTH, PIC_HEIGHT);
   InsetRect(
       &picRect, 10,
       10);  // This doesn't exactly preserve aspect ratio, but close enough
+  OffsetRect(&picRect, 0, (WINDOW_HEIGHT - PIC_HEIGHT) / 2);
   DrawPicture(myPic, &picRect);
 
   // Do we have an event?
@@ -177,7 +189,7 @@ void ShowAboutBox() {
     SystemTask();
     gotEvent = GetNextEvent(everyEvent, &event);
     if (gotEvent) {
-      printf("about got event %d\r", event.what);
+      // printf("about got event %d\r", event.what);
       switch (event.what) {
         case nullEvent:
           DoAboutIdle();
@@ -221,7 +233,11 @@ void ShowAboutBox() {
   }
 
   printf("disposing about window\r");
+  TEDispose(te);
   DisposeWindow(window);
+
+  // FIXME(memleak): Do we still need to dispose of the picture handle, the text
+  // handle, the style handle?
 
   if (doLastEvent) {
     DoEvent(&event);
