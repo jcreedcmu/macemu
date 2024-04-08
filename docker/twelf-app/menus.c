@@ -31,18 +31,43 @@ void AdjustFileMenu() {
     DisableItem(menu, iOpen);
   }
 
+  Boolean closeEnabled = false;
+  Boolean saveEnabled = false;
+  Boolean saveAsEnabled = false;
+
   if (window != nil) {
-    EnableItem(menu, iClose);
-    EnableItem(menu, iSaveAs);
-    DocumentPeek doc = getDoc(window);
-    if (doc->fsSpecSet && doc->dirty) {
-      EnableItem(menu, iSave);  // also Revert?
-    } else {
-      DisableItem(menu, iSave);
+    closeEnabled = true;
+    if (IsAppWindow(window)) {
+      TwelfWinPtr twin = (TwelfWinPtr)window;
+      switch (twin->winType) {
+        case TwelfWinDocument: {
+          DocumentPeek doc = getDoc(window);
+          saveAsEnabled = true;
+          if (doc->fsSpecSet && doc->dirty) {
+            saveEnabled = true;  // maybe also revert?
+          }
+        } break;
+        case TwelfWinAbout: {
+        } break;
+      }
     }
+  }
+
+  if (closeEnabled) {
+    EnableItem(menu, iClose);
   } else {
     DisableItem(menu, iClose);
+  }
+
+  if (saveEnabled) {
+    EnableItem(menu, iSave);
+  } else {
     DisableItem(menu, iSave);
+  }
+
+  if (saveAsEnabled) {
+    EnableItem(menu, iSaveAs);
+  } else {
     DisableItem(menu, iSaveAs);
   }
 
@@ -63,13 +88,23 @@ void AdjustEditMenu() {
     cutCopyClear = true;
     paste = true;
   } else if (IsAppWindow(window)) {
-    selectAll = true;
-    TEHandle te = getDoc(window)->docTE;
-    if ((*te)->selStart < (*te)->selEnd) cutCopyClear = true;
-    /* Cut, Copy, and Clear is enabled for app. windows with selections */
-    long offset;
-    if (GetScrap(nil, 'TEXT', &offset) > 0)
-      paste = true; /* if there's any text in the clipboard, paste is enabled */
+    TwelfWinPtr twin = (TwelfWinPtr)window;
+    switch (twin->winType) {
+      case TwelfWinDocument: {
+        DocumentPtr doc = getDoc(window);
+        selectAll = true;
+        TEHandle te = doc->docTE;
+        if ((*te)->selStart < (*te)->selEnd) cutCopyClear = true;
+        /* Cut, Copy, and Clear is enabled for app. windows with selections */
+        long offset;
+        if (GetScrap(nil, 'TEXT', &offset) > 0)
+          paste =
+              true; /* if there's any text in the clipboard, paste is enabled */
+
+      } break;
+      case TwelfWinAbout: {
+      } break;
+    }
   }
   if (undo)
     EnableItem(menu, iUndo);
@@ -99,7 +134,23 @@ void AdjustSignatureMenu() {
   WindowPtr window = FrontWindow();
   MenuHandle menu = GetMenuHandle(mSignature);
 
-  if (window != nil) {
+  Boolean enabled = false;
+
+  if (IsAppWindow(window)) {
+    TwelfWinPtr twin = (TwelfWinPtr)window;
+    switch (twin->winType) {
+      case TwelfWinDocument: {
+        DocumentPtr doc = getDoc(window);
+        if (doc->docType == TwelfDocument) {
+          enabled = true;
+        }
+      } break;
+      case TwelfWinAbout: {
+      } break;
+    }
+  }
+
+  if (enabled) {
     EnableItem(menu, iEval);
     // EnableItem(menu, iEvalUnsafe);
   } else {
@@ -253,6 +304,9 @@ void NoShowAboutBox() {
 /*	This is called when an item is chosen from the menu bar (after calling
         MenuSelect or MenuKey). It does the right thing for each command. */
 
+// FIXME(safety): There may be some subtle assumptions about menu
+// items having been enabled only if they're applicable to the front
+// window. Probably should have getDoc do some more tag checking at runtime.
 void DoMenuCommand(long menuResult) {
   short menuID, menuItem;
   short itemHit, daRefNum;
