@@ -5,6 +5,7 @@
 #include "api.h"
 #include "asmclikloop.h"
 #include "consts.h"
+#include "dialogs.h"
 #include "document.h"
 #include "global-state.h"
 #include "resource-consts.h"
@@ -256,22 +257,19 @@ void DrawWindow(WindowPtr window) {
       TEUpdate(&window->portRect, doc->docTE);
     } break;
   }
-} /*DrawWindow*/
-
-/* Clean up the application and exit. We close all of the windows so that
- they can update their documents, if any. */
-
-/*	1.01 - If we find out that a cancel has occurred, we won't exit to the
-        shell, but will return instead. */
+}
 
 void Terminate() {
-  WindowPtr aWindow;
-  Boolean closed;
-
-  closed = true;
   do {
-    aWindow = FrontWindow(); /* get the current front window */
-    if (aWindow != nil) closed = DoCloseWindow(aWindow); /* close this window */
-  } while (closed && (aWindow != nil));
-  if (closed) ExitToShell(); /* exit if no cancellation */
-} /*Terminate*/
+    WindowPtr window = FrontWindow(); /* get the current front window */
+    if (window == nil) {
+      break;
+    }
+    if (!(closeConfirmForWin(window) && DoCloseWindow(window))) {
+      /* cancelled, don't terminate anymore */
+      return;
+    }
+  } while (1);
+
+  gRunning = false;
+}

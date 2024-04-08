@@ -49,7 +49,10 @@ pascal OSErr handleAEOpenApplication(AppleEvent *msg, AppleEvent *reply,
 }
 
 pascal OSErr handleAEQuit(AppleEvent *msg, AppleEvent *reply, long refCon) {
-  gRunning = false;
+  // This has the effect of setting gRunning to false, not really
+  // calling ExitToShell() yet.
+  Terminate();
+
   return noErr;
 }
 
