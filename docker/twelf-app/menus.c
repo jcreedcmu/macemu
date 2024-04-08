@@ -177,7 +177,7 @@ void DoOpen() {
 
 void ShowAboutBox() {
   if (gAboutWindow != NULL) {
-    // FIXME(about): bring window to front
+    BringToFront(gAboutWindow);
     return;
   }
 

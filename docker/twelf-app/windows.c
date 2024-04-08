@@ -22,7 +22,8 @@ WindowPtr getOutputWindow() {
 }
 
 AboutPtr mkAboutWindow(Rect *windowRect) {
-  // caller is responsible for positioning and showing the window
+  // We assume the input rect gives the appropriate size, but caller
+  // is responsible for positioning and showing the window
 
   Ptr storage = NewPtr(sizeof(AboutRecord));
   if (storage == nil) return nil;
