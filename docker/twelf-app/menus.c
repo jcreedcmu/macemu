@@ -176,11 +176,10 @@ void DoOpen() {
 }
 
 void ShowAboutBox() {
-  WindowPtr window = mkDocumentWindow(TwelfDocument);
-  ((TwelfWinPtr)window)->winType = TwelfWinAbout;
-
-  // About box
-  Rect aboutWindowRect;
+  if (gAboutWindow != NULL) {
+    // FIXME(about): bring window to front
+    return;
+  }
 
   // original pic size 515x431
   int PIC_WIDTH = 258;
@@ -188,32 +187,12 @@ void ShowAboutBox() {
   int WINDOW_HEIGHT = 310;
   int WINDOW_WIDTH = 400 + PIC_WIDTH;
 
-  /* SetRect(&aboutWindowRect, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT); */
-  /* WindowPtr window = NewCWindow(NULL, &aboutWindowRect, "\pAbout Twelf",
-   * false, */
-  /*                               altDBoxProc, (WindowPtr)-1, false, 0); */
+  Rect windowRect;
+  SetRect(&windowRect, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-  SizeWindow(window, WINDOW_WIDTH, WINDOW_HEIGHT, false);
-  MoveWindow(
-      window, qd.screenBits.bounds.right / 2 - window->portRect.right / 2,
-      qd.screenBits.bounds.bottom / 2 - window->portRect.bottom / 2, false);
-  ShowWindow(window);
-  SetPort(window);
-
-  Handle txtHndl = GetResource('TEXT', rAboutText);
-  Handle stylHndl = GetResource('styl', rAboutText);
-
-  HLock(txtHndl);
-  HLock(stylHndl);
-  Rect r = window->portRect;
-  r.left += 260;
-  InsetRect(&r, 10, 10);
-  TEHandle te = TEStyleNew(&r, &r);
-  TEStyleInsert(*txtHndl, GetHandleSize(txtHndl), (StScrpHandle)stylHndl, te);
-  ReleaseResource(stylHndl);
-  ReleaseResource(txtHndl);
-
-  PicHandle myPic = GetPicture(rAboutPict);
+  AboutPtr adoc = mkAboutWindow(&windowRect);
+  WindowPtr window = (WindowPtr)(&adoc->window);
+  gAboutWindow = window;
 
   Rect picRect;
   SetRect(&picRect, 0, 0, PIC_WIDTH, PIC_HEIGHT);
@@ -221,7 +200,13 @@ void ShowAboutBox() {
       &picRect, 10,
       10);  // This doesn't exactly preserve aspect ratio, but close enough
   OffsetRect(&picRect, 0, (WINDOW_HEIGHT - PIC_HEIGHT) / 2);
-  DrawPicture(myPic, &picRect);
+  adoc->picRect = picRect;
+
+  SizeWindow(window, WINDOW_WIDTH, WINDOW_HEIGHT, false);
+  MoveWindow(
+      window, qd.screenBits.bounds.right / 2 - window->portRect.right / 2,
+      qd.screenBits.bounds.bottom / 2 - window->portRect.bottom / 2, false);
+  ShowWindow(window);
 }
 
 /*	This is called when an item is chosen from the menu bar (after calling

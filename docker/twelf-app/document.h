@@ -25,4 +25,14 @@ typedef struct {
   Boolean dirty;
 } DocumentRecord, *DocumentPeek, *DocumentPtr;
 
-#define getDoc(window) ((DocumentPeek)(window))
+// If winType == TwelfWinAbout, then assume all these fields exist:
+typedef struct {
+  WindowRecord window;
+  TwelfWinType winType;
+  TEHandle te;
+  PicHandle pic;
+  Rect picRect;
+} AboutRecord, *AboutPtr;
+
+#define getDoc(window) ((DocumentPeek)(window))   // FIXME(safety): check tag
+#define getAboutDoc(window) ((AboutPtr)(window))  // FIXME(safety): check tag

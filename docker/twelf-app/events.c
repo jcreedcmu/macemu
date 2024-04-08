@@ -58,7 +58,7 @@ void DoEvent(EventRecord *event) {
           break;
         case inGoAway: {
           if (TrackGoAway(window, event->where)) {
-            if (closeConfirmForDoc(getDoc(window))) {
+            if (closeConfirmForWin(window)) {
               DoCloseWindow(window);
             }
           }

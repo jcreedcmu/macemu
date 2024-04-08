@@ -21,6 +21,46 @@ WindowPtr getOutputWindow() {
   return gOutputWindow;
 }
 
+AboutPtr mkAboutWindow(Rect *windowRect) {
+  // caller is responsible for positioning and showing the window
+
+  Ptr storage = NewPtr(sizeof(AboutRecord));
+  if (storage == nil) return nil;
+
+  Rect rfake;
+  WindowPtr window = NewCWindow(storage, windowRect, "\pAbout Twelf\311", false,
+                                documentProc, (WindowPtr)-1, true, 0);
+
+  if (window == nil) {
+    DisposePtr(storage);
+    return nil;
+  }
+
+  SetPort(window);  // I think this is necessary at this stage for associating
+                    // the TE correctly
+
+  AboutPtr adoc = (AboutPtr)window;
+
+  adoc->winType = TwelfWinAbout;
+
+  Handle txtHndl = GetResource('TEXT', rAboutText);   // FIXME(leak): dispose?
+  Handle stylHndl = GetResource('styl', rAboutText);  // FIXME(leak): dispose?
+  adoc->pic = GetPicture(rAboutPict);                 // FIXME(leak): dispose?
+
+  HLock(txtHndl);
+  HLock(stylHndl);
+  Rect r = *windowRect;
+  r.left += 260;
+  InsetRect(&r, 10, 10);
+  adoc->te = TEStyleNew(&r, &r);  // FIXME(leak): dispose?
+  TEStyleInsert(*txtHndl, GetHandleSize(txtHndl), (StScrpHandle)stylHndl,
+                adoc->te);
+  ReleaseResource(stylHndl);
+  ReleaseResource(txtHndl);
+
+  return adoc;
+}
+
 // FIXME(safety): should return DocumentPtr
 WindowPtr mkDocumentWindow(DocType docType) {
   Boolean good;
@@ -201,11 +241,11 @@ void DrawWindow(WindowPtr window) {
   TwelfWinPtr twin = (TwelfWinPtr)window;
   switch (twin->winType) {
     case TwelfWinAbout: {
-      /* Rect r; */
-      /* EraseRect(&window->portRect); */
-      /* SetRect(&r, 20, 20, 80, 80); */
-      /* ForeColor(redColor); */
-      /* PaintRect(&r); */
+      AboutPtr adoc = getAboutDoc(window);
+      EraseRect(&window->portRect);
+
+      DrawPicture(adoc->pic, &adoc->picRect);
+      TEUpdate(&window->portRect, adoc->te);
     } break;
     case TwelfWinDocument: {
       DocumentPtr doc = getDoc(window);
