@@ -10,6 +10,9 @@ extern Boolean gRunning;
 /* Output window, if any */
 extern WindowPtr gOutputWindow;
 
+/* About window, if any */
+extern WindowPtr gAboutWindow;
+
 /* GMac is used to hold the result of a SysEnvirons call. This makes
    it convenient for any routine to check the environment. It is
    global information, anyway. */

@@ -1,7 +1,8 @@
 #include "global-state.h"
 
 Boolean gRunning;
-WindowPtr gOutputWindow;
+WindowPtr gOutputWindow = NULL;
+WindowPtr gAboutWindow = NULL;
 SysEnvRec gMac;
 Boolean gHasWaitNextEvent;
 Boolean gInBackground;

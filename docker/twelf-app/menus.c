@@ -175,19 +175,9 @@ void DoOpen() {
   openFileSpec(&reply.sfFile);
 }
 
-void DoAboutIdle() {
-  // Nothing for now, maybe do some kind of animation?
-}
-
 void ShowAboutBox() {
   WindowPtr window = mkDocumentWindow(TwelfDocument);
-  ShowWindow(window);
   ((TwelfWinPtr)window)->winType = TwelfWinAbout;
-}
-
-void NoShowAboutBox() {
-  WindowPtr window;
-  // should test for color availability
 
   // About box
   Rect aboutWindowRect;
@@ -198,10 +188,12 @@ void NoShowAboutBox() {
   int WINDOW_HEIGHT = 310;
   int WINDOW_WIDTH = 400 + PIC_WIDTH;
 
-  SetRect(&aboutWindowRect, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-  window = NewCWindow(NULL, &aboutWindowRect, "\pAbout Twelf", false,
-                      altDBoxProc, (WindowPtr)-1, false, 0);
+  /* SetRect(&aboutWindowRect, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT); */
+  /* WindowPtr window = NewCWindow(NULL, &aboutWindowRect, "\pAbout Twelf",
+   * false, */
+  /*                               altDBoxProc, (WindowPtr)-1, false, 0); */
 
+  SizeWindow(window, WINDOW_WIDTH, WINDOW_HEIGHT, false);
   MoveWindow(
       window, qd.screenBits.bounds.right / 2 - window->portRect.right / 2,
       qd.screenBits.bounds.bottom / 2 - window->portRect.bottom / 2, false);
@@ -230,75 +222,6 @@ void NoShowAboutBox() {
       10);  // This doesn't exactly preserve aspect ratio, but close enough
   OffsetRect(&picRect, 0, (WINDOW_HEIGHT - PIC_HEIGHT) / 2);
   DrawPicture(myPic, &picRect);
-
-  // Do we have an event?
-  Boolean gotEvent;
-
-  // Do we want to fall back to the usual event
-  // handler for this event?
-  Boolean doLastEvent = false;
-
-  // Ought we still process events in the about box context?
-  Boolean running = true;
-
-  EventRecord event;
-  while (running) {
-    SystemTask();
-    gotEvent = GetNextEvent(everyEvent, &event);
-    if (gotEvent) {
-      // printf("about got event %d\r", event.what);
-      switch (event.what) {
-        case nullEvent:
-          DoAboutIdle();
-          break;
-        case mouseDown:  // fallthrough intentional
-        case keyDown:
-          printf("stopped %d\r", event.what);
-          running = false;
-          break;
-        case activateEvt:
-          // assuming this is the about window itself, not sure if that's a safe
-          // assumption
-          break;
-        case updateEvt:
-          // assuming this is the about window itself, not sure if that's a safe
-          // assumption
-          break;
-        case diskEvt:
-          break;
-        case kOSEvent:
-          switch ((event.message >> 24) & 0x0FF) {
-            case kMouseMovedMessage:
-              DoAboutIdle();
-              break;
-            default:
-              printf("stopped OSEvent %d\r", event.what);
-              doLastEvent = true;
-              running = false;
-              break;
-          }
-          break;
-        default:
-          printf("stopped default %d\r", event.what);
-          doLastEvent = true;
-          running = false;
-          break;
-      }
-    } else {
-      DoAboutIdle();
-    }
-  }
-
-  printf("disposing about window\r");
-  TEDispose(te);
-  DisposeWindow(window);
-
-  // FIXME(memleak): Do we still need to dispose of the picture handle, the text
-  // handle, the style handle?
-
-  if (doLastEvent) {
-    DoEvent(&event);
-  }
 }
 
 /*	This is called when an item is chosen from the menu bar (after calling

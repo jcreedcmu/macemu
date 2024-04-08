@@ -143,6 +143,7 @@ Boolean DoCloseWindow(WindowPtr window) {
       case TwelfWinAbout: {
         // FIXME(memleak): probably should dispose of more things here
         CloseWindow(window);
+        gAboutWindow = NULL;
       } break;
     }
     return true;
@@ -200,11 +201,11 @@ void DrawWindow(WindowPtr window) {
   TwelfWinPtr twin = (TwelfWinPtr)window;
   switch (twin->winType) {
     case TwelfWinAbout: {
-      Rect r;
-      EraseRect(&window->portRect);
-      SetRect(&r, 20, 20, 80, 80);
-      ForeColor(redColor);
-      PaintRect(&r);
+      /* Rect r; */
+      /* EraseRect(&window->portRect); */
+      /* SetRect(&r, 20, 20, 80, 80); */
+      /* ForeColor(redColor); */
+      /* PaintRect(&r); */
     } break;
     case TwelfWinDocument: {
       DocumentPtr doc = getDoc(window);
