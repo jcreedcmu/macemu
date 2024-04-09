@@ -33,6 +33,7 @@
 #define rMenuBar 128      /* application's menu bar */
 #define rCloseConfirm 128 /* close-confirm dialog box */
 #define rUserAlert 129    /* user error alert */
+#define rUserMessage 130  /* user message */
 #define rDocWindow 128    /* application's window */
 #define rVScroll 128      /* vertical scrollbar control */
 #define rHScroll 129      /* horizontal scrollbar control */

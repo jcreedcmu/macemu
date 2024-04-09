@@ -124,6 +124,45 @@ resource 'DITL' (rUserAlert, purgeable) {
 	}
 };
 
+resource 'ALRT' (rUserMessage, purgeable) {
+	{40, 20, 160, 290},
+	rUserMessage,
+	{ /* array: 4 elements */
+		/* [1] */
+		OK, visible, silent,
+		/* [2] */
+		OK, visible, silent,
+		/* [3] */
+		OK, visible, silent,
+		/* [4] */
+		OK, visible, silent
+	},
+    centerMainScreen       // Where to show the alert
+};
+
+resource 'DITL' (rUserMessage, purgeable) {
+	{ /* array DITLarray: 3 elements */
+		/* [1] */
+		{80, 150, 100, 230},
+		Button {
+			enabled,
+			"OK"
+		},
+		/* [2] */
+		{10, 60, 60, 230},
+		StaticText {
+			disabled,
+			"^0"
+		},
+		/* [3] */
+		{8, 8, 40, 40},
+		Icon {
+			disabled,
+			1
+		}
+	}
+};
+
 type 'CNTL' {
   rect;
   integer; // value
