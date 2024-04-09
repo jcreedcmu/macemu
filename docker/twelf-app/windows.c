@@ -243,3 +243,10 @@ void Terminate() {
 
   gRunning = false;
 }
+
+void alertSideEffect() {
+  // display an alert
+  ParamText("\pHello from Twelf logic program execution!", "\p", "\p", "\p");
+  SetCursor(&qd.arrow);
+  Alert(rUserMessage, nil);
+}
