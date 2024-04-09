@@ -48,6 +48,7 @@ AboutPtr mkAboutWindow(Rect *windowRect) {
   Handle txtHndl = GetResource('TEXT', rAboutText);   // FIXME(leak): dispose?
   Handle stylHndl = GetResource('styl', rAboutText);  // FIXME(leak): dispose?
   adoc->pic = GetPicture(rAboutPict);                 // FIXME(leak): dispose?
+  adoc->bwPic = GetPicture(rAboutPict + 1);           // FIXME(leak): dispose?
 
   HLock(txtHndl);
   HLock(stylHndl);
@@ -245,7 +246,9 @@ void DrawWindow_(WindowPtr window, short depth) {
     case TwelfWinAbout: {
       AboutPtr adoc = getAboutDoc(window);
       EraseRect(&window->portRect);
-      if (depth > 1) {
+      if (depth == 1) {
+        DrawPicture(adoc->bwPic, &adoc->picRect);
+      } else {
         DrawPicture(adoc->pic, &adoc->picRect);
       }
       TEUpdate(&window->portRect, adoc->te);

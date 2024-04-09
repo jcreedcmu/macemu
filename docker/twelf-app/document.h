@@ -31,6 +31,7 @@ typedef struct {
   TwelfWinType winType;
   TEHandle te;
   PicHandle pic;
+  PicHandle bwPic;
   Rect picRect;
 } AboutRecord, *AboutPtr;
 
