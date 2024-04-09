@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "about.h"
 #include "api.h"
 #include "console.h"
 #include "consts.h"
@@ -181,40 +182,6 @@ void DoOpen() {
   if (!reply.sfGood) return;
 
   openFileSpec(&reply.sfFile);
-}
-
-void ShowAboutBox() {
-  if (gAboutWindow != NULL) {
-    SelectWindow(gAboutWindow);
-    return;
-  }
-
-  // original pic size 515x431
-  int PIC_WIDTH = 258;
-  int PIC_HEIGHT = 216;
-  int WINDOW_HEIGHT = 310;
-  int WINDOW_WIDTH = 400 + PIC_WIDTH;
-
-  Rect windowRect;
-  SetRect(&windowRect, 0, 0, WINDOW_WIDTH, WINDOW_HEIGHT);
-
-  AboutPtr adoc = mkAboutWindow(&windowRect);
-  WindowPtr window = (WindowPtr)(&adoc->window);
-  gAboutWindow = window;
-
-  Rect picRect;
-  SetRect(&picRect, 0, 0, PIC_WIDTH, PIC_HEIGHT);
-  InsetRect(
-      &picRect, 10,
-      10);  // This doesn't exactly preserve aspect ratio, but close enough
-  OffsetRect(&picRect, 0, (WINDOW_HEIGHT - PIC_HEIGHT) / 2);
-  adoc->picRect = picRect;
-
-  SizeWindow(window, WINDOW_WIDTH, WINDOW_HEIGHT, false);
-  MoveWindow(
-      window, qd.screenBits.bounds.right / 2 - window->portRect.right / 2,
-      qd.screenBits.bounds.bottom / 2 - window->portRect.bottom / 2, false);
-  ShowWindow(window);
 }
 
 /*	This is called when an item is chosen from the menu bar (after calling

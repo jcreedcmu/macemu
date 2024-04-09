@@ -19,6 +19,7 @@ Twelf.bin: Twelf.code.bin
 # remove multiversal-stubs.o if we use universal interface
 OBJS = \
 	 twelf.o \
+	 about.o \
 	 apple-event-handlers.o \
 	 asmclikloop.o \
 	 clikloop.o \

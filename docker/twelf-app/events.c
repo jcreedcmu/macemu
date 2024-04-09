@@ -4,6 +4,7 @@
 #include <Types.h>
 #include <stdio.h>
 
+#include "about.h"
 #include "consts.h"
 #include "dialogs.h"
 #include "global-state.h"
@@ -37,6 +38,10 @@ void DoEvent(EventRecord *event) {
       DoIdle();
       break;
     case mouseDown:
+      if (gAboutWindow) {
+        CloseAboutBox();
+        break;
+      }
       part = FindWindow(event->where, &window);
       switch (part) {
         case inMenuBar:  /* process a mouse menu command (if any) */
@@ -72,8 +77,12 @@ void DoEvent(EventRecord *event) {
           break;
       }
       break;
-    case keyDown:
-    case autoKey: /* check for menukey equivalents */
+    case keyDown:  // fallthrough intentional
+    case autoKey:
+      if (gAboutWindow) {
+        CloseAboutBox();
+        break;
+      }
       key = event->message & charCodeMask;
       if (event->modifiers & cmdKey) { /* Command key down */
         if (event->what == keyDown) {
