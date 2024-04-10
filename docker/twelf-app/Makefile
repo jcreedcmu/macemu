@@ -23,6 +23,7 @@ OBJS = \
 	 apple-event-handlers.o \
 	 asmclikloop.o \
 	 clikloop.o \
+    debug.o \
 	 dialogs.o \
 	 events.o \
 	 global-state.o \
