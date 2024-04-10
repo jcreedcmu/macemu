@@ -1,6 +1,6 @@
 #include "windows.h"
 
-#include <stdio.h>
+#include <string.h>
 
 #include "about.h"
 #include "api.h"
@@ -244,9 +244,14 @@ void Terminate() {
   gRunning = false;
 }
 
-void alertSideEffect() {
+void alertSideEffect(char *message) {
+  size_t len = strlen(message);
+  if (len > 255) len = 255;
+  char pMessage[256];
+  pMessage[0] = len;
+  strncpy(pMessage + 1, message, len);
   // display an alert
-  ParamText("\pHello from Twelf logic program execution!", "\p", "\p", "\p");
+  ParamText(pMessage, "\p", "\p", "\p");
   SetCursor(&qd.arrow);
   Alert(rUserMessage, nil);
 }
