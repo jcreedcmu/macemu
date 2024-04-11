@@ -99,7 +99,7 @@ void AdjustEditMenu() {
         TEHandle te = doc->docTE;
         Boolean isSelection = (*te)->selStart < (*te)->selEnd;
         if (isSelection) copy = true;
-        if (doc->docType == TwelfDocument) {
+        if (!isReadOnly(doc->docType)) {
           long offset;
           if (GetScrap(nil, 'TEXT', &offset) > 0) {
             paste = true;
@@ -150,7 +150,7 @@ void AdjustSignatureMenu() {
     switch (twin->winType) {
       case TwelfWinDocument: {
         DocumentPtr doc = getDoc(window);
-        if (doc->docType == TwelfDocument) {
+        if (!isReadOnly(doc->docType)) {
           enabled = true;
         }
       } break;

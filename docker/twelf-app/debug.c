@@ -6,8 +6,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "global-state.h"
+
 FILE *debug_log = NULL;
-WindowPtr gLogWindow = NULL;
 
 void init_debug() {
   // debug log

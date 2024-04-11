@@ -25,6 +25,7 @@ OBJS = \
 	 clikloop.o \
     debug.o \
 	 dialogs.o \
+    document.o \
 	 events.o \
 	 global-state.o \
 	 handlers.o \

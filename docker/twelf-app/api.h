@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Windows.h>
+
 typedef ProcPtr TEClickLoopUPP;
 
 // Got these values from

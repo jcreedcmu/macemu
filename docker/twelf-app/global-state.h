@@ -10,6 +10,9 @@ extern Boolean gRunning;
 /* Output window, if any */
 extern WindowPtr gOutputWindow;
 
+/* Log window, if any */
+extern WindowPtr gLogWindow;
+
 /* About window, if any */
 extern WindowPtr gAboutWindow;
 

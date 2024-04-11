@@ -11,9 +11,6 @@
 #include "scrolling.h"
 #include "view-rects.h"
 
-/* Create a new document and window. Returns NULL on failure, pointer to new
- * document on success. */
-
 WindowPtr getOutputWindow() {
   if (!gOutputWindow) {
     gOutputWindow = mkDocumentWindow(TwelfOutput);
@@ -21,6 +18,15 @@ WindowPtr getOutputWindow() {
   return gOutputWindow;
 }
 
+WindowPtr getLogWindow() {
+  if (!gLogWindow) {
+    gLogWindow = mkDocumentWindow(TwelfLog);
+  }
+  return gLogWindow;
+}
+
+/* Create a new document and window. Returns NULL on failure, pointer to new
+ * document on success. */
 // FIXME(safety): should return DocumentPtr
 WindowPtr mkDocumentWindow(DocType docType) {
   Boolean good;
@@ -43,6 +49,10 @@ WindowPtr mkDocumentWindow(DocType docType) {
         break;
       case TwelfOutput:
         window = NewWindow(storage, &windowRect, "\pTwelf Output", true,
+                           documentProc, (WindowPtr)-1, true, 0);
+        break;
+      case TwelfLog:
+        window = NewWindow(storage, &windowRect, "\pTwelf Debug Log", true,
                            documentProc, (WindowPtr)-1, true, 0);
         break;
     }
@@ -135,6 +145,10 @@ Boolean DoCloseWindow(WindowPtr window) {
 
         if (doc->docType == TwelfOutput) {
           gOutputWindow = NULL;
+        }
+
+        if (doc->docType == TwelfLog) {
+          gLogWindow = NULL;
         }
 
         DisposePtr((Ptr)window);

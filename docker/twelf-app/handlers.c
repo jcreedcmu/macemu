@@ -251,8 +251,7 @@ void DoKeyDown(EventRecord *event) {
     switch (twin->winType) {
       case TwelfWinDocument: {
         DocumentPeek doc = getDoc(window);
-        if (doc->docType == TwelfOutput) {
-          // Output document is readonly
+        if (isReadOnly(doc->docType)) {
           return;
         }
         TEHandle te = doc->docTE;

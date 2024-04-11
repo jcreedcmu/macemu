@@ -3,7 +3,7 @@
 #include "api.h"
 
 typedef enum { TwelfWinDocument, TwelfWinAbout } TwelfWinType;
-typedef enum { TwelfDocument, TwelfOutput } DocType;
+typedef enum { TwelfDocument, TwelfOutput, TwelfLog } DocType;
 
 // All windows in this application should be of this type:
 typedef struct {
@@ -37,3 +37,5 @@ typedef struct {
 
 #define getDoc(window) ((DocumentPeek)(window))   // FIXME(safety): check tag
 #define getAboutDoc(window) ((AboutPtr)(window))  // FIXME(safety): check tag
+
+Boolean isReadOnly(DocType docType);
