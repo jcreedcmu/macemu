@@ -78,6 +78,10 @@ resource 'MENU' (mSignature, preload) {
 			noicon, "E", nomark, plain;
 		"Evaluate Unsafe",
 			noicon, "U", nomark, plain;
+		"-",
+		   noicon, nokey, nomark, plain;
+		"Show Debug Log",
+			noicon, nokey, nomark, plain;
 	}
 };
 

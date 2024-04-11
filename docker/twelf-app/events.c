@@ -17,7 +17,7 @@ void DoMenuCommand(long menuResult);
 /* Do the right thing for an event. Determine what kind of event it is, and call
  the appropriate routines. */
 
-int debug = 25;
+int debug = 0;
 
 void DoEvent(EventRecord *event) {
   short part, err;

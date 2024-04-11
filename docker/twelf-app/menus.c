@@ -166,6 +166,8 @@ void AdjustSignatureMenu() {
     DisableItem(menu, iEval);
     DisableItem(menu, iEvalUnsafe);
   }
+
+  EnableItem(menu, iShowLog);
 }
 
 void AdjustMenus() {
@@ -356,6 +358,13 @@ void DoMenuCommand(long menuResult) {
         } break;
         case iEvalUnsafe: {
         } break;
+        case iShowLog: {
+          if (gLogWindow != NULL) {
+            SelectWindow(gLogWindow);
+          } else {
+            getLogWindow();
+          }
+        }
       }
     } break;
   }

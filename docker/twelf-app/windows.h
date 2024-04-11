@@ -5,6 +5,7 @@
 #include "document.h"
 
 WindowPtr getOutputWindow();
+WindowPtr getLogWindow();
 WindowPtr mkDocumentWindow(DocType docType);
 AboutPtr mkAboutWindow();
 void DoNew();
