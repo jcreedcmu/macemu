@@ -2,10 +2,10 @@
 
 #include <Events.h>
 #include <Types.h>
-#include <stdio.h>
 
 #include "about.h"
 #include "consts.h"
+#include "debug.h"
 #include "dialogs.h"
 #include "global-state.h"
 #include "handlers.h"
@@ -26,7 +26,7 @@ void DoEvent(EventRecord *event) {
   Point aPoint;
 
   if (debug > 0) {
-    printf("event type %d is apple event? %d\r", event->what,
+    logger("event type %d is apple event? %d", event->what,
            event->what == kHighLevelEvent);
     debug--;
   }

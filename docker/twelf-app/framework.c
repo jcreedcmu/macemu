@@ -2,7 +2,6 @@
 
 #include <Quickdraw.h>
 #include <Traps.h>
-#include <stdio.h>
 
 #include "api.h"
 #include "apple-event-handlers.h"

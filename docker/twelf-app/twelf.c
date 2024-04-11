@@ -11,9 +11,9 @@ int main() {
   const char *argv[] = {
       "twelf",
   };
-  logger("about to twelf-open\r");
+  logger("about to twelf-open");
   twelf_server_open(argc, argv);
-  logger("twelf-opened\r");
+  logger("twelf-opened");
 
   // call framework
   FrameworkEntry();

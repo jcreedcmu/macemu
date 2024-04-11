@@ -1,7 +1,5 @@
 #include "windows.h"
 
-#include <stdio.h>
-
 #include "about.h"
 #include "api.h"
 #include "asmclikloop.h"

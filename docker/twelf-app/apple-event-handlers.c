@@ -1,8 +1,8 @@
 #include "apple-event-handlers.h"
 
 #include <Events.h>
-#include <stdio.h>
 
+#include "debug.h"
 #include "file-ops.h"
 #include "global-state.h"
 #include "windows.h"
@@ -10,17 +10,17 @@
 pascal OSErr handleAEOpenDocuments(AppleEvent *msg, AppleEvent *reply,
                                    long refCon) {
   AEDescList docList;
-  printf("handleAEOpenDocs invoked!\r");
+  logger("handleAEOpenDocs invoked!");
   OSErr err;
   err = AEGetParamDesc(msg, keyDirectObject, typeAEList, &docList);
   if (err != 0) {
-    printf("GetParamDesc error %d\r", err);
+    logger("GetParamDesc error %d", err);
     return err;
   }
   long numItems;
   err = AECountItems(&docList, &numItems);
   if (err != 0) {
-    printf("AECountItems error %d\r", err);
+    logger("AECountItems error %d", err);
     return err;
   }
 
@@ -42,7 +42,7 @@ pascal OSErr handleAEOpenDocuments(AppleEvent *msg, AppleEvent *reply,
 pascal OSErr handleAEOpenApplication(AppleEvent *msg, AppleEvent *reply,
                                      long refCon) {
   AEDescList docList;
-  printf("handleAEOpenApp invoked!\r");
+  logger("handleAEOpenApp invoked!");
   DoNew();
 
   return noErr;
@@ -62,20 +62,20 @@ void installAEHandlers() {
   err = AEInstallEventHandler(kCoreEventClass, kAEQuitApplication,
                               (AEEventHandlerUPP)handleAEQuit, 0, false);
   if (err != 0) {
-    printf("AEInstall Quit err: %d\r", err);
+    logger("AEInstall Quit err: %d", err);
   }
 
   err =
       AEInstallEventHandler(kCoreEventClass, kAEOpenDocuments,
                             (AEEventHandlerUPP)handleAEOpenDocuments, 0, false);
   if (err != 0) {
-    printf("AEInstall Open Doc err: %d\r", err);
+    logger("AEInstall Open Doc err: %d", err);
   }
 
   err = AEInstallEventHandler(kCoreEventClass, kAEOpenApplication,
                               (AEEventHandlerUPP)handleAEOpenApplication, 0,
                               false);
   if (err != 0) {
-    printf("AEInstall Open App err: %d\r", err);
+    logger("AEInstall Open App err: %d", err);
   }
 }

@@ -1,13 +1,13 @@
 #include "menus.h"
 
 #include <libtwelf.h>
-#include <stdio.h>
 #include <string.h>
 
 #include "about.h"
 #include "api.h"
 #include "console.h"
 #include "consts.h"
+#include "debug.h"
 #include "dialogs.h"
 #include "document.h"
 #include "events.h"
@@ -319,24 +319,24 @@ void DoMenuCommand(long menuResult) {
           unsigned char **textHandle = TEGetText(doc->docTE);
           TERec *tePtr = *(doc->docTE);
 
-          printf("got the text: \"%.*s\"\r", tePtr->teLength, *textHandle);
+          logger("got the text: \"%.*s\"", tePtr->teLength, *textHandle);
 
           int len = tePtr->teLength;
-          printf("about to allocate %d bytes...\r", len);
+          logger("about to allocate %d bytes...", len);
           char *buffer = (char *)allocate(len);
-          printf("allocated\r");
+          logger("allocated");
           strncpy(buffer, *textHandle, len);
-          printf("copied %d bytes to buffer\r", len);
+          logger("copied %d bytes to buffer", len);
 
           for (int i = 0; i < len; i++) {
             if (buffer[i] == '\r') {
               buffer[i] = '\n';
             }
           }
-          printf("swizzled %d bytes from CR to NL...\r", len);
+          logger("swizzled %d bytes from CR to NL...", len);
 
           int resp = execute();
-          printf("Twelf response: %d\r", resp);
+          logger("Twelf response: %d", resp);
 
           // XXX raise an alert if abort?
           setOutputDest(NULL);
