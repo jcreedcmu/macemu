@@ -7,12 +7,12 @@ int main() {
   // Debugging Log
   init_debug();
 
-  int argc = 1;
   const char *argv[] = {
       "twelf",
+      "@MLton", "gc-messages", "--",
   };
   logger("about to twelf-open");
-  twelf_server_open(argc, argv);
+  twelf_server_open(sizeof(argv) / sizeof(argv[0]), argv);
   logger("twelf-opened");
 
   // call framework
