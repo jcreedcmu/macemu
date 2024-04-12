@@ -360,10 +360,11 @@ void DoMenuCommand(long menuResult) {
         } break;
         case iShowLog: {
           if (gLogWindow != NULL) {
-            SelectWindow(gLogWindow);
-          } else {
-            getLogWindow();
+            // This should really have been initialized already
+            gLogWindow = getLogWindow();
           }
+          ShowWindow(gLogWindow);
+          SelectWindow(gLogWindow);
         }
       }
     } break;

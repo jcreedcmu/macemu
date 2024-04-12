@@ -52,7 +52,8 @@ WindowPtr mkDocumentWindow(DocType docType) {
                            documentProc, (WindowPtr)-1, true, 0);
         break;
       case TwelfLog:
-        window = NewWindow(storage, &windowRect, "\pTwelf Debug Log", true,
+        window = NewWindow(storage, &windowRect, "\pTwelf Debug Log",
+                           false,  // debug log not initially visible
                            documentProc, (WindowPtr)-1, true, 0);
         break;
     }
@@ -127,9 +128,10 @@ void DoNew() {
   ShowWindow(window);
 }
 
-/* Close a window. This handles desk accessory and application windows. */
+/* Really close a window. This handles desk accessory and application windows.
+ */
 
-Boolean DoCloseWindow(WindowPtr window) {
+Boolean ReallyDoCloseWindow(WindowPtr window) {
   if (IsDAWindow(window))
     CloseDeskAcc(((WindowPeek)window)->windowKind);
   else if (IsAppWindow(window)) {
@@ -164,8 +166,8 @@ Boolean DoCloseWindow(WindowPtr window) {
 
 /* Gets called from our assembly language routine, AsmClickLoop, which is in
         turn called by the TEClick toolbox routine. Saves the windows clip
-   region, sets it to the portRect, adjusts the scrollbar values to match the TE
-   scroll amount, then restores the clip region. */
+   region, sets it to the portRect, adjusts the scrollbar values to match the
+   TE scroll amount, then restores the clip region. */
 
 Boolean IsAppWindow(WindowPtr window) {
   short windowKind;
@@ -188,12 +190,12 @@ Boolean IsDAWindow(WindowPtr window) {
 } /*IsDAWindow*/
 
 /*	Display an alert that tells the user an error occurred, then exit the
-   program. This routine is used as an ultimate bail-out for serious errors that
-   prohibit the continuation of the application. Errors that do not require the
-   termination of the application should be handled in a different manner. Error
-   checking and reporting has a place even in the simplest application. The
-   error number is used to index an 'STR#' resource so that a relevant message
-   can be displayed. */
+   program. This routine is used as an ultimate bail-out for serious errors
+   that prohibit the continuation of the application. Errors that do not
+   require the termination of the application should be handled in a different
+   manner. Error checking and reporting has a place even in the simplest
+   application. The error number is used to index an 'STR#' resource so that a
+   relevant message can be displayed. */
 
 void AlertUser(short error) {
   short itemHit;
@@ -232,6 +234,25 @@ void DrawWindow_(WindowPtr window, short depth) {
   }
 }
 
+/* Handle the user's attempt to close a window, but if it's the log window,
+ * merely hide it */
+
+Boolean DoCloseWindow(WindowPtr window) {
+  if (IsAppWindow(window)) {
+    TwelfWinPtr twin = (TwelfWinPtr)window;
+    switch (twin->winType) {
+      case TwelfWinDocument: {
+        DocumentPeek doc = getDoc(window);
+        if (doc->docType == TwelfLog) {
+          HideWindow(window);
+          return true;  // successfully "closed"
+        }
+      }
+    }
+    return ReallyDoCloseWindow(window);
+  }
+}
+
 pascal void DrawWindowWrap(short depth, short flags, GDHandle device,
                            long userData) {
   DrawWindow_((WindowPtr)userData, depth);
@@ -247,7 +268,7 @@ void Terminate() {
     if (window == nil) {
       break;
     }
-    if (!(closeConfirmForWin(window) && DoCloseWindow(window))) {
+    if (!(closeConfirmForWin(window) && ReallyDoCloseWindow(window))) {
       /* cancelled, don't terminate anymore */
       return;
     }

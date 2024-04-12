@@ -78,6 +78,9 @@ void Initialize() {
   DrawMenuBar();
 
   gNumDocuments = 0;
+
+  // Make sure log window exists to receive stderr
+  gLogWindow = getLogWindow();
 }
 
 int FrameworkEntry() {
