@@ -10,6 +10,7 @@
 #include "framework.h"
 #include "global-state.h"
 #include "resource-consts.h"
+#include "twelf.h"
 #include "windows.h"
 
 Boolean TrapAvailable(short tNumber, TrapType tType) {
@@ -88,6 +89,8 @@ int FrameworkEntry() {
 
   Initialize();
   // UnloadSeg((Ptr)Initialize); // Initialize must not be in Main segment
+
+  InitTwelf();
 
   EventLoop();
 

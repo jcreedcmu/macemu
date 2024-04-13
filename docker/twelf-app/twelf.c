@@ -3,10 +3,7 @@
 #include "debug.h"
 #include "framework.h"
 
-int main() {
-  // Debugging Log
-  init_debug();
-
+void InitTwelf(void) {
   const char *argv[] = {
       "twelf",
       "@MLton", "gc-messages", "--",
@@ -14,6 +11,11 @@ int main() {
   logger("about to twelf-open");
   twelf_server_open(sizeof(argv) / sizeof(argv[0]), argv);
   logger("twelf-opened");
+}
+
+int main(void) {
+  // Debugging Log
+  init_debug();
 
   // call framework
   FrameworkEntry();
