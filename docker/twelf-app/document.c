@@ -8,5 +8,7 @@ Boolean isReadOnly(DocType docType) {
       return true;
     case TwelfLog:
       return true;
+    default:
+      return true;
   }
 }

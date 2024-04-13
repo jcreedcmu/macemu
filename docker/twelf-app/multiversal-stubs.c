@@ -23,7 +23,6 @@ pascal OSErr TEFromScrap() {
 }
 
 pascal OSErr TEToScrap() {
-  PScrapStuff scrapInfo = InfoScrap();
   // XXX how detect whether scrap hasn't been initialized?
   // Is checking for length = 0 enough?
   // should return noScrapErr = -100 in that case

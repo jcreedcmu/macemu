@@ -194,7 +194,6 @@ void DoOpen() {
 // window. Probably should have getDoc do some more tag checking at runtime.
 void DoMenuCommand(long menuResult) {
   short menuID, menuItem;
-  short itemHit, daRefNum;
   Str255 daName;
   OSErr saveErr;
   WindowPtr window;
@@ -214,7 +213,7 @@ void DoMenuCommand(long menuResult) {
         default: /* all non-About items in this menu are DAs et al */
           /* type Str255 is an array in MPW 3 */
           GetMenuItemText(GetMenuHandle(mApple), menuItem, daName);
-          daRefNum = OpenDeskAcc(daName);
+          OpenDeskAcc(daName);
           break;
       }
       break;
@@ -318,7 +317,7 @@ void DoMenuCommand(long menuResult) {
           TESetText("", 0, outDoc->docTE);
           setOutputDest(outDoc->docTE);
 
-          unsigned char **textHandle = TEGetText(doc->docTE);
+          CharsHandle textHandle = TEGetText(doc->docTE);
           TERec *tePtr = *(doc->docTE);
 
           logger("got the text: \"%.*s\"", tePtr->teLength, *textHandle);
@@ -327,7 +326,7 @@ void DoMenuCommand(long menuResult) {
           logger("about to allocate %d bytes...", len);
           char *buffer = (char *)allocate(len);
           logger("allocated");
-          strncpy(buffer, *textHandle, len);
+          strncpy(buffer, (char *)*textHandle, len);
           logger("copied %d bytes to buffer", len);
 
           for (int i = 0; i < len; i++) {

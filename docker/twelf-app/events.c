@@ -20,7 +20,7 @@ void DoMenuCommand(long menuResult);
 int debug = 0;
 
 void DoEvent(EventRecord *event) {
-  short part, err;
+  short part;
   WindowPtr window;
   char key;
   Point aPoint;
@@ -105,7 +105,7 @@ void DoEvent(EventRecord *event) {
 
       if (HiWord(event->message) != noErr) {
         SetPt(&aPoint, kDILeft, kDITop);
-        err = DIBadMount(aPoint, event->message);
+        DIBadMount(aPoint, event->message);
       }
 
       break;

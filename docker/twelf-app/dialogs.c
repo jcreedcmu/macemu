@@ -9,11 +9,8 @@ short closeConfirm(FSSpec *spec) {
   Rect box;
 
   GetDialogItem(dlg, rCloseConfirm_SaveButtonIndex, &type, &itemH, &box);
-  ControlHandle saveButton = (ControlHandle)itemH;
   GetDialogItem(dlg, rCloseConfirm_CancelButtonIndex, &type, &itemH, &box);
-  ControlHandle cancelButton = (ControlHandle)itemH;
   GetDialogItem(dlg, rCloseConfirm_DontSaveButtonIndex, &type, &itemH, &box);
-  ControlHandle dontSaveButton = (ControlHandle)itemH;
   if (spec) {
     ParamText(spec->name, "\p", "\p", "\p");
   } else {
@@ -53,17 +50,19 @@ Boolean closeConfirmForDoc(DocumentPeek doc) {
       return false;
     case rCloseConfirm_DontSaveButtonIndex:
       return true;
+  default:
+      return true;
   }
 }
 
 Boolean closeConfirmForWin(WindowPtr window) {
   TwelfWinPtr twin = (TwelfWinPtr)window;
   switch (twin->winType) {
-    case TwelfWinDocument: {
+    case TwelfWinDocument:
       return closeConfirmForDoc(getDoc(window));
-    } break;
-    case TwelfWinAbout: {
+    case TwelfWinAbout:
       return true;
-    } break;
+  default:
+      return true;
   }
 }

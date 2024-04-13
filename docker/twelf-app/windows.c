@@ -118,8 +118,8 @@ WindowPtr mkDocumentWindow(DocType docType) {
       }
     } else
       DisposePtr(storage); /* get rid of the storage if it is never used */
-    return NULL;
   }
+  return NULL;
 }
 
 // Create a new untitled document window and show it.
@@ -162,6 +162,7 @@ Boolean ReallyDoCloseWindow(WindowPtr window) {
     }
     return true;
   }
+  return false;
 }
 
 /* Gets called from our assembly language routine, AsmClickLoop, which is in
@@ -198,14 +199,13 @@ Boolean IsDAWindow(WindowPtr window) {
    relevant message can be displayed. */
 
 void AlertUser(short error) {
-  short itemHit;
   Str255 message;
 
   SetCursor(&qd.arrow);
   /* type Str255 is an array in MPW 3 */
   GetIndString(message, kErrStrings, error);
-  ParamText(message, "", "", "");
-  itemHit = Alert(rUserAlert, nil);
+  ParamText(message, "\p", "\p", "\p");
+  Alert(rUserAlert, nil);
 } /* AlertUser */
 
 /* Draw the contents of an application window. */
@@ -240,17 +240,16 @@ void DrawWindow_(WindowPtr window, short depth) {
 Boolean DoCloseWindow(WindowPtr window) {
   if (IsAppWindow(window)) {
     TwelfWinPtr twin = (TwelfWinPtr)window;
-    switch (twin->winType) {
-      case TwelfWinDocument: {
-        DocumentPeek doc = getDoc(window);
-        if (doc->docType == TwelfLog) {
-          HideWindow(window);
-          return true;  // successfully "closed"
-        }
+    if (twin->winType == TwelfWinDocument) {
+      DocumentPeek doc = getDoc(window);
+      if (doc->docType == TwelfLog) {
+        HideWindow(window);
+        return true;  // successfully "closed"
       }
     }
     return ReallyDoCloseWindow(window);
   }
+  return false;
 }
 
 pascal void DrawWindowWrap(short depth, short flags, GDHandle device,

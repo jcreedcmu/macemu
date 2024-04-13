@@ -7,7 +7,7 @@ CC=$(RETRO68)/bin/m68k-apple-macos-gcc
 CXX=$(RETRO68)/bin/m68k-apple-macos-g++
 REZ=$(RETRO68)/bin/Rez
 
-CFLAGS=-I/build/twelf/bin -g
+CFLAGS=-I/build/twelf/bin -g -Wall -Werror
 RINCLUDES=$(PREFIX)/RIncludes
 REZFLAGS=-I$(RINCLUDES)
 

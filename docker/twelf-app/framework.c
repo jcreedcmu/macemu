@@ -63,13 +63,14 @@ void Initialize() {
 #endif
 
   PurgeSpace(&total, &contig);
-  if (total < kMinSpace)
+  if (total < kMinSpace) {
     if (UnloadScrap() != noErr)
       BigBadError(eNoMemory);
     else {
       PurgeSpace(&total, &contig);
       if (total < kMinSpace) BigBadError(eNoMemory);
     }
+  }
 
   menuBar = GetNewMBar(rMenuBar); /* read menus into menu bar */
   if (menuBar == nil) BigBadError(eNoMemory);
@@ -84,7 +85,7 @@ void Initialize() {
   gLogWindow = getLogWindow();
 }
 
-int FrameworkEntry() {
+void FrameworkEntry() {
   MaxApplZone();
 
   Initialize();

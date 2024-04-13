@@ -26,7 +26,7 @@ pascal OSErr handleAEOpenDocuments(AppleEvent *msg, AppleEvent *reply,
 
   for (long i = 0; i < numItems; i++) {
     FSSpec spec;
-    size_t actualSize;
+    long actualSize;
     DescType returnedType;
     AEKeyword keywd;
     err = AEGetNthPtr(&docList, i + 1, typeFSS, &keywd, &returnedType, &spec,
@@ -41,7 +41,6 @@ pascal OSErr handleAEOpenDocuments(AppleEvent *msg, AppleEvent *reply,
 
 pascal OSErr handleAEOpenApplication(AppleEvent *msg, AppleEvent *reply,
                                      long refCon) {
-  AEDescList docList;
   logger("handleAEOpenApp invoked!");
   DoNew();
 

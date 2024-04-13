@@ -19,7 +19,6 @@ AboutPtr mkAboutWindow(Rect *windowRect) {
   Ptr storage = NewPtr(sizeof(AboutRecord));
   if (storage == nil) return nil;
 
-  Rect rfake;
   WindowPtr window = NewCWindow(storage, windowRect, "\pAbout Twelf\311", false,
                                 altDBoxProc, (WindowPtr)-1, true, 0);
 

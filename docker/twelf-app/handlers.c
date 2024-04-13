@@ -215,11 +215,12 @@ void DoContentClick(WindowPtr window, EventRecord *event) {
                 value -= GetControlValue(control);
                 /* value now has CHANGE in value; if value changed, scroll
                  */
-                if (value != 0)
+                if (value != 0) {
                   if (control == doc->docVScroll)
                     TEScroll(0, value * (*doc->docTE)->lineHeight, doc->docTE);
                   else
                     TEScroll(value, 0, doc->docTE);
+                }
               }
               break;
             default: /* they clicked in an arrow, so track & scroll */
