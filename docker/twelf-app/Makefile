@@ -45,7 +45,7 @@ buildinfo.h: scripts/buildinfo.sh
 Makefile.deps:
 	gcc $(CFLAGS) -MM *.c > $@
 
-Twelf.code.bin: $(OBJS) buildinfo.h
+Twelf.code.bin: buildinfo.h $(OBJS)
 	$(CC) $^ -o $@ $(LDFLAGS) -L/build/twelf/bin -L/opt/gmp-m68k-INSTALL/lib -ltwelf -lgmp -lm
 
 asmclikloop.o: asmclikloop.s
@@ -53,4 +53,4 @@ asmclikloop.o: asmclikloop.s
 
 .PHONY: clean
 clean:
-	rm -f Twelf.bin Twelf.APPL Twelf.dsk Twelf.code.bin Twelf.code.bin.gdb $(OBJS)
+	rm -f Twelf.bin Twelf.APPL Twelf.dsk Twelf.code.bin Twelf.code.bin.gdb buildinfo.h $(OBJS)

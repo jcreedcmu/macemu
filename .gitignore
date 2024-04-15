@@ -15,3 +15,5 @@ libtwelf/dist
 *.a
 result
 source
+twelf-mac.sha
+buildinfo.h

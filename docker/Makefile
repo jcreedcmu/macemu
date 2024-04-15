@@ -1,6 +1,7 @@
 Twelf.bin: Dockerfile twelf-app/*.c twelf-app/*.h twelf-app/scripts/buildinfo.sh twelf-app/*.r twelf-app/Makefile \
            twelf-app/icon.r twelf-app/pict.r
 	docker build . -t "jcreed/retro68:latest"
+	git rev-parse HEAD >twelf-app/twelf-mac.sha
 	docker run --rm -v "./twelf-app:/root/app" "jcreed/retro68:latest" /root/build.sh
 	cp twelf-app/Twelf.bin Twelf.bin
 	touch Twelf.bin

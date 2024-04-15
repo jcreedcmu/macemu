@@ -3,6 +3,7 @@
 RETRO68_SHA=`cat /build/buildinfo/retro68.sha`
 MLTON_SHA=`cat /build/buildinfo/mlton.sha`
 TWELF_SHA=`cat /build/buildinfo/twelf.sha`
+TWELF_MAC_SHA=`cat /root/app/twelf-mac.sha`
 
 cat <<EOF
 /*
@@ -10,7 +11,8 @@ cat <<EOF
  * Edits may be lost.
  */
 char *build_info =
-  "Retro68 at commit: $RETRO68_SHA\r"
-  "MLTon at commit: $MLTON_SHA\r"
-  "Twelf at commit: $TWELF_SHA\r";
+  "github:agoode/Retro68 at:      $RETRO68_SHA\r"
+  "github:agoode/mlton at:        $MLTON_SHA\r"
+  "github:agoode/twelf at:        $TWELF_SHA\r"
+  "github:jcreedcmu/twelf-mac at: $TWELF_MAC_SHA\r";
 EOF
