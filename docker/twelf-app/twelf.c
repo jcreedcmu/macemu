@@ -7,7 +7,8 @@ void InitTwelf(void) {
   const char *argv[] = {
       "twelf",
       "@MLton",
-      "gc-messages",
+      "gc-messages",      // Print garbage collection messages.
+      "ram-slop", "0.9",  // Use 90% of Application Heap Limit.
       "--",
   };
   logger("about to twelf-open");
