@@ -6,7 +6,9 @@
 void InitTwelf(void) {
   const char *argv[] = {
       "twelf",
-      "@MLton", "gc-messages", "--",
+      "@MLton",
+      "gc-messages",
+      "--",
   };
   logger("about to twelf-open");
   twelf_server_open(sizeof(argv) / sizeof(argv[0]), argv);

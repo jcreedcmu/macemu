@@ -1,4 +1,4 @@
-Twelf.bin: Dockerfile twelf-app/*.c twelf-app/*.h twelf-app/*.r twelf-app/Makefile \
+Twelf.bin: Dockerfile twelf-app/*.c twelf-app/*.h twelf-app/scripts/buildinfo.sh twelf-app/*.r twelf-app/Makefile \
            twelf-app/icon.r twelf-app/pict.r
 	docker build . -t "jcreed/retro68:latest"
 	docker run --rm -v "./twelf-app:/root/app" "jcreed/retro68:latest" /root/build.sh
@@ -33,7 +33,7 @@ docker:
 	docker build . -t jcreed/retro68
 
 bash:
-	docker run --rm -v "./tesample-app:/root/app" -it jcreed/retro68
+	docker run --rm -v "./twelf-app:/root/app" -it jcreed/retro68
 
 # local server that I can access from http://10.0.2.2:8000 on the client to
 # download twelf.bin and put it through stuffit

@@ -39,10 +39,13 @@ OBJS = \
     framework.o \
 	 #
 
+buildinfo.h: scripts/buildinfo.sh
+	scripts/buildinfo.sh >$@
+
 Makefile.deps:
 	gcc $(CFLAGS) -MM *.c > $@
 
-Twelf.code.bin: $(OBJS)
+Twelf.code.bin: $(OBJS) buildinfo.h
 	$(CC) $^ -o $@ $(LDFLAGS) -L/build/twelf/bin -L/opt/gmp-m68k-INSTALL/lib -ltwelf -lgmp -lm
 
 asmclikloop.o: asmclikloop.s

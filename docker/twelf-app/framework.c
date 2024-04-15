@@ -5,7 +5,9 @@
 
 #include "api.h"
 #include "apple-event-handlers.h"
+#include "buildinfo.h"
 #include "consts.h"
+#include "debug.h"
 #include "events.h"
 #include "framework.h"
 #include "global-state.h"
@@ -83,6 +85,8 @@ void Initialize() {
 
   // Make sure log window exists to receive stderr
   gLogWindow = getLogWindow();
+
+  logger(build_info);
 }
 
 void FrameworkEntry() {
