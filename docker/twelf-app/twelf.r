@@ -248,7 +248,7 @@ data 'TEXT' (rAboutText) {
 	 "See LICENSE for more details."
 };
 
-data 'TEXT' (rBalloonText) {
+resource 'STR ' (rBalloonText) {
   "Twelf is a language used to specify, implement, and "
   "prove properties of deductive systems such as "
   "programming languages and logics."
@@ -294,12 +294,6 @@ resource 'styl' (rAboutText) {
   }
 };
 
-resource 'styl' (rBalloonText) {
-  {
-    0x0000, 0x0C, 0x0A, geneva, 0, 0x09, 0, 0, 0;
-  }
-};
-
 // Close confirm dialog. XXX should it be an ALRT instead?
 
 resource 'DLOG' (rCloseConfirm) {
@@ -332,12 +326,12 @@ type 'hfdr' {
   integer = 6; // variation code (= preferred balloon position)
   integer = 1; // icon component count
   integer = 6; // size of "icon" data
-  integer = 6; // "TEXT" resource
-  integer; // Resource ID of TEXT, styl
+  integer TEXT = 6, STR = 7; // use a resource
+  integer; // Resource ID of 'STR ' or of 'TEXT', 'styl'
 };
 
 resource 'hfdr' (-5696) {
-  HelpMgrVersion, hmDefaultOptions, rBalloonText
+  HelpMgrVersion, hmDefaultOptions, STR, rBalloonText
 };
 
 
