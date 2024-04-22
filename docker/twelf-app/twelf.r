@@ -248,6 +248,12 @@ data 'TEXT' (rAboutText) {
 	 "See LICENSE for more details."
 };
 
+resource 'STR ' (rBalloonText) {
+  "Twelf is a language used to specify, implement, and "
+  "prove properties of deductive systems such as "
+  "programming languages and logics."
+};
+
 type 'styl'
 {
  integer = $$CountOf(runs);
@@ -310,6 +316,24 @@ resource 'DITL' (rCloseConfirm) {
 		{ 10, 72, 76, 344 },	StaticText { enabled, "Save changes to the document \"^0\" before closing?" };
 	}
 };
+
+// https://dev.os9.ca/techpubs/mac/MoreToolbox/MoreToolbox-199.html#HEADING199-0
+type 'hfdr' {
+  integer HelpMgrVersion = 2;
+  longint hmDefaultOptions = 0; // value
+  integer = 0; // balloon definition function
+  // https://dev.os9.ca/techpubs/mac/MoreToolbox/MoreToolbox-140.html#MARKER-9-48
+  integer = 6; // variation code (= preferred balloon position)
+  integer = 1; // icon component count
+  integer = 6; // size of "icon" data
+  integer TEXT = 6, STR = 7; // use a resource
+  integer; // Resource ID of 'STR ' or of 'TEXT', 'styl'
+};
+
+resource 'hfdr' (-5696) {
+  HelpMgrVersion, hmDefaultOptions, STR, rBalloonText
+};
+
 
 #include "icon.r"
 #include "pict.r"
