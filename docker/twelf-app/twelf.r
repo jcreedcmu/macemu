@@ -248,6 +248,12 @@ data 'TEXT' (rAboutText) {
 	 "See LICENSE for more details."
 };
 
+data 'TEXT' (rBalloonText) {
+  "Twelf is a language used to specify, implement, and "
+  "prove properties of deductive systems such as "
+  "programming languages and logics."
+};
+
 type 'styl'
 {
  integer = $$CountOf(runs);
@@ -288,6 +294,12 @@ resource 'styl' (rAboutText) {
   }
 };
 
+resource 'styl' (rBalloonText) {
+  {
+    0x0000, 0x0C, 0x0A, geneva, 0, 0x09, 0, 0, 0;
+  }
+};
+
 // Close confirm dialog. XXX should it be an ALRT instead?
 
 resource 'DLOG' (rCloseConfirm) {
@@ -310,6 +322,24 @@ resource 'DITL' (rCloseConfirm) {
 		{ 10, 72, 76, 344 },	StaticText { enabled, "Save changes to the document \"^0\" before closing?" };
 	}
 };
+
+// https://dev.os9.ca/techpubs/mac/MoreToolbox/MoreToolbox-199.html#HEADING199-0
+type 'hfdr' {
+  integer HelpMgrVersion = 2;
+  longint hmDefaultOptions = 0; // value
+  integer = 0; // balloon definition function
+  // https://dev.os9.ca/techpubs/mac/MoreToolbox/MoreToolbox-140.html#MARKER-9-48
+  integer = 6; // variation code (= preferred balloon position)
+  integer = 1; // icon component count
+  integer = 6; // size of "icon" data
+  integer = 6; // "TEXT" resource
+  integer; // Resource ID of TEXT, styl
+};
+
+resource 'hfdr' (-5696) {
+  HelpMgrVersion, hmDefaultOptions, rBalloonText
+};
+
 
 #include "icon.r"
 #include "pict.r"

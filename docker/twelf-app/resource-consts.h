@@ -45,3 +45,5 @@
 
 #define rAboutText 128
 #define rAboutPict 128
+
+#define rBalloonText 129
