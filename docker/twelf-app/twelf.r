@@ -242,7 +242,7 @@ data 'TEXT' (rAboutText) {
     "Languages for Systems Software (PIs: Robert Harper, Peter "
 	 "Lee, and Frank Pfenning).\r\r"
 	 "Classic Mac interface by Adam Goode & Jason Reed\r"
-	 "MPW sample code \251 1989, 1994-1995 Apple Computer, Inc. "
+	 "MPW sample code \251 1989, 1994\3201995 Apple Computer, Inc. "
 	 "with modifications by Cam Henlin\r"
 	 "Retro68 sample code \251 2017 Wolfgang Thaller\r\r"
 	 "See LICENSE for more details."
