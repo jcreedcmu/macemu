@@ -323,9 +323,9 @@ void DoMenuCommand(long menuResult) {
           logger("got the text: \"%.*s\"", tePtr->teLength, *textHandle);
 
           int len = tePtr->teLength;
-          logger("about to allocate %d bytes...", len);
-          char *buffer = (char *)allocate(len);
-          logger("allocated");
+          logger("about to prepare with %d bytes...", len);
+          char *buffer = (char *)prepare(len);
+          logger("prepared");
           strncpy(buffer, (char *)*textHandle, len);
           logger("copied %d bytes to buffer", len);
 
@@ -336,7 +336,12 @@ void DoMenuCommand(long menuResult) {
           }
           logger("swizzled %d bytes from CR to NL...", len);
 
-          int resp = execute();
+          int resp;
+          do {
+            logger("Executing a little twelf...");
+            resp = execute_for_milliseconds(20);
+            // TODO: Go all the way back up to the main loop each time.
+          } while (resp == -1);
           logger("Twelf response: %d", resp);
 
           // XXX raise an alert if abort?
