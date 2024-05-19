@@ -29,7 +29,8 @@
 #define mSignature 131 /* Signature menu */
 #define iEval 1
 #define iEvalUnsafe 2
-#define iShowLog 4
+#define iCancelEval 3
+#define iShowLog 5
 
 #define rMenuBar 128      /* application's menu bar */
 #define rCloseConfirm 128 /* close-confirm dialog box */

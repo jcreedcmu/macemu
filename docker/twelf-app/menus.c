@@ -143,15 +143,21 @@ void AdjustSignatureMenu() {
   WindowPtr window = FrontWindow();
   MenuHandle menu = GetMenuHandle(mSignature);
 
-  Boolean enabled = false;
+  Boolean evaluationEnabled = false;
+  Boolean cancellationEnabled = gTwelfStatus == TWELF_STATUS_RUNNING;
+
+  DisableItem(menu, iEval);
+  DisableItem(menu, iEvalUnsafe);
+  DisableItem(menu, iCancelEval);
 
   if (IsAppWindow(window)) {
     TwelfWinPtr twin = (TwelfWinPtr)window;
     switch (twin->winType) {
       case TwelfWinDocument: {
         DocumentPtr doc = getDoc(window);
-        if (!isReadOnly(doc->docType)) {
-          enabled = true;
+        if (!isReadOnly(doc->docType) &&
+            gTwelfStatus == TWELF_STATUS_NOT_RUNNING) {
+          evaluationEnabled = true;
         }
       } break;
       case TwelfWinAbout: {
@@ -159,12 +165,12 @@ void AdjustSignatureMenu() {
     }
   }
 
-  if (enabled) {
+  if (evaluationEnabled) {
     EnableItem(menu, iEval);
-    // EnableItem(menu, iEvalUnsafe);
-  } else {
-    DisableItem(menu, iEval);
-    DisableItem(menu, iEvalUnsafe);
+  }
+
+  if (cancellationEnabled) {
+    EnableItem(menu, iCancelEval);
   }
 
   EnableItem(menu, iShowLog);
@@ -336,31 +342,20 @@ void DoMenuCommand(long menuResult) {
           }
           logger("swizzled %d bytes from CR to NL...", len);
 
-          int resp;
-          do {
-            logger("Executing a little twelf...");
-            resp = execute_for_milliseconds(20);
-            // TODO: Go all the way back up to the main loop each time.
-          } while (resp == -1);
-          logger("Twelf response: %d", resp);
-
-          // XXX raise an alert if abort?
-          setOutputDest(NULL);
-          char *abortStr = "%% ABORT %%";
-          char *okStr = "%% OK %%";
-          TEInsert(resp ? abortStr : okStr,
-                   resp ? strlen(abortStr) : strlen(okStr), outDoc->docTE);
-          // Scroll to insertion point
-          TESelView(outDoc->docTE);
-          // Update scrollbars as necessary
-          AdjustScrollValues(outDoc, false);
-          // I couldn't seem to get by with anything less than this, which
-          // includes a whole EraseWindow. I tried just TEUpdate, I tried just
-          // InvalRect, but when the output string grew shorter, it left
-          // graphical cruft behind.
-          DrawWindow(outWin);
+          gTwelfStatus = TWELF_STATUS_RUNNING;
+          // Actual twelf evaluation happens inside DoIdle when
+          // TWELF_STATUS_RUNNING is true.
         } break;
         case iEvalUnsafe: {
+        } break;
+        case iCancelEval: {
+          /* Theoretically we might have had to do some explicit
+           * cleanup here, but for now we believe it's safe to just
+           * stop running the twelf thread, and by the time we start
+           * another twelf evaluation, it will clean up the previous
+           * one.
+           */
+          gTwelfStatus = TWELF_STATUS_NOT_RUNNING;
         } break;
         case iShowLog: {
           if (gLogWindow != NULL) {
