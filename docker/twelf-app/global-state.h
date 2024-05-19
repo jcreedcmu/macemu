@@ -34,3 +34,12 @@ extern Boolean gInBackground; /* maintained by Initialize and DoEvent */
  */
 extern short
     gNumDocuments; /* maintained by Initialize, DoNew, and DoCloseWindow */
+
+/* Keep track of whether twelf evaluation is currently running in the
+ * background. */
+typedef enum {
+  TWELF_STATUS_NOT_RUNNING,
+  TWELF_STATUS_RUNNING,
+} TwelfStatus;
+
+extern TwelfStatus gTwelfStatus;

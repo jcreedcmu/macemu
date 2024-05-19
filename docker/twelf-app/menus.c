@@ -336,29 +336,9 @@ void DoMenuCommand(long menuResult) {
           }
           logger("swizzled %d bytes from CR to NL...", len);
 
-          int resp;
-          do {
-            logger("Executing a little twelf...");
-            resp = execute_for_milliseconds(20);
-            // TODO: Go all the way back up to the main loop each time.
-          } while (resp == -1);
-          logger("Twelf response: %d", resp);
-
-          // XXX raise an alert if abort?
-          setOutputDest(NULL);
-          char *abortStr = "%% ABORT %%";
-          char *okStr = "%% OK %%";
-          TEInsert(resp ? abortStr : okStr,
-                   resp ? strlen(abortStr) : strlen(okStr), outDoc->docTE);
-          // Scroll to insertion point
-          TESelView(outDoc->docTE);
-          // Update scrollbars as necessary
-          AdjustScrollValues(outDoc, false);
-          // I couldn't seem to get by with anything less than this, which
-          // includes a whole EraseWindow. I tried just TEUpdate, I tried just
-          // InvalRect, but when the output string grew shorter, it left
-          // graphical cruft behind.
-          DrawWindow(outWin);
+          gTwelfStatus = TWELF_STATUS_RUNNING;
+          // Actual twelf evaluation happens inside DoIdle when
+          // TWELF_STATUS_RUNNING is true.
         } break;
         case iEvalUnsafe: {
         } break;

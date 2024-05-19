@@ -1,9 +1,13 @@
 #include "handlers.h"
 
+#include <libtwelf.h>
 #include <limits.h>
+#include <string.h>
 
 #include "api.h"
+#include "console.h"
 #include "consts.h"
+#include "debug.h"
 #include "document.h"
 #include "global-state.h"
 #include "rect-macros.h"
@@ -305,24 +309,59 @@ unsigned long GetSleep() {
   return LONG_MAX;
 }
 
+void FinishTwelfEval(int resp) {
+  WindowPtr outWin = getOutputWindow();
+  DocumentPeek outDoc = getDoc(outWin);
+
+  logger("Twelf response: %d", resp);
+
+  // XXX raise an alert if abort?
+  setOutputDest(NULL);
+  char *abortStr = "%% ABORT %%";
+  char *okStr = "%% OK %%";
+  TEInsert(resp ? abortStr : okStr, resp ? strlen(abortStr) : strlen(okStr),
+           outDoc->docTE);
+  // Scroll to insertion point
+  TESelView(outDoc->docTE);
+  // Update scrollbars as necessary
+  AdjustScrollValues(outDoc, false);
+  // I couldn't seem to get by with anything less than this, which
+  // includes a whole EraseWindow. I tried just TEUpdate, I tried just
+  // InvalRect, but when the output string grew shorter, it left
+  // graphical cruft behind.
+  DrawWindow(outWin);
+}
+
 /* This is called whenever we get a null event et al.
  It takes care of necessary periodic actions. For this program, it calls
  TEIdle.
  */
-
 void DoIdle() {
-  WindowPtr window;
-  window = FrontWindow();
-  if (IsAppWindow(window)) {
-    TwelfWinPtr twin = (TwelfWinPtr)window;
-    switch (twin->winType) {
-      case TwelfWinAbout: {
-        // Conceivably some kind of idle animation could go here
-      } break;
-      case TwelfWinDocument: {
-        TEIdle(((DocumentPeek)window)->docTE);
-      } break;
-    }
+  switch (gTwelfStatus) {
+    case TWELF_STATUS_NOT_RUNNING: {
+      WindowPtr window;
+      window = FrontWindow();
+      if (IsAppWindow(window)) {
+        TwelfWinPtr twin = (TwelfWinPtr)window;
+        switch (twin->winType) {
+          case TwelfWinAbout: {
+            // Conceivably some kind of idle animation could go here
+          } break;
+          case TwelfWinDocument: {
+            TEIdle(((DocumentPeek)window)->docTE);
+          } break;
+        }
+      }
+    } break;
+    case TWELF_STATUS_RUNNING: {
+      int resp;
+      logger("Executing a little twelf...");
+      resp = execute_for_milliseconds(20);
+      if (resp != -1) {
+        FinishTwelfEval(resp);
+        gTwelfStatus = TWELF_STATUS_NOT_RUNNING;
+      }
+    } break;
   }
 }
 
