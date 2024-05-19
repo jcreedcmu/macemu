@@ -22,11 +22,11 @@ void init_debug() {
 void logger(const char *format, ...) {
   va_list args;
   va_start(args, format);
-  char buffer[1024];
-  size_t n = vsnprintf((char *)buffer, 1023, format, args);
+  size_t n;
+  char *buffer = vasnprintf(NULL, &n, format, args);
   va_end(args);
 
-  if (n >= 0) {
+  if (buffer != NULL) {
     fwrite(buffer, 1, n, debug_log);
     fwrite("\r", 1, 1, debug_log);
     if (gLogWindow) {
@@ -39,6 +39,7 @@ void logger(const char *format, ...) {
       AdjustScrollValues(doc, false);
       DrawWindow(gLogWindow);
     }
+    free(buffer);
   } else {
     char *error = "couldn't write to debug log?\r";
     fwrite(error, 1, strlen(error), debug_log);
